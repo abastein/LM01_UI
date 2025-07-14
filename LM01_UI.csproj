@@ -1,0 +1,129 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants);$(OutputPath)$(TargetFramework.ToLowerInvariant())\</DefineConstants>
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>$(DefineConstants);$(OutputPath)$(RuntimeIdentifier)\</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Folder Include="Enums\" />
+    <Folder Include="Data\" />
+    <Folder Include="Data\Persistence\" />
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.2" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.2" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.2">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="MessageBox.Avalonia" Version="3.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.7" />
+	  
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+	  
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.7" />
+	  
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaXaml Update="App.axaml" />
+    <Compile Update="App.axaml.cs">
+      <DependentUpon>App.axaml</DependentUpon>
+    </Compile>
+
+   <AvaloniaXaml Update="Views\RecipeEditorView.axaml" />
+   <Compile Update="Views\RecipeEditorView.axaml.cs">
+     <DependentUpon>Views\RecipeEditorView.axaml</DependentUpon>
+   </Compile>
+
+    <AvaloniaXaml Update="Views\MainWindow.axaml" />
+    <Compile Update="Views\MainWindow.axaml.cs">
+      <DependentUpon>Views\MainWindow.axaml</DependentUpon>
+    </Compile>
+
+    <AvaloniaXaml Update="Views\WelcomeView.axaml" />
+    <Compile Update="Views\WelcomeView.axaml.cs">
+      <DependentUpon>Views\WelcomeView.axaml</DependentUpon>
+    </Compile>
+
+    <AvaloniaXaml Update="Views\AdminPageView.axaml" />
+    <Compile Update="Views\AdminPageView.axaml.cs">
+      <DependentUpon>Views\AdminPageView.axaml</DependentUpon>
+    </Compile>
+
+    <AvaloniaXaml Update="Views\MainPageView.axaml" />
+    <Compile Update="Views\MainPageView.axaml.cs">
+      <DependentUpon>Views\MainPageView.axaml</DependentUpon>
+    </Compile>
+
+    <AvaloniaXaml Update="Views\PlcTestView.axaml" />
+    <Compile Update="Views\PlcTestView.axaml.cs">
+      <DependentUpon>Views\PlcTestView.axaml</DependentUpon>
+    </Compile>
+
+    <AvaloniaXaml Update="Views\ParameterEditorView.axaml" />
+    <Compile Update="Views\ParameterEditorView.axaml.cs">
+      <DependentUpon>Views\ParameterEditorView.axaml</DependentUpon>
+    </Compile>
+
+    <AvaloniaXaml Update="Views\UITestView.axaml" />
+    <Compile Update="Views\UITestView.axaml.cs">
+      <DependentUpon>Views\UITestView.axaml</DependentUpon>
+    </Compile>
+
+    <Compile Update="BoolToBrushConverter.cs" />
+    <Compile Update="Logger.cs" />
+    <Compile Update="PlcTcpClient.cs" />
+    <Compile Update="Program.cs" />
+    <Compile Update="ViewLocator.cs" />
+    <Compile Update="ViewModels\RecipeEditorViewModel.cs" />
+    
+    <Compile Update="Enums\FunctionType.cs" />
+    <Compile Update="Enums\DirectionType.cs" />
+    <Compile Update="Models\Recipe.cs" />
+    <Compile Update="Models\RecipeStep.cs" />
+    <Compile Update="Data\Persistence\ApplicationDbContext.cs" />
+
+    <Compile Update="ViewModels\ViewModelBase.cs" />
+    <Compile Update="ViewModels\MainWindowViewModel.cs" />
+    <Compile Update="ViewModels\WelcomeViewModel.cs" />
+    <Compile Update="ViewModels\AdminPageViewModel.cs" />
+    <Compile Update="ViewModels\MainPageViewModel.cs" />
+    <Compile Update="ViewModels\PlcTestViewModel.cs" />
+    <Compile Update="ViewModels\ParameterEditorViewModel.cs" />
+    <Compile Update="ViewModels\RecipeListViewModel.cs" /> <Compile Update="ViewModels\UITestViewModel.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LM01_UI.Views.StepEditorView"
+             xmlns:vm="clr-namespace:LM01_UI.ViewModels"
+             xmlns:views="clr-namespace:LM01_UI.Views"
+             x:DataType="vm:StepEditorViewModel"
+             Background="#FF202530">
+
+	<Grid ColumnDefinitions="Auto, Auto" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+		<StackPanel Grid.Column="0" Margin="0,0,40,0" Spacing="10" VerticalAlignment="Center">
+			<TextBlock Text="Urejanje Koraka Recepture" FontSize="24" FontWeight="Bold" Foreground="#FFDCA400" Margin="0,0,0,10"/>
+
+			<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+				<TextBlock Grid.Row="0" Grid.Column="0" Text="Št. Koraka:" Foreground="White" VerticalAlignment="Center"/>
+				<TextBlock Grid.Row="1" Grid.Column="0" Text="Funkcija:" Foreground="White" VerticalAlignment="Center"/>
+				<TextBlock Grid.Row="2" Grid.Column="0" Text="Smer:" Foreground="White" VerticalAlignment="Center"/>
+				<TextBlock Grid.Row="3" Grid.Column="0" Text="Hitrost(RPM):" Foreground="White" VerticalAlignment="Center"/>
+				<TextBlock Grid.Row="4" Grid.Column="0" Text="Cilj(X°):" Foreground="White" VerticalAlignment="Center"/>
+				<TextBlock Grid.Row="5" Grid.Column="0" Text="Ponavljanja:" Foreground="White" VerticalAlignment="Center"/>
+				<TextBlock Grid.Row="6" Grid.Column="0" Text="Pavza(ms):" Foreground="White" VerticalAlignment="Center"/>
+
+				<TextBox x:Name="StepNumberTextBox" Grid.Row="0" Grid.Column="1" Text="{Binding StepNumberString}" Width="150" HorizontalAlignment="Left" IsEnabled="False"/>
+				<ComboBox x:Name="FunctionComboBox" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding FunctionTypes}" SelectedItem="{Binding CurrentStep.Function}" Width="150" HorizontalAlignment="Left"/>
+				<ComboBox x:Name="DirectionComboBox" Grid.Row="2" Grid.Column="1" ItemsSource="{Binding DirectionTypes}" SelectedItem="{Binding CurrentStep.Direction}" Width="150" HorizontalAlignment="Left"/>
+				<TextBox x:Name="SpeedRpmTextBox" Grid.Row="3" Grid.Column="1" Text="{Binding SpeedRpmString}" Width="150" HorizontalAlignment="Left"/>
+				<TextBox x:Name="TargetXDegTextBox" Grid.Row="4" Grid.Column="1" Text="{Binding TargetXDegString}" Width="150" HorizontalAlignment="Left"/>
+				<TextBox x:Name="RepeatsTextBox" Grid.Row="5" Grid.Column="1" Text="{Binding RepeatsString}" Width="150" HorizontalAlignment="Left"/>
+				<TextBox x:Name="PauseMsTextBox" Grid.Row="6" Grid.Column="1" Text="{Binding PauseMsString}" Width="150" HorizontalAlignment="Left"/>
+			</Grid>
+
+			<StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0" HorizontalAlignment="Right">
+				<Button Content="Shrani" Command="{Binding SaveStepCommand}" Width="120"/>
+				<Button Content="Prekliči" Command="{Binding CancelCommand}" Width="120"/>
+			</StackPanel>
+		</StackPanel>
+
+		<views:NumericKeypad x:Name="Keypad" Grid.Column="1" />
+
+	</Grid>
+</UserControl>

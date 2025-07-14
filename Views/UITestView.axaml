@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
+             x:Class="LM01_UI.Views.UITestView"
+             x:DataType="vm:UITestViewModel"
+             Background="#FF202530" xmlns:vm="clr-namespace:LM01_UI.ViewModels"> <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20" Spacing="20">
+            <TextBlock Text="Avalonia UI Controls Gallery" FontSize="36" FontWeight="Bold" Foreground="#FFDCA400" HorizontalAlignment="Center"/>
+
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0">
+                <TextBlock Text="Buttons:" FontSize="24" Foreground="White" VerticalAlignment="Center"/>
+                <Button Content="Enabled Button"/>
+                <Button Content="Disabled Button" IsEnabled="False"/>
+                <Button Content="Toggle Button" Classes="toggle"/> </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0">
+                <TextBlock Text="Text Input:" FontSize="24" Foreground="White" VerticalAlignment="Center"/>
+                <TextBox Watermark="Placeholder text" Width="200"/>
+                <TextBox Text="Text Value" Width="200"/>
+                <TextBox AcceptsReturn="True" TextWrapping="Wrap" Watermark="Multiline text" Height="100" Width="300"/>
+                <TextBox Watermark="Disabled text" IsEnabled="False" Width="200"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="20" Margin="0,20,0,0">
+                <TextBlock Text="Checks &amp; Radios:" FontSize="24" Foreground="White" VerticalAlignment="Center"/>
+                <StackPanel Spacing="5">
+                    <CheckBox Content="Unchecked" IsChecked="False"/>
+                    <CheckBox Content="Checked" IsChecked="True"/>
+                    <CheckBox Content="Third state" IsChecked="{x:Null}"/> <CheckBox Content="Disabled" IsEnabled="False"/>
+                </StackPanel>
+                <StackPanel Spacing="5" Margin="20,0,0,0">
+                    <RadioButton Content="Option 1" GroupName="RadioGroup1" IsChecked="True"/>
+                    <RadioButton Content="Option 2" GroupName="RadioGroup1"/>
+                    <RadioButton Content="Disabled Option" GroupName="RadioGroup1" IsEnabled="False"/>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0">
+                <TextBlock Text="Dropdowns &amp; Lists:" FontSize="24" Foreground="White" VerticalAlignment="Center"/>
+                <ComboBox PlaceholderText="Select an item" Width="150" ItemsSource="{Binding ComboBoxItems}" SelectedItem="{Binding SelectedComboBoxItem}"/>
+                <ListBox ItemsSource="{Binding ListBoxItems}" Width="150" Height="100" SelectedItem="{Binding SelectedListBoxItem}"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="20" Margin="0,20,0,0">
+                <TextBlock Text="Sliders &amp; Progress:" FontSize="24" Foreground="White" VerticalAlignment="Center"/>
+                <Slider Minimum="0" Maximum="100" Value="50" Width="200"/>
+                <ProgressBar Minimum="0" Maximum="100" Value="75" Width="200" Margin="20,0,0,0"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,20,0,0">
+                <TextBlock Text="Date/Time Pickers:" FontSize="24" Foreground="White" VerticalAlignment="Center"/>
+                <DatePicker SelectedDate="{Binding SelectedDate}"/>
+                <TimePicker SelectedTime="{Binding SelectedTime}"/>
+            </StackPanel>
+
+            <Button Content="Nazaj na Glavni meni" Command="{Binding NavigateBackCommand}" Width="200" HorizontalAlignment="Right" Margin="0,40,0,0"/>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

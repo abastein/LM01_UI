@@ -1,0 +1,4 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LM01_UI.Views.ParameterEditorView" x:DataType="vm:ParameterEditorViewModel"   xmlns:vm="clr-namespace:LM01_UI.ViewModels" >
+</UserControl>

@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="LM01_UI.Views.WelcomeView" x:DataType="vm:WelcomeViewModel"      Background="#FF202530"                xmlns:vm="clr-namespace:LM01_UI.ViewModels"     xmlns:converters="clr-namespace:LM01_UI">
+	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="30">
+		<TextBlock Text="Mixer Turbo"
+                   FontSize="48"
+                   FontWeight="Bold"
+                   Foreground="White"
+                   HorizontalAlignment="Center"/>
+
+		<StackPanel Orientation="Horizontal" Spacing="40" HorizontalAlignment="Center">
+			<Button Content="RUN"
+                    Width="200"
+                    Height="80"
+                    FontSize="32"
+                    Background="Blue"
+                    Foreground="White"
+                    Command="{Binding NavigateToRunCommand}"/>
+
+			<Button Content="ADMIN"
+                    Width="200"
+                    Height="80"
+                    FontSize="32"
+                    Background="Blue"
+                    Foreground="White"
+                    Command="{Binding NavigateToAdminCommand}"/>
+		</StackPanel>
+
+		<StackPanel Orientation="Horizontal" Spacing="15" HorizontalAlignment="Center">
+			<TextBlock Text="PLC Status:"
+                       FontSize="20"
+                       Foreground="White"
+                       VerticalAlignment="Center"/>
+
+			<Border Width="24" Height="24"
+                    CornerRadius="12"
+                    Background="{Binding IsPlcConnected, Converter={StaticResource BoolToBrushConverter}}" BorderBrush="White"
+                    BorderThickness="1"
+                    VerticalAlignment="Center"/>
+
+			<TextBlock Text="{Binding PlcStatusText}"
+                       FontSize="20"
+                       Foreground="White"
+                       VerticalAlignment="Center"/>
+		</StackPanel>
+	</StackPanel>
+</UserControl>

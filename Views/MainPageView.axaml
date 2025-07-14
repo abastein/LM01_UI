@@ -1,0 +1,86 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LM01_UI.Views.MainPageView"
+             xmlns:vm="clr-namespace:LM01_UI.ViewModels"
+             xmlns:local="clr-namespace:LM01_UI"
+             x:DataType="vm:MainPageViewModel"
+             Background="#FF202530">
+
+	<UserControl.Resources>
+		<local:NullToBoolConverter x:Key="NullToBoolConverter" />
+	</UserControl.Resources>
+
+	<UserControl.Styles>
+		<Style Selector="Button">
+			<Setter Property="Height" Value="100"/>
+			<Setter Property="FontSize" Value="36"/>
+			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+			<Setter Property="VerticalAlignment" Value="Stretch"/>
+		</Style>
+
+		<Style Selector="DataGrid">
+			<Setter Property="FontSize" Value="28"/>
+			<Setter Property="IsReadOnly" Value="True"/>
+			<Setter Property="AutoGenerateColumns" Value="False"/>
+			<Setter Property="CanUserSortColumns" Value="False"/>
+			<Setter Property="Background" Value="#FF4E5E74"/>
+			<Setter Property="BorderBrush" Value="#FF66CCFF"/>
+			<Setter Property="BorderThickness" Value="2"/>
+			<Setter Property="CornerRadius" Value="4"/>
+		</Style>
+	</UserControl.Styles>
+
+	<Grid RowDefinitions="Auto,*,Auto" Margin="10">
+
+		<TextBlock Grid.Row="0"
+                   Text="Izberi proceduro"
+                   FontSize="40" FontWeight="Bold"
+                   Foreground="#FFDCA400"
+                   Margin="10,0,0,20"/>
+
+		<Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="20">
+			<DataGrid Grid.Column="0" ItemsSource="{Binding Recipes}" SelectedItem="{Binding SelectedRecipe}">
+				<DataGrid.Columns>
+					<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="70"/>
+					<DataGridTextColumn Header="Ime Recepture" Binding="{Binding Name}" Width="*"/>
+					<DataGridTextColumn Header="Opis" Binding="{Binding Description}" Width="1.5*"/>
+				</DataGrid.Columns>
+			</DataGrid>
+			<DataGrid Grid.Column="1" ItemsSource="{Binding SelectedRecipeSteps}" IsVisible="{Binding SelectedRecipe, Converter={StaticResource NullToBoolConverter}}">
+				<DataGrid.Columns>
+					<DataGridTextColumn Header="Št." Binding="{Binding StepNumber}" Width="50"/>
+					<DataGridTextColumn Header="Funkcija" Binding="{Binding Function}" Width="*"/>
+					<DataGridTextColumn Header="Hitrost(RPM)" Binding="{Binding SpeedRPM}" Width="Auto"/>
+					<DataGridTextColumn Header="Smer" Binding="{Binding Direction}" Width="Auto"/>
+					<DataGridTextColumn Header="Cilj(X°)" Binding="{Binding TargetXDeg}" Width="Auto"/>
+					<DataGridTextColumn Header="Ponavljanja" Binding="{Binding Repeats}" Width="Auto"/>
+					<DataGridTextColumn Header="Pavza(ms)" Binding="{Binding PauseMs}" Width="Auto"/>
+				</DataGrid.Columns>
+			</DataGrid>
+		</Grid>
+
+		<Grid Grid.Row="2" RowDefinitions="Auto, Auto" Margin="0,10,0,0" RowSpacing="10">
+
+			<Grid Grid.Row="0" ColumnDefinitions="*,*" ColumnSpacing="20">
+				<Button Grid.Column="0"
+                        Content="Naloži"
+                        Background="#007BFF"
+                        Command="{Binding LoadRecipeCommand}"/>
+
+				<Button Grid.Column="1"
+                        Content="Počisti"
+                        Background="#FD7E14"
+                        Command="{Binding ClearSelectionCommand}"/>
+			</Grid>
+
+			<Button Grid.Row="1"
+                    Name="StartStopButton"
+                    Background="{Binding StartStopButtonBrush}"
+                    Content="{Binding StartStopButtonText}"
+                    Command="{Binding ToggleStartStopCommand}"/>
+		</Grid>
+
+	</Grid>
+</UserControl>

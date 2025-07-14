@@ -1,0 +1,41 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:LM01_UI.ViewModels"
+        xmlns:views="clr-namespace:LM01_UI.Views"
+        x:Class="LM01_UI.Views.MainWindow"
+        Title="LM01 PLC Control"
+        SystemDecorations="None"
+        WindowState="FullScreen"
+        Background="#FF202530"
+        x:DataType="vm:MainWindowViewModel">
+
+	<Grid>
+
+		<DockPanel>
+
+			<StackPanel DockPanel.Dock="Top"
+                        Orientation="Horizontal"
+                        Spacing="20"
+                        Margin="20"
+                        HorizontalAlignment="Left">
+
+				<Image Source="avares://LM01_UI/Assets/Images/LogoLM.png"
+                       Width="240"
+                       Stretch="Uniform"
+                       VerticalAlignment="Center"/>
+
+				<Button Content="Izhod"
+                        Command="{Binding ExitApplicationCommand}"
+                        Width="100"
+                        Height="40"
+                        FontSize="16"/>
+			</StackPanel>
+
+			<ContentControl Content="{Binding CurrentPageViewModel}"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch"/>
+		</DockPanel>
+
+
+	</Grid>
+</Window>
