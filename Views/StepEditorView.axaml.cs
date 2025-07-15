@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Avalonia.Threading; // <-- DODAJTE TA USING
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using LM01_UI.Enums;
 using LM01_UI.ViewModels;
@@ -21,6 +21,7 @@ namespace LM01_UI.Views
         {
             InitializeComponent();
 
+            // Poiščemo vse kontrole, med katerimi se želimo premikati
             var functionComboBox = this.FindControl<ComboBox>("FunctionComboBox");
             var directionComboBox = this.FindControl<ComboBox>("DirectionComboBox");
             var speedRpmTextBox = this.FindControl<TextBox>("SpeedRpmTextBox");
@@ -29,6 +30,7 @@ namespace LM01_UI.Views
             var pauseMsTextBox = this.FindControl<TextBox>("PauseMsTextBox");
             var keypad = this.FindControl<NumericKeypad>("Keypad");
 
+            // Ustvarimo seznam kontrol v pravilnem vrstnem redu za "Next" funkcionalnost
             _focusableControls = new List<Control>();
             if (functionComboBox != null) _focusableControls.Add(functionComboBox);
             if (directionComboBox != null) _focusableControls.Add(directionComboBox);
@@ -37,10 +39,9 @@ namespace LM01_UI.Views
             if (repeatsTextBox != null) _focusableControls.Add(repeatsTextBox);
             if (pauseMsTextBox != null) _focusableControls.Add(pauseMsTextBox);
 
-            var textBoxes = _focusableControls.OfType<TextBox>().ToList();
-            textBoxes.Add(this.FindControl<TextBox>("StepNumberTextBox")); // Tudi tega moramo obravnavati
-
-            foreach (var tb in textBoxes)
+            // Zberemo vse TextBoxe (razen tistega za št. koraka) in jim dodamo dogodek
+            var editableTextBoxes = new[] { speedRpmTextBox, targetXDegTextBox, repeatsTextBox, pauseMsTextBox };
+            foreach (var tb in editableTextBoxes)
             {
                 if (tb != null)
                 {
@@ -48,9 +49,10 @@ namespace LM01_UI.Views
                 }
             }
 
+            // Povežemo dogodke
             if (keypad != null) keypad.KeyPressed += OnKeypadPressed;
-            if (functionComboBox != null) functionComboBox.SelectionChanged += FunctionComboBox_SelectionChanged;
-            if (directionComboBox != null) directionComboBox.SelectionChanged += DirectionComboBox_SelectionChanged;
+            if (functionComboBox != null) functionComboBox.SelectionChanged += OnFunctionComboBoxSelectionChanged;
+            if (directionComboBox != null) directionComboBox.SelectionChanged += OnDirectionComboBoxSelectionChanged;
 
             this.AttachedToVisualTree += OnAttachedToVisualTree;
         }
@@ -62,17 +64,16 @@ namespace LM01_UI.Views
             var functionComboBox = this.FindControl<ComboBox>("FunctionComboBox");
             if (functionComboBox != null)
             {
-                functionComboBox.Focus();
-
-                // POPRAVEK: Akcijo za odprtje pošljemo v čakalno vrsto, da se izvede, ko bo UI pripravljen.
+                // Uporabimo Dispatcher, da zagotovimo, da je UI pripravljen
                 Dispatcher.UIThread.Post(() =>
                 {
+                    functionComboBox.Focus();
                     functionComboBox.IsDropDownOpen = true;
-                }, DispatcherPriority.Loaded); // Prioriteta 'Loaded' je idealna za to.
+                }, DispatcherPriority.Loaded);
             }
         }
 
-        private void FunctionComboBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+        private void OnFunctionComboBoxSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             var viewModel = this.DataContext as StepEditorViewModel;
             if (viewModel?.CurrentStep.Function == FunctionType.Rotate)
@@ -80,8 +81,11 @@ namespace LM01_UI.Views
                 var directionComboBox = this.FindControl<ComboBox>("DirectionComboBox");
                 if (directionComboBox != null)
                 {
-                    directionComboBox.Focus();
-                    Dispatcher.UIThread.Post(() => directionComboBox.IsDropDownOpen = true, DispatcherPriority.Input);
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        directionComboBox.Focus();
+                        directionComboBox.IsDropDownOpen = true;
+                    }, DispatcherPriority.Input);
                 }
             }
             else
@@ -90,7 +94,7 @@ namespace LM01_UI.Views
             }
         }
 
-        private void DirectionComboBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+        private void OnDirectionComboBoxSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             FocusNext(sender as Control);
         }
@@ -99,6 +103,7 @@ namespace LM01_UI.Views
         {
             if (key == "NEXT")
             {
+                // Za premik naprej uporabimo trenutno aktivno vnosno polje
                 FocusNext(_activeTextBox);
                 return;
             }
@@ -120,17 +125,33 @@ namespace LM01_UI.Views
         private void FocusNext(Control? currentControl)
         {
             if (currentControl == null) return;
+
             int currentIndex = _focusableControls.IndexOf(currentControl);
-            if (currentIndex == -1) return;
+            if (currentIndex == -1)
+            {
+                // Če trenutne kontrole ni na seznamu (npr. je bil fokus na gumbu),
+                // poskusimo najti naslednjo od zadnjega aktivnega TextBoxa.
+                if (_activeTextBox != null)
+                {
+                    currentIndex = _focusableControls.IndexOf(_activeTextBox);
+                }
+                if (currentIndex == -1) return; // Če še vedno ne najdemo, prekinemo.
+            }
 
             int nextIndex = currentIndex;
-            int loopGuard = _focusableControls.Count;
+            int loopGuard = _focusableControls.Count + 1; // Varovalka proti neskončni zanki
             while (loopGuard > 0)
             {
                 nextIndex = (nextIndex + 1) % _focusableControls.Count;
                 if (_focusableControls[nextIndex].IsEnabled)
                 {
                     _focusableControls[nextIndex].Focus();
+
+                    // Če je naslednja kontrola ComboBox, jo tudi odpremo
+                    if (_focusableControls[nextIndex] is ComboBox nextComboBox)
+                    {
+                        Dispatcher.UIThread.Post(() => nextComboBox.IsDropDownOpen = true, DispatcherPriority.Input);
+                    }
                     return;
                 }
                 loopGuard--;

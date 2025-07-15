@@ -24,7 +24,11 @@ namespace LM01_UI.ViewModels
 
         public Recipe CurrentRecipe { get; set; }
         public ObservableCollection<RecipeStep> CurrentRecipeSteps { get; set; } = new();
-        public RecipeStep? SelectedStep { get => _selectedStep; set => SetProperty(ref _selectedStep, value); }
+        public RecipeStep? SelectedStep
+        {
+            get => _selectedStep;
+            set => SetProperty(ref _selectedStep, value);
+        }
 
         public RecipeEditorViewModel(ApplicationDbContext dbContext, Logger logger, Action closeAction)
         {
@@ -52,10 +56,14 @@ namespace LM01_UI.ViewModels
             AddStepCommand = new AsyncRelayCommand(AddStepAsync);
             EditStepCommand = new AsyncRelayCommand(EditStepAsync, () => SelectedStep != null);
             DeleteStepCommand = new AsyncRelayCommand(DeleteStepAsync, () => SelectedStep != null);
-            this.WhenAnyValue(x => x.SelectedStep).Subscribe(_ => { ((AsyncRelayCommand)EditStepCommand).NotifyCanExecuteChanged(); ((AsyncRelayCommand)DeleteStepCommand).NotifyCanExecuteChanged(); });
-        }
 
-        public void SetCloseAction(Action action) => _closeAction = action;
+            this.WhenAnyValue(x => x.SelectedStep)
+                .Subscribe(_ =>
+                {
+                    ((AsyncRelayCommand)EditStepCommand).NotifyCanExecuteChanged();
+                    ((AsyncRelayCommand)DeleteStepCommand).NotifyCanExecuteChanged();
+                });
+        }
 
         public IAsyncRelayCommand SaveRecipeCommand { get; private set; } = null!;
         public IRelayCommand CancelCommand { get; private set; } = null!;
@@ -90,8 +98,16 @@ namespace LM01_UI.ViewModels
                     CurrentRecipe.Steps.Add(new RecipeStep { StepNumber = uiStep.StepNumber, Function = uiStep.Function, SpeedRPM = uiStep.SpeedRPM, Direction = uiStep.Direction, TargetXDeg = uiStep.TargetXDeg, Repeats = uiStep.Repeats, PauseMs = uiStep.PauseMs });
                 }
 
-                if (CurrentRecipe.Id == 0) { _dbContext.Recipes.Add(CurrentRecipe); }
-                else { _dbContext.Recipes.Update(CurrentRecipe); }
+                if (CurrentRecipe.Id == 0)
+                {
+                    _dbContext.Recipes.Add(CurrentRecipe);
+                }
+                else
+                {
+                    // Ko urejamo, EF Core že sledi spremembam na 'CurrentRecipe'.
+                    // Zgornja logika, ki počisti in na novo doda korake, je pravilna za posodobitev.
+                    // Klic .Update() ni vedno potreben, če je entiteta že sledena.
+                }
 
                 await _dbContext.SaveChangesAsync();
                 _closeAction?.Invoke();
@@ -99,7 +115,7 @@ namespace LM01_UI.ViewModels
             catch (Exception ex) { _logger.Inform(2, $"Napaka pri shranjevanju recepture: {ex.Message}"); }
         }
 
-        private void Cancel() => _closeAction?.Invoke();
+        private void Cancel() { _closeAction?.Invoke(); }
 
         private async Task AddStepAsync()
         {
