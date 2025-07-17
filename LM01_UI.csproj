@@ -21,8 +21,6 @@
   <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="Enums\" />
-    <Folder Include="Data\" />
-    <Folder Include="Data\Persistence\" />
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 

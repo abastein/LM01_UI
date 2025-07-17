@@ -1,12 +1,16 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LM01_UI.Data.Persistence;
 using LM01_UI.Models;
 using LM01_UI.Services;
-using Microsoft.EntityFrameworkCore;
+using LM01_UI.Views;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace LM01_UI.ViewModels
 {
@@ -14,7 +18,7 @@ namespace LM01_UI.ViewModels
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly Logger _logger;
-        private readonly Action<string> _navigateBack;
+        private readonly Action _closeAction; // Spremenjeno iz Action<string>
 
         [ObservableProperty]
         private Recipe _currentRecipe;
@@ -25,123 +29,122 @@ namespace LM01_UI.ViewModels
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(EditStepCommand))]
         [NotifyCanExecuteChangedFor(nameof(DeleteStepCommand))]
-        [NotifyCanExecuteChangedFor(nameof(MoveStepUpCommand))]
-        [NotifyCanExecuteChangedFor(nameof(MoveStepDownCommand))]
         private RecipeStep? _selectedStep;
 
-        [ObservableProperty]
-        private ViewModelBase? _currentStepEditor;
-
-        public RecipeEditorViewModel(Recipe recipe, ApplicationDbContext dbContext, Logger logger, Action<string> navigateBack)
+        public RecipeEditorViewModel(Recipe recipe, ApplicationDbContext dbContext, Logger logger, Action closeAction)
         {
-            _currentRecipe = recipe;
             _dbContext = dbContext;
             _logger = logger;
-            _navigateBack = navigateBack;
+            _closeAction = closeAction;
+            _currentRecipe = recipe;
 
-            Steps = new ObservableCollection<RecipeStep>(
-                _currentRecipe.Steps.OrderBy(s => s.StepNumber)
-            );
+            Steps = new ObservableCollection<RecipeStep>(_currentRecipe.Steps.OrderBy(s => s.StepNumber));
 
-            SaveRecipeCommand = new RelayCommand(SaveChanges);
-            AddNewStepCommand = new RelayCommand(AddNewStep);
-            EditStepCommand = new RelayCommand(EditStep, CanEditOrDeleteStep);
-            DeleteStepCommand = new RelayCommand(DeleteStep, CanEditOrDeleteStep);
-            CloseEditorCommand = new RelayCommand(CloseStepEditor);
-            MoveStepUpCommand = new RelayCommand(MoveStepUp, CanMoveStepUp);
-            MoveStepDownCommand = new RelayCommand(MoveStepDown, CanMoveStepDown);
-            CancelCommand = new RelayCommand(() => _navigateBack("Admin")); // Ukaz za nazaj
+            SaveRecipeCommand = new AsyncRelayCommand(SaveRecipeAsync);
+            CancelCommand = new RelayCommand(_closeAction);
+            AddStepCommand = new AsyncRelayCommand(AddStepAsync);
+            EditStepCommand = new AsyncRelayCommand(EditStepAsync, () => SelectedStep != null);
+            DeleteStepCommand = new AsyncRelayCommand(DeleteStepAsync, () => SelectedStep != null);
         }
 
-        public IRelayCommand SaveRecipeCommand { get; }
-        public IRelayCommand AddNewStepCommand { get; }
-        public IRelayCommand EditStepCommand { get; }
-        public IRelayCommand DeleteStepCommand { get; }
-        public IRelayCommand CloseEditorCommand { get; }
-        public IRelayCommand MoveStepUpCommand { get; }
-        public IRelayCommand MoveStepDownCommand { get; }
-        public IRelayCommand CancelCommand { get; } // Nov ukaz
+        public IAsyncRelayCommand SaveRecipeCommand { get; }
+        public IRelayCommand CancelCommand { get; }
+        public IAsyncRelayCommand AddStepCommand { get; }
+        public IAsyncRelayCommand EditStepCommand { get; }
+        public IAsyncRelayCommand DeleteStepCommand { get; }
 
-        private bool CanEditOrDeleteStep() => SelectedStep != null;
-        private bool CanMoveStepUp() => SelectedStep != null && Steps.FirstOrDefault() != SelectedStep;
-        private bool CanMoveStepDown() => SelectedStep != null && Steps.LastOrDefault() != SelectedStep;
-
-        private void SaveChanges()
+        private async Task SaveRecipeAsync()
         {
-            // Če je recept nov (nima ID-ja), ga dodamo v DbContext pred shranjevanjem
-            if (CurrentRecipe.Id == 0)
+            if (string.IsNullOrWhiteSpace(CurrentRecipe.Name))
             {
-                _dbContext.Recipes.Add(CurrentRecipe);
+                await MessageBoxManager.GetMessageBoxStandard("Napaka", "Ime recepture ne sme biti prazno.").ShowAsync();
+                return;
             }
+            try
+            {
+                RenumberSteps();
+                CurrentRecipe.Steps = new ObservableCollection<RecipeStep>(Steps);
 
+                if (CurrentRecipe.Id == 0) { _dbContext.Recipes.Add(CurrentRecipe); }
+
+                await _dbContext.SaveChangesAsync();
+                _logger.Inform(1, $"Receptura '{CurrentRecipe.Name}' uspešno shranjena.");
+                _closeAction();
+            }
+            catch (Exception ex) { _logger.Inform(2, $"Napaka pri shranjevanju recepture: {ex.Message}"); }
+        }
+
+        private async Task AddStepAsync()
+        {
+            RecipeStep? newStepResult = null;
+            var editorWindow = new Window { Title = "Nov Korak", SizeToContent = SizeToContent.WidthAndHeight, SystemDecorations = SystemDecorations.BorderOnly, WindowStartupLocation = WindowStartupLocation.CenterOwner };
+
+            Action<RecipeStep?> closeCallback = (stepResult) =>
+            {
+                newStepResult = stepResult;
+                editorWindow.Close();
+            };
+
+            var nextStepNumber = Steps.Any() ? Steps.Max(s => s.StepNumber) + 1 : 1;
+            // POPRAVEK: Ustvarimo nov prazen korak in ga posredujemo
+            var newStepObject = new RecipeStep { StepNumber = nextStepNumber };
+            var editorViewModel = new StepEditorViewModel(newStepObject, closeCallback);
+            editorWindow.Content = new StepEditorView { DataContext = editorViewModel };
+
+            await editorWindow.ShowDialog((App.Current as App)!.GetMainWindow());
+
+            if (newStepResult != null)
+            {
+                Steps.Add(newStepResult);
+                RenumberSteps();
+            }
+        }
+
+        private async Task EditStepAsync()
+        {
+            if (SelectedStep == null) return;
+
+            RecipeStep? editedStepResult = null;
+            var originalStep = SelectedStep;
+            var editorWindow = new Window { Title = $"Urejanje koraka {SelectedStep.StepNumber}", SizeToContent = SizeToContent.WidthAndHeight, SystemDecorations = SystemDecorations.BorderOnly, WindowStartupLocation = WindowStartupLocation.CenterOwner };
+
+            Action<RecipeStep?> closeCallback = (stepResult) =>
+            {
+                editedStepResult = stepResult;
+                editorWindow.Close();
+            };
+
+            var editorViewModel = new StepEditorViewModel(originalStep, closeCallback);
+            editorWindow.Content = new StepEditorView { DataContext = editorViewModel };
+
+            await editorWindow.ShowDialog((App.Current as App)!.GetMainWindow());
+
+            if (editedStepResult != null)
+            {
+                var index = Steps.IndexOf(originalStep);
+                if (index != -1) { Steps[index] = editedStepResult; }
+                RenumberSteps();
+            }
+        }
+
+        private async Task DeleteStepAsync()
+        {
+            if (SelectedStep == null) return;
+            var box = MessageBoxManager.GetMessageBoxStandard("Potrdi brisanje", $"Ali ste prepričani, da želite izbrisati korak št. {SelectedStep.StepNumber}?", ButtonEnum.YesNo, Icon.Warning);
+            var result = await box.ShowAsync();
+
+            if (result == ButtonResult.Yes)
+            {
+                Steps.Remove(SelectedStep);
+                RenumberSteps();
+            }
+        }
+
+        private void RenumberSteps()
+        {
             for (int i = 0; i < Steps.Count; i++)
             {
                 Steps[i].StepNumber = i + 1;
-            }
-
-            CurrentRecipe.Steps = Steps.ToList();
-            _dbContext.SaveChanges();
-            _logger.Inform(1, $"Receptura '{CurrentRecipe.Name}' shranjena.");
-            _navigateBack("Admin");
-        }
-
-        private void CloseStepEditor()
-        {
-            CurrentStepEditor = null;
-        }
-
-        private void EditStep()
-        {
-            if (SelectedStep != null)
-            {
-                CurrentStepEditor = new StepEditorViewModel(SelectedStep);
-            }
-        }
-
-        private void AddNewStep()
-        {
-            var newStep = new RecipeStep
-            {
-                RecipeId = CurrentRecipe.Id,
-                StepNumber = Steps.Count + 1
-            };
-
-            Steps.Add(newStep);
-            SelectedStep = newStep;
-            CurrentStepEditor = new StepEditorViewModel(newStep);
-        }
-
-        private void DeleteStep()
-        {
-            if (SelectedStep != null)
-            {
-                // Pomembno: če korak še ni bil shranjen v bazo, ga samo odstranimo iz kolekcije
-                if (SelectedStep.Id != 0)
-                {
-                    _dbContext.Steps.Remove(SelectedStep);
-                }
-                Steps.Remove(SelectedStep);
-                CloseStepEditor();
-            }
-        }
-
-        private void MoveStepUp()
-        {
-            if (SelectedStep == null) return;
-            int oldIndex = Steps.IndexOf(SelectedStep);
-            if (oldIndex > 0)
-            {
-                Steps.Move(oldIndex, oldIndex - 1);
-            }
-        }
-
-        private void MoveStepDown()
-        {
-            if (SelectedStep == null) return;
-            int oldIndex = Steps.IndexOf(SelectedStep);
-            if (oldIndex < Steps.Count - 1)
-            {
-                Steps.Move(oldIndex, oldIndex + 1);
             }
         }
     }

@@ -11,14 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LM01_UI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250704124459_UpdateRecipeStepsColumns")]
-    partial class UpdateRecipeStepsColumns
+    [Migration("20250717094806_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.6");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
 
             modelBuilder.Entity("LM01_UI.Models.Recipe", b =>
                 {
@@ -56,29 +56,32 @@ namespace LM01_UI.Migrations
                     b.Property<int>("Function")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("PauseMs")
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PauseMs")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("RecipeId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("Repeats")
+                    b.Property<int>("Repeats")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("SpeedRPM")
+                    b.Property<int>("SpeedRPM")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("StepNumber")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("TargetXDeg")
+                    b.Property<int>("TargetXDeg")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RecipeId");
 
-                    b.ToTable("RecipeSteps");
+                    b.ToTable("Steps");
                 });
 
             modelBuilder.Entity("LM01_UI.Models.RecipeStep", b =>

@@ -3,7 +3,7 @@
              x:Class="LM01_UI.Views.RecipeListView"
              xmlns:vm="clr-namespace:LM01_UI.ViewModels"
              x:DataType="vm:RecipeListViewModel">
-	<Grid RowDefinitions="Auto,*,Auto" Gap="10">
+	<Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
 		<TextBlock Grid.Row="0" Text="Seznam Receptur" FontSize="20" FontWeight="Bold"/>
 
 		<DataGrid Grid.Row="1" ItemsSource="{Binding Recipes}" SelectedItem="{Binding SelectedRecipe}" AutoGenerateColumns="False" IsReadOnly="True">
@@ -17,7 +17,7 @@
 		<StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10">
 			<Button Content="Dodaj Novo" Command="{Binding AddNewRecipeCommand}"/>
 			<Button Content="Uredi Izbrano" Command="{Binding EditRecipeCommand}"/>
-			<Button Content="Izbriši Izbrano" Command="{Binding DeleteRecipeCommand}" Background="IndianRed"/>
+			<Button Content="Izbriši Izbrano" Command="{Binding DeleteRecipeCommand}"/>
 		</StackPanel>
 	</Grid>
 </UserControl>

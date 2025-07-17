@@ -28,7 +28,7 @@ namespace LM01_UI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RecipeSteps",
+                name: "Steps",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -40,13 +40,14 @@ namespace LM01_UI.Migrations
                     Direction = table.Column<int>(type: "INTEGER", nullable: false),
                     TargetXDeg = table.Column<int>(type: "INTEGER", nullable: false),
                     Repeats = table.Column<int>(type: "INTEGER", nullable: false),
-                    PauseMs = table.Column<int>(type: "INTEGER", nullable: false)
+                    PauseMs = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RecipeSteps", x => x.Id);
+                    table.PrimaryKey("PK_Steps", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RecipeSteps_Recipes_RecipeId",
+                        name: "FK_Steps_Recipes_RecipeId",
                         column: x => x.RecipeId,
                         principalTable: "Recipes",
                         principalColumn: "Id",
@@ -54,8 +55,8 @@ namespace LM01_UI.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_RecipeSteps_RecipeId",
-                table: "RecipeSteps",
+                name: "IX_Steps_RecipeId",
+                table: "Steps",
                 column: "RecipeId");
         }
 
@@ -63,7 +64,7 @@ namespace LM01_UI.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "RecipeSteps");
+                name: "Steps");
 
             migrationBuilder.DropTable(
                 name: "Recipes");

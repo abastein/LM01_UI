@@ -5,27 +5,19 @@
              xmlns:views="clr-namespace:LM01_UI.Views"
              x:DataType="vm:RecipeEditorViewModel">
 
-	<Border BorderBrush="White"
-            BorderThickness="1"
-            CornerRadius="5"
-            Padding="20"
-            Background="#FF202530">
-
-		<Grid RowDefinitions="Auto, Auto, Auto, *, Auto"
-              ColumnDefinitions="Auto,*"
-              HorizontalAlignment="Center"
-              VerticalAlignment="Center">
+	<Border BorderBrush="White" BorderThickness="1" CornerRadius="5" Padding="20" Background="#FF202530" MinWidth="1000">
+		<Grid RowDefinitions="Auto, Auto, Auto, *, Auto" ColumnDefinitions="Auto, Auto">
 
 			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Urejanje Recepture" FontSize="30" FontWeight="Bold" Foreground="#FFDCA400" Margin="0,0,0,20"/>
 
 			<StackPanel Grid.Row="1" Grid.Column="0" Spacing="10" Margin="0,0,40,0">
 				<TextBlock Text="Ime recepture:" Foreground="White"/>
-				<TextBox x:Name="NameTextBox" Text="{Binding CurrentRecipe.Name, Mode=TwoWay}" MinWidth="350"/>
+				<TextBox Text="{Binding CurrentRecipe.Name, Mode=TwoWay}" MinWidth="350"/>
 				<TextBlock Text="Opis:" Foreground="White" Margin="0,10,0,0"/>
-				<TextBox x:Name="DescriptionTextBox" Text="{Binding CurrentRecipe.Description, Mode=TwoWay}" MinWidth="350" Height="150" TextWrapping="Wrap" AcceptsReturn="True"/>
+				<TextBox Text="{Binding CurrentRecipe.Description, Mode=TwoWay}" MinWidth="350" Height="150" TextWrapping="Wrap" AcceptsReturn="True"/>
 			</StackPanel>
 
-			<views:QwertyKeypad x:Name="QwertyKeypad" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top"/>
+			<views:QwertyKeypad Grid.Row="1" Grid.Column="1" VerticalAlignment="Top"/>
 
 			<StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="10" Margin="0,20,0,10">
 				<TextBlock Text="Koraki Recepture:" FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
@@ -34,12 +26,7 @@
 				<Button Content="Izbriši Korak" Command="{Binding DeleteStepCommand}"/>
 			</StackPanel>
 
-			<DataGrid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
-                      ItemsSource="{Binding CurrentRecipeSteps}"
-                      SelectedItem="{Binding SelectedStep}"
-                      IsReadOnly="True"
-                      AutoGenerateColumns="False"
-                      Foreground="White">
+			<DataGrid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Steps}" SelectedItem="{Binding SelectedStep}" IsReadOnly="True" AutoGenerateColumns="False">
 				<DataGrid.Columns>
 					<DataGridTextColumn Header="Št." Binding="{Binding StepNumber}" Width="50"/>
 					<DataGridTextColumn Header="Funkcija" Binding="{Binding Function}" Width="Auto"/>

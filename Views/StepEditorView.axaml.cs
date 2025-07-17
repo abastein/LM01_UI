@@ -1,34 +1,37 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using LM01_UI.Models; // POPRAVEK: Dodana using direktiva
+using LM01_UI.Enums; // Uvozimo pravilen imenski prostor
 using LM01_UI.ViewModels;
+using System;
 
 namespace LM01_UI.Views
 {
-    // POPRAVEK: Izbrisana je bila celotna definicija za "public enum FunctionType", ker ni več potrebna.
-
     public partial class StepEditorView : UserControl
     {
         public StepEditorView()
         {
             InitializeComponent();
+            this.DataContextChanged += OnDataContextChanged;
+        }
+
+        private void OnDataContextChanged(object? sender, EventArgs e)
+        {
+            if (DataContext is StepEditorViewModel viewModel)
+            {
+                UpdateParameterVisibility(viewModel);
+            }
         }
 
         private void OnFunctionSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (DataContext is StepEditorViewModel viewModel && sender is ComboBox comboBox)
+            if (DataContext is StepEditorViewModel viewModel)
             {
-                if (comboBox.SelectedItem is FunctionViewModel selectedFunction)
-                {
-                    viewModel.SelectedFunction = selectedFunction;
-                    UpdateParameterVisibility(viewModel);
-                }
+                UpdateParameterVisibility(viewModel);
             }
         }
 
         private void UpdateParameterVisibility(StepEditorViewModel viewModel)
         {
-            // Prikrijemo vse parametre na začetku
             var speedPanel = this.FindControl<StackPanel>("SpeedPanel");
             var directionPanel = this.FindControl<StackPanel>("DirectionPanel");
             var targetPanel = this.FindControl<StackPanel>("TargetPanel");
@@ -41,21 +44,22 @@ namespace LM01_UI.Views
             if (repeatsPanel != null) repeatsPanel.IsVisible = false;
             if (pausePanel != null) pausePanel.IsVisible = false;
 
-            // Prikažemo samo relevantne parametre glede na izbrano funkcijo
-            // POPRAVEK: Primerjava sedaj uporablja pravilen Enum 'EStepFunction'
-            if (viewModel.SelectedFunction?.Function == EStepFunction.Rotate)
+            if (viewModel.SelectedFunction == null) return;
+
+            // POPRAVEK: Uporabimo pravilno ime 'FunctionType'
+            switch (viewModel.SelectedFunction.Function)
             {
-                if (speedPanel != null) speedPanel.IsVisible = true;
-                if (directionPanel != null) directionPanel.IsVisible = true;
-                if (targetPanel != null) targetPanel.IsVisible = true;
-            }
-            else if (viewModel.SelectedFunction?.Function == EStepFunction.Wait)
-            {
-                if (pausePanel != null) pausePanel.IsVisible = true;
-            }
-            else if (viewModel.SelectedFunction?.Function == EStepFunction.Repeat)
-            {
-                if (repeatsPanel != null) repeatsPanel.IsVisible = true;
+                case FunctionType.Rotate:
+                    if (speedPanel != null) speedPanel.IsVisible = true;
+                    if (directionPanel != null) directionPanel.IsVisible = true;
+                    if (targetPanel != null) targetPanel.IsVisible = true;
+                    break;
+                case FunctionType.Wait:
+                    if (pausePanel != null) pausePanel.IsVisible = true;
+                    break;
+                case FunctionType.Repeat:
+                    if (repeatsPanel != null) repeatsPanel.IsVisible = true;
+                    break;
             }
         }
     }
