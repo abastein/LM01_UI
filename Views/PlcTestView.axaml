@@ -1,79 +1,28 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="LM01_UI.Views.PlcTestView"
-             x:DataType="vm:PlcTestViewModel"
              xmlns:vm="clr-namespace:LM01_UI.ViewModels"
+             x:DataType="vm:PlcTestViewModel"
              Background="#FF202530">
 
-	<Grid Margin="48">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="Auto"/>
-		</Grid.RowDefinitions>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="*"/>
-			<ColumnDefinition Width="Auto"/>
-		</Grid.ColumnDefinitions>
+	<Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="*,Auto" RowSpacing="10" ColumnSpacing="10" Margin="20">
 
-		<StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Left" VerticalAlignment="Center">
-			<TextBlock Text="PLC IP Address:" FontSize="18" Foreground="#FFDCA400" VerticalAlignment="Center"/>
-			<TextBox Text="{Binding PlcIpAddress}" Width="150" Height="38" FontSize="18"/>
+		<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                   Text="PLC Manual Command Interface"
+                   FontSize="24" FontWeight="Bold" Foreground="White"/>
 
-			<TextBlock Text="PLC Port:" FontSize="18" Foreground="#FFDCA400" VerticalAlignment="Center" Margin="15,0,0,0"/>
-			<TextBox Text="{Binding PlcPort}" Width="80" Height="38" FontSize="18"/>
+		<ListBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                 ItemsSource="{Binding LogMessages}"
+                 BorderThickness="1" BorderBrush="Gray"/>
 
-			<Button Content="Poveži" Command="{Binding ConnectCommand}" Width="100" Height="38" FontSize="18" Margin="20,0,0,0"
-                    IsEnabled="{Binding !IsConnectedToPlc}"/>
-			<Button Content="Prekini" Command="{Binding DisconnectCommand}" Width="100" Height="38" FontSize="18"
-                    IsEnabled="{Binding IsConnectedToPlc}"/>
-		</StackPanel>
+		<TextBox Grid.Row="2" Grid.Column="0"
+                 Watermark="Enter command to send (e.g., STATUS)"
+                 Text="{Binding CommandToSend, Mode=TwoWay}"
+                 VerticalAlignment="Center" />
 
-		<TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="Last message from PLC:" FontSize="20" Margin="0,20,0,0" Foreground="#FFDCA400"/>
+		<Button Grid.Row="2" Grid.Column="1"
+                Content="Send Command"
+                Command="{Binding SendCommand}" />
 
-		<TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding ReceivedString}" IsReadOnly="True" HorizontalAlignment="Stretch"/>
-
-		<TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="Enter string to send:" FontSize="20" Margin="0,20,0,0" Foreground="#FFDCA400"/>
-
-		<Grid Grid.Row="4" ColumnDefinitions="*,Auto" ColumnSpacing="12">
-			<TextBox Grid.Column="0" Text="{Binding SendText, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch"
-                     IsEnabled="{Binding IsConnectedToPlc}"/>
-			<Button Grid.Column="1" Content="Send" Width="140" Command="{Binding SendCommand}"
-                    IsEnabled="{Binding IsConnectedToPlc}"/>
-		</Grid>
-
-		<TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Text="Event log:" FontSize="20" Margin="0,10,0,0" Foreground="#FFDCA400"/>
-
-		<ListBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" 
-				 x:Name="LogBox"
-                 Margin="0,10,0,0"
-				 ItemsSource="{Binding LogMessages}"
-                 Height="250" 
-				 HorizontalAlignment="Stretch" 
-				 VerticalAlignment="Stretch"
-                 Background="#FF4E5E74" 
-				 BorderBrush="#FF66CCFF" 
-				 BorderThickness="2" 
-				 CornerRadius="4"
-                 FontFamily="Consolas" 
-				 FontSize="14" 
-				 Foreground="White"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto" 
-				 ScrollViewer.HorizontalScrollBarVisibility="Auto">
-			<ListBox.ItemTemplate>
-				<DataTemplate>
-					<TextBlock Text="{Binding}" Foreground="White" FontSize="14" FontFamily="Consolas"/>
-				</DataTemplate>
-			</ListBox.ItemTemplate>
-		</ListBox>
-
-		<StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="16" Margin="0,20,0,0" HorizontalAlignment="Right">
-			<Button Content="Clear Log" Command="{Binding ClearLogCommand}" Width="120"/>
-		</StackPanel>
 	</Grid>
 </UserControl>

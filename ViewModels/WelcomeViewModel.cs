@@ -1,71 +1,85 @@
-﻿using Avalonia.Threading;
+﻿using Avalonia.Media;
+using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using LM01_UI.ViewModels; // Prepričaj se, da je to prisotno, če je ViewModelBase v istem namespace-u ali ga ustrezno prilagodi.
+using LM01_UI.Services;
 using System;
-using System.ComponentModel; // Ni več nujno, če podeduješ iz ViewModelBase
-using System.Runtime.CompilerServices; // Ni več nujno, če podeduješ iz ViewModelBase
 using System.Threading.Tasks;
 
 namespace LM01_UI.ViewModels
 {
-    // Podeduj iz ViewModelBase
-    public class WelcomeViewModel : ViewModelBase // Prej je bil : INotifyPropertyChanged, sedaj : ViewModelBase
+    public partial class WelcomeViewModel : ViewModelBase
     {
         private readonly PlcTcpClient _plcClient;
         private readonly Logger _logger;
-        private Action<object>? _navigateAction;
+        private readonly Action<string> _navigate;
 
+        [ObservableProperty]
+        private string _plcStatusText = "PLC ni povezan";
+
+        [ObservableProperty]
+        private IBrush _plcStatusBrush = Brushes.IndianRed;
+
+        [ObservableProperty]
         private bool _isPlcConnected;
-        private string _plcStatusText = "Povezava s PLC: Prekinjena";
 
-        public WelcomeViewModel(PlcTcpClient plcClient, Logger logger, Action<object> navigateAction)
+        public WelcomeViewModel(PlcTcpClient plcClient, Logger logger, Action<string> navigate)
         {
             _plcClient = plcClient;
             _logger = logger;
-            _navigateAction = navigateAction;
+            _navigate = navigate;
+
+            ConnectToPlcCommand = new AsyncRelayCommand(ConnectToPlcAsync);
 
             _plcClient.ConnectionStatusChanged += OnPlcConnectionStatusChanged;
 
-            NavigateToRunCommand = new RelayCommand(() => _navigateAction?.Invoke("Run"));
-            NavigateToAdminCommand = new RelayCommand(() => _navigateAction?.Invoke("Admin"));
-
-            _logger.Inform(1, "WelcomeViewModel initialised.");
-
-            _ = Task.Run(async () => await _plcClient.ConnectAsync("10.100.1.113", 2000));
+            // THE FIX: Automatically execute the connect command on startup.
+            ConnectToPlcCommand.Execute(null);
         }
 
-        public bool IsPlcConnected
-        {
-            get => _isPlcConnected;
-            private set
-            {
-                if (SetProperty(ref _isPlcConnected, value)) // SetProperty je zdaj iz ViewModelBase
-                {
-                    PlcStatusText = value ? "Povezava s PLC: VZPOSTAVLJENA" : "Povezava s PLC: Prekinjena";
-                }
-            }
-        }
-
-        public string PlcStatusText
-        {
-            get => _plcStatusText;
-            private set => SetProperty(ref _plcStatusText, value); // SetProperty je zdaj iz ViewModelBase
-        }
-
-        public IRelayCommand NavigateToRunCommand { get; }
-        public IRelayCommand NavigateToAdminCommand { get; }
+        public IAsyncRelayCommand ConnectToPlcCommand { get; }
 
         private void OnPlcConnectionStatusChanged(bool isConnected)
         {
-            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            Dispatcher.UIThread.Invoke(() =>
             {
                 IsPlcConnected = isConnected;
-                _logger.Inform(1, $"PLC povezava status: {(isConnected ? "VZPOSTAVLJENA" : "PREKINJENA")}");
+
+                if (isConnected)
+                {
+                    PlcStatusText = "PLC Povezan";
+                    PlcStatusBrush = Brushes.MediumSeaGreen;
+                    _logger.Inform(1, "Povezava s PLC uspešno vzpostavljena.");
+                }
+                else
+                {
+                    PlcStatusText = "PLC ni povezan";
+                    PlcStatusBrush = Brushes.IndianRed;
+                    _logger.Inform(2, "Povezava s PLC prekinjena.");
+                }
             });
         }
 
-        // ODSTRANITE TA DVA BLOKA, KI STA SEDAJ V VIEWMODELBASE.CS:
-        // public event PropertyChangedEventHandler? PropertyChanged;
-        // protected bool SetProperty<T>(ref T field, T newValue, [CallerMemberName] string? propertyName = null) { ... }
+        [RelayCommand]
+        private void NavigateToRun() => _navigate("Run");
+
+        [RelayCommand]
+        private void NavigateToAdmin() => _navigate("Admin");
+
+        private async Task ConnectToPlcAsync()
+        {
+            try
+            {
+                if (!_plcClient.IsConnected)
+                {
+                    // You mentioned you changed this line, which is correct.
+                    await _plcClient.ConnectAsync("10.100.1.113", 2000);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Inform(2, $"Napaka pri povezovanju s PLC: {ex.Message}");
+            }
+        }
     }
 }

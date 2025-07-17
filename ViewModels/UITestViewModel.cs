@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input; // Potrebno za IRelayCommand
 using LM01_UI; // Za Logger
 using LM01_UI.ViewModels; // Za ViewModelBase
+using LM01_UI.Services;
 
 namespace LM01_UI.ViewModels
 {

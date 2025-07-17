@@ -1,67 +1,64 @@
-﻿using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Avalonia.Threading;
-using LM01_UI; // Za PlcTcpClient in Logger
-using LM01_UI.ViewModels; // Za dostop do drugih ViewModelov
-using LM01_UI.Data.Persistence; // Za ApplicationDbContext
+using LM01_UI.Data.Persistence;
+using LM01_UI.Models;
+using LM01_UI.Services;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
 
 namespace LM01_UI.ViewModels
 {
-    public class AdminPageViewModel : ViewModelBase
+    public partial class AdminPageViewModel : ViewModelBase
     {
         private readonly PlcTcpClient _plcClient;
         private readonly Logger _logger;
         private readonly ApplicationDbContext _dbContext;
-        private readonly Action<object>? _navigateAction; // Akcija za navigacijo iz MainWindowViewModel
+        private readonly Action<string> _navigate;
 
-        // ViewModeli za podstrani znotraj Admin strani
-        private readonly RecipeListViewModel _recipeListViewModel; // NOVO: Za seznam receptur
-        private readonly PlcTestViewModel _plcTestViewModel;
-        private readonly ParameterEditorViewModel _parameterEditorViewModel;
+        [ObservableProperty]
+        private ViewModelBase? _currentAdminContent;
 
-        private object? _currentAdminSubPageViewModel;
-
-        public AdminPageViewModel(PlcTcpClient plcClient, Logger logger, ApplicationDbContext dbContext, Action<object> navigateAction)
+        public AdminPageViewModel(PlcTcpClient plcClient, Logger logger, ApplicationDbContext dbContext, Action<string> navigate)
         {
             _plcClient = plcClient;
             _logger = logger;
             _dbContext = dbContext;
-            _navigateAction = navigateAction;
+            _navigate = navigate;
 
-            _logger.Inform(1, "AdminPageViewModel initialised.");
-
-            // Inicializacija podrejenih ViewModelov
-            _recipeListViewModel = new RecipeListViewModel(_dbContext, _logger, _navigateAction); // NOVO: Injiciramo dbContext in logger
-            _plcTestViewModel = new PlcTestViewModel(_plcClient, _logger);
-            _parameterEditorViewModel = new ParameterEditorViewModel(_plcClient, _logger, _dbContext);
-
-            // Nastavi privzeto podstran ob vstopu na Admin Page na seznam receptur
-            CurrentAdminSubPageViewModel = _recipeListViewModel;
-
-            // Inicializiraj ukaze za navigacijo znotraj Admin Page
-            NavigateToRecipeListCommand = new RelayCommand(() => CurrentAdminSubPageViewModel = _recipeListViewModel); // NOVO: Gumb za seznam
-            NavigateToPlcTestCommand = new RelayCommand(() => CurrentAdminSubPageViewModel = _plcTestViewModel);
-            NavigateToParameterEditorCommand = new RelayCommand(() => CurrentAdminSubPageViewModel = _parameterEditorViewModel);
-            NavigateBackCommand = new RelayCommand(NavigateBackToWelcome);
+            NavigateToRecipeListCommand = new RelayCommand(ShowRecipeList);
+            NavigateBackCommand = new RelayCommand(() => _navigate("Welcome"));
+            // Inicialno prikažemo seznam receptur
+            ShowRecipeList();
         }
 
-        public object? CurrentAdminSubPageViewModel
-        {
-            get => _currentAdminSubPageViewModel;
-            set => SetProperty(ref _currentAdminSubPageViewModel, value);
-        }
-
-        // Commands za navigacijo znotraj Admin strani
-        public IRelayCommand NavigateToRecipeListCommand { get; } // NOVO
-        public IRelayCommand NavigateToPlcTestCommand { get; }
-        public IRelayCommand NavigateToParameterEditorCommand { get; }
+        public IRelayCommand NavigateToRecipeListCommand { get; }
         public IRelayCommand NavigateBackCommand { get; }
+        // TODO: Dodajte ukaze za ostale poglede, če jih potrebujete
+        // public IRelayCommand NavigateToPlcTestCommand { get; } 
 
-        private void NavigateBackToWelcome()
+        private void ShowRecipeList()
         {
-            _navigateAction?.Invoke("Welcome");
+            CurrentAdminContent = new RecipeListViewModel(_dbContext, _logger, EditRecipe, AddNewRecipe);
+        }
+
+        private void EditRecipe(Recipe recipe)
+        {
+            var trackedRecipe = _dbContext.Recipes
+                                          .Include(r => r.Steps)
+                                          .FirstOrDefault(r => r.Id == recipe.Id);
+
+            if (trackedRecipe != null)
+            {
+                CurrentAdminContent = new RecipeEditorViewModel(trackedRecipe, _dbContext, _logger, (s) => ShowRecipeList());
+            }
+        }
+
+        private void AddNewRecipe()
+        {
+            var newRecipe = new Recipe { Name = "Nova Receptura" };
+            // Ne dodamo je v DbContext takoj, to bo naredil urejevalnik ob shranjevanju
+            CurrentAdminContent = new RecipeEditorViewModel(newRecipe, _dbContext, _logger, (s) => ShowRecipeList());
         }
     }
 }

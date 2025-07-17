@@ -5,7 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 using Avalonia.Threading;
 using LM01_UI; // Za PlcTcpClient in Logger
 using LM01_UI.Data.Persistence; // Dodano za ApplicationDbContext
-// ... ostali usingi ...
+using LM01_UI.Services;
+
 
 namespace LM01_UI.ViewModels
 {

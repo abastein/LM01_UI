@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="LM01_UI.Views.MainPageView"
              xmlns:vm="clr-namespace:LM01_UI.ViewModels"
+             xmlns:models="clr-namespace:LM01_UI.Models"
              xmlns:local="clr-namespace:LM01_UI"
              x:DataType="vm:MainPageViewModel"
              Background="#FF202530">
@@ -48,7 +49,13 @@
 					<DataGridTextColumn Header="Opis" Binding="{Binding Description}" Width="1.5*"/>
 				</DataGrid.Columns>
 			</DataGrid>
+
 			<DataGrid Grid.Column="1" ItemsSource="{Binding SelectedRecipeSteps}" IsVisible="{Binding SelectedRecipe, Converter={StaticResource NullToBoolConverter}}">
+				<DataGrid.Styles>
+					<Style Selector="DataGridRow:has(:is(models:RecipeStep).IsActive)">
+						<Setter Property="Background" Value="#FF3399FF" />
+					</Style>
+				</DataGrid.Styles>
 				<DataGrid.Columns>
 					<DataGridTextColumn Header="Št." Binding="{Binding StepNumber}" Width="50"/>
 					<DataGridTextColumn Header="Funkcija" Binding="{Binding Function}" Width="*"/>
