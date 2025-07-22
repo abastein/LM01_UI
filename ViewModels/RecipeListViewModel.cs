@@ -1,6 +1,4 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Layout;
-using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LM01_UI.Data.Persistence;
@@ -30,21 +28,18 @@ namespace LM01_UI.ViewModels
         [NotifyCanExecuteChangedFor(nameof(DeleteRecipeCommand))]
         private Recipe? _selectedRecipe;
 
-        public RecipeListViewModel(ApplicationDbContext dbContext, Logger logger)
+        public RecipeListViewModel(ApplicationDbContext dbContext, Logger logger, Action<Recipe> onEditRecipe, Action onAddNewRecipe)
         {
             _dbContext = dbContext;
             _logger = logger;
 
-            LoadRecipesCommand = new AsyncRelayCommand(LoadRecipesAsync);
             AddNewRecipeCommand = new AsyncRelayCommand(AddNewRecipeAsync);
             EditRecipeCommand = new AsyncRelayCommand(EditSelectedRecipeAsync, () => SelectedRecipe != null);
             DeleteRecipeCommand = new AsyncRelayCommand(DeleteSelectedRecipeAsync, () => SelectedRecipe != null);
 
-            // Naložimo recepte ob zagonu
             _ = LoadRecipesAsync();
         }
 
-        public IAsyncRelayCommand LoadRecipesCommand { get; }
         public IAsyncRelayCommand AddNewRecipeCommand { get; }
         public IAsyncRelayCommand EditRecipeCommand { get; }
         public IAsyncRelayCommand DeleteRecipeCommand { get; }
@@ -68,7 +63,6 @@ namespace LM01_UI.ViewModels
         private async Task EditSelectedRecipeAsync()
         {
             if (SelectedRecipe == null) return;
-            // Naložimo celoten recept s koraki iz baze
             var recipeToEdit = await _dbContext.Recipes
                 .Include(r => r.Steps)
                 .FirstOrDefaultAsync(r => r.Id == SelectedRecipe.Id);
@@ -82,15 +76,20 @@ namespace LM01_UI.ViewModels
         private async Task OpenRecipeEditor(Recipe recipe)
         {
             var editorWindow = new Window { Title = "Urejevalnik Recepture", WindowStartupLocation = WindowStartupLocation.CenterScreen, SizeToContent = SizeToContent.WidthAndHeight };
-
-            // Ustvarimo nov ViewModel za urejevalnik in mu podamo recept ter akcijo za zapiranje
             var editorViewModel = new RecipeEditorViewModel(recipe, _dbContext, _logger, () => editorWindow.Close());
             editorWindow.Content = new RecipeEditorView { DataContext = editorViewModel };
 
-            // Pokažemo okno kot dialog
-            await editorWindow.ShowDialog((App.Current as App)!.GetMainWindow());
+            // POPRAVEK: Dodano preverjanje, če glavno okno obstaja
+            var mainWindow = (App.Current as App)?.GetMainWindow();
+            if (mainWindow != null)
+            {
+                await editorWindow.ShowDialog(mainWindow);
+            }
+            else
+            {
+                editorWindow.Show(); // Odpremo kot navadno okno, če lastnika ni mogoče najti
+            }
 
-            // Ko se dialog zapre, osvežimo seznam receptur
             await LoadRecipesAsync();
         }
 

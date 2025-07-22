@@ -5,12 +5,9 @@
              xmlns:vm="clr-namespace:LM01_UI.ViewModels"
              xmlns:views="clr-namespace:LM01_UI.Views">
 
-	<!-- ********  Theme & global styles  ******** -->
 	<Application.Styles>
-		<!-- Če želite temni način dodajte  Mode="Dark"  ali preklop s kod-behind -->
 		<FluentTheme/>
 		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
-		
 		<Style Selector="Button">
 			<Setter Property="Background" Value="#FF4CAF50"/>
 			<Setter Property="Foreground" Value="White"/>
@@ -20,41 +17,40 @@
 		</Style>
 	</Application.Styles>
 
-	<!-- ********  Viri (brush-i, converter-ji, …)  ******** -->
 	<Application.Resources>
-		<!-- Bool → čopič (Green / Red) -->
 		<converters:BoolToBrushConverter x:Key="BoolToBrushConverter"
                                          TrueBrush="Green"
                                          FalseBrush="Red" />
 		<converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
 	</Application.Resources>
 
-	<!-- ********  DataTemplates (ViewModel → View)  ******** -->
-	<!-- !!  Tu jih pričakuje Avalonia; ne v ResourceDictionary  -->
 	<Application.DataTemplates>
 		<DataTemplate DataType="{x:Type vm:WelcomeViewModel}">
 			<views:WelcomeView/>
 		</DataTemplate>
-
 		<DataTemplate DataType="{x:Type vm:MainPageViewModel}">
 			<views:MainPageView/>
 		</DataTemplate>
-
 		<DataTemplate DataType="{x:Type vm:AdminPageViewModel}">
 			<views:AdminPageView/>
 		</DataTemplate>
-
 		<DataTemplate DataType="{x:Type vm:PlcTestViewModel}">
 			<views:PlcTestView/>
 		</DataTemplate>
-
 		<DataTemplate DataType="{x:Type vm:ParameterEditorViewModel}">
 			<views:ParameterEditorView/>
 		</DataTemplate>
-
 		<DataTemplate DataType="{x:Type vm:UITestViewModel}">
 			<views:UITestView/>
 		</DataTemplate>
+
+		<DataTemplate DataType="{x:Type vm:RecipeListViewModel}">
+			<views:RecipeListView/>
+		</DataTemplate>
+		<DataTemplate DataType="{x:Type vm:RecipeEditorViewModel}">
+			<views:RecipeEditorView/>
+		</DataTemplate>
+
 	</Application.DataTemplates>
 
 </Application>

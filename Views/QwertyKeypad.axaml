@@ -11,6 +11,7 @@
 			<Setter Property="MinWidth" Value="60"/>
 			<Setter Property="MinHeight" Value="60"/>
 			<Setter Property="CornerRadius" Value="8"/>
+			<Setter Property="Focusable" Value="False"/>
 		</Style>
 	</UserControl.Styles>
 

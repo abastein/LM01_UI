@@ -18,7 +18,7 @@ namespace LM01_UI.ViewModels
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly Logger _logger;
-        private readonly Action _closeAction; // Spremenjeno iz Action<string>
+        private readonly Action _closeAction;
 
         [ObservableProperty]
         private Recipe _currentRecipe;
@@ -30,6 +30,9 @@ namespace LM01_UI.ViewModels
         [NotifyCanExecuteChangedFor(nameof(EditStepCommand))]
         [NotifyCanExecuteChangedFor(nameof(DeleteStepCommand))]
         private RecipeStep? _selectedStep;
+
+        [ObservableProperty]
+        private StepEditorViewModel? _currentStepEditor;
 
         public RecipeEditorViewModel(Recipe recipe, ApplicationDbContext dbContext, Logger logger, Action closeAction)
         {
@@ -86,12 +89,20 @@ namespace LM01_UI.ViewModels
             };
 
             var nextStepNumber = Steps.Any() ? Steps.Max(s => s.StepNumber) + 1 : 1;
-            // POPRAVEK: Ustvarimo nov prazen korak in ga posredujemo
             var newStepObject = new RecipeStep { StepNumber = nextStepNumber };
             var editorViewModel = new StepEditorViewModel(newStepObject, closeCallback);
             editorWindow.Content = new StepEditorView { DataContext = editorViewModel };
 
-            await editorWindow.ShowDialog((App.Current as App)!.GetMainWindow());
+            // POPRAVEK: Dodano preverjanje, če glavno okno obstaja
+            var mainWindow = (App.Current as App)?.GetMainWindow();
+            if (mainWindow != null)
+            {
+                await editorWindow.ShowDialog(mainWindow);
+            }
+            else
+            {
+                editorWindow.Show();
+            }
 
             if (newStepResult != null)
             {
@@ -105,8 +116,8 @@ namespace LM01_UI.ViewModels
             if (SelectedStep == null) return;
 
             RecipeStep? editedStepResult = null;
-            var originalStep = SelectedStep;
-            var editorWindow = new Window { Title = $"Urejanje koraka {SelectedStep.StepNumber}", SizeToContent = SizeToContent.WidthAndHeight, SystemDecorations = SystemDecorations.BorderOnly, WindowStartupLocation = WindowStartupLocation.CenterOwner };
+            var stepToEdit = SelectedStep;
+            var editorWindow = new Window { Title = $"Urejanje koraka {stepToEdit.StepNumber}", SizeToContent = SizeToContent.WidthAndHeight, SystemDecorations = SystemDecorations.BorderOnly, WindowStartupLocation = WindowStartupLocation.CenterOwner };
 
             Action<RecipeStep?> closeCallback = (stepResult) =>
             {
@@ -114,14 +125,23 @@ namespace LM01_UI.ViewModels
                 editorWindow.Close();
             };
 
-            var editorViewModel = new StepEditorViewModel(originalStep, closeCallback);
+            var editorViewModel = new StepEditorViewModel(stepToEdit, closeCallback);
             editorWindow.Content = new StepEditorView { DataContext = editorViewModel };
 
-            await editorWindow.ShowDialog((App.Current as App)!.GetMainWindow());
+            // POPRAVEK: Dodano preverjanje, če glavno okno obstaja
+            var mainWindow = (App.Current as App)?.GetMainWindow();
+            if (mainWindow != null)
+            {
+                await editorWindow.ShowDialog(mainWindow);
+            }
+            else
+            {
+                editorWindow.Show();
+            }
 
             if (editedStepResult != null)
             {
-                var index = Steps.IndexOf(originalStep);
+                var index = Steps.IndexOf(stepToEdit);
                 if (index != -1) { Steps[index] = editedStepResult; }
                 RenumberSteps();
             }

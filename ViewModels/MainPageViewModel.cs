@@ -23,30 +23,24 @@ namespace LM01_UI.ViewModels
 
         [ObservableProperty]
         private ObservableCollection<Recipe> _recipes = new();
-
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(LoadRecipeCommand))]
         [NotifyCanExecuteChangedFor(nameof(ClearSelectionCommand))]
         private Recipe? _selectedRecipe;
-
         [ObservableProperty]
         private ObservableCollection<RecipeStep> _selectedRecipeSteps = new();
-
         [ObservableProperty]
         private string _plcStatusText = "Povezava ni vzpostavljena";
-
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(LoadRecipeCommand))]
         [NotifyCanExecuteChangedFor(nameof(StartPlcCommand))]
         [NotifyCanExecuteChangedFor(nameof(StopPlcCommand))]
         [NotifyCanExecuteChangedFor(nameof(ToggleStartStopCommand))]
         private bool _isPlcConnected;
-
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(StartPlcCommand))]
         [NotifyCanExecuteChangedFor(nameof(ToggleStartStopCommand))]
         private bool _isRecipeLoaded;
-
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(LoadRecipeCommand))]
         [NotifyCanExecuteChangedFor(nameof(StartPlcCommand))]
@@ -55,17 +49,12 @@ namespace LM01_UI.ViewModels
         [NotifyPropertyChangedFor(nameof(StartStopButtonText))]
         [NotifyPropertyChangedFor(nameof(StartStopButtonBrush))]
         private bool _isRunning;
-
         [ObservableProperty]
         private int _currentStepNumber;
-
         [ObservableProperty]
         private int _plcErrorCode;
 
-
-        public MainPageViewModel(ApplicationDbContext dbContext,
-                                 PlcTcpClient tcpClient,
-                                 Logger logger)
+        public MainPageViewModel(ApplicationDbContext dbContext, PlcTcpClient tcpClient, Logger logger)
         {
             _dbContext = dbContext;
             _tcpClient = tcpClient;
@@ -88,13 +77,10 @@ namespace LM01_UI.ViewModels
                                          ToggleStartStopAsync,
                                          () => IsPlcConnected && (IsRecipeLoaded || IsRunning));
 
-            ClearSelectionCommand = new RelayCommand(
-                                        ClearSelection,
-                                        () => SelectedRecipe != null);
+            ClearSelectionCommand = new RelayCommand(ClearSelection);
 
             _tcpClient.ConnectionStatusChanged += OnConnectionStatusChanged;
             OnConnectionStatusChanged(_tcpClient.IsConnected);
-
             _ = LoadRecipesAsync();
         }
 
@@ -106,7 +92,6 @@ namespace LM01_UI.ViewModels
         public IAsyncRelayCommand StopPlcCommand { get; }
         public IAsyncRelayCommand ToggleStartStopCommand { get; }
         public IRelayCommand ClearSelectionCommand { get; }
-
 
         partial void OnSelectedRecipeChanged(Recipe? value)
         {
@@ -127,9 +112,7 @@ namespace LM01_UI.ViewModels
             try
             {
                 var recipes = await _dbContext.Recipes.OrderBy(r => r.Name).ToListAsync();
-                await Dispatcher.UIThread.InvokeAsync(() =>
-                    Recipes = new ObservableCollection<Recipe>(recipes));
-
+                Recipes = new ObservableCollection<Recipe>(recipes);
                 StartPlcStatusPolling();
             }
             catch (Exception ex) { _logger.Inform(2, $"Napaka pri nalaganju receptur: {ex.Message}"); }
@@ -143,25 +126,30 @@ namespace LM01_UI.ViewModels
                 var recipeWithSteps = await _dbContext.Recipes.Include(r => r.Steps).FirstOrDefaultAsync(r => r.Id == SelectedRecipe.Id);
                 if (recipeWithSteps != null)
                 {
-                    await Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        foreach (var step in recipeWithSteps.Steps.OrderBy(s => s.StepNumber))
-                            SelectedRecipeSteps.Add(step);
-                    });
+                    SelectedRecipeSteps = new ObservableCollection<RecipeStep>(recipeWithSteps.Steps.OrderBy(s => s.StepNumber));
                 }
             }
         }
 
-        private void ClearSelection() => SelectedRecipe = null;
+        private void ClearSelection()
+        {
+            SelectedRecipe = null;
+            // POPRAVEK: Gumb "Počisti" sedaj ponastavi tudi parametre v klientu.
+            _tcpClient.ClearParameters();
+            _logger.Inform(1, "Parametri ponastavljeni na ničle.");
+            // Takoj preverimo status, da se UI osveži
+            _ = CheckPlcStatusAsync();
+        }
 
         private async Task LoadRecipeOnPlcAsync()
         {
             if (SelectedRecipe == null) return;
             try
             {
-                string loadCommand = PlcService.BuildLoadCommand(SelectedRecipe);
-                // Ukaz pošljemo in takoj počakamo na odgovor za posodobitev vmesnika
-                string response = await _tcpClient.SendReceiveAsync(loadCommand, TimeSpan.FromSeconds(2));
+                // Zgradimo samo parametre...
+                string parameters = PlcService.BuildLoadParameters(SelectedRecipe);
+                // ...in jih pošljemo s posebnim ukazom, ki si jih bo zapomnil
+                string response = await _tcpClient.SendLoadCommandAsync(parameters, TimeSpan.FromSeconds(2));
                 await ProcessPlcResponse(response);
             }
             catch (Exception ex) { _logger.Inform(2, $"Napaka pri pošiljanju LOAD: {ex.Message}"); }
@@ -171,6 +159,7 @@ namespace LM01_UI.ViewModels
         {
             try
             {
+                // Pošljemo samo kodo ukaza, klient bo dodal parametre
                 string response = await _tcpClient.SendReceiveAsync(PlcService.StartCommand, TimeSpan.FromSeconds(2));
                 await ProcessPlcResponse(response);
             }
@@ -185,6 +174,16 @@ namespace LM01_UI.ViewModels
                 await ProcessPlcResponse(response);
             }
             catch (Exception ex) { _logger.Inform(2, $"Napaka pri pošiljanju STOP: {ex.Message}"); }
+        }
+
+        private async Task CheckPlcStatusAsync()
+        {
+            try
+            {
+                string response = await _tcpClient.SendReceiveAsync(PlcService.StatusCommand, TimeSpan.FromSeconds(2));
+                await ProcessPlcResponse(response);
+            }
+            catch (Exception ex) { _logger.Inform(2, $"Napaka pri preverjanju statusa: {ex.Message}"); }
         }
 
         private void OnConnectionStatusChanged(bool isConnected)
@@ -213,12 +212,11 @@ namespace LM01_UI.ViewModels
         {
             while (!token.IsCancellationRequested)
             {
-                // Najprej počakamo, da ne pošljemo zahteve takoj po ukazu z gumba
                 await Task.Delay(500, token);
                 if (token.IsCancellationRequested) break;
-
                 try
                 {
+                    // Pošljemo samo kodo ukaza, klient bo dodal parametre
                     string response = await _tcpClient.SendReceiveAsync(PlcService.StatusCommand, TimeSpan.FromSeconds(2));
                     await ProcessPlcResponse(response);
                 }
@@ -233,8 +231,6 @@ namespace LM01_UI.ViewModels
         private async Task ProcessPlcResponse(string response)
         {
             if (string.IsNullOrEmpty(response) || response.Length < 10) return;
-
-            // Razčlenimo odgovor iz PLC-ja
             string plcState = response.Substring(0, 1);
             int.TryParse(response.Substring(1, 3), out int loadedRecipeId);
             int.TryParse(response.Substring(4, 3), out int currentStep);
@@ -242,21 +238,10 @@ namespace LM01_UI.ViewModels
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                // Posodobimo glavne lastnosti stanja
                 CurrentStepNumber = currentStep;
                 PlcErrorCode = errorCode;
                 IsRecipeLoaded = plcState is "1" or "2" or "9";
                 IsRunning = plcState == "2";
-
-                // POPRAVEK: Dodana nova logika za osveževanje aktivnega koraka
-                // Gremo čez vse prikazane korake v desni tabeli...
-                foreach (var step in SelectedRecipeSteps)
-                {
-                    // ...in nastavimo IsActive samo za tistega, ki se trenutno izvaja.
-                    step.IsActive = (IsRunning && step.StepNumber == CurrentStepNumber);
-                }
-
-                // Posodobimo opisno besedilo statusa
                 PlcStatusText = plcState switch
                 {
                     "0" => "Pripravljen (Standby)",

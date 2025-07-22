@@ -3,7 +3,14 @@
              x:Class="LM01_UI.Views.AdminPageView"
              xmlns:vm="clr-namespace:LM01_UI.ViewModels"
              x:DataType="vm:AdminPageViewModel">
+	<DockPanel>
+		<Border DockPanel.Dock="Top" Padding="10" BorderThickness="0,0,0,1" BorderBrush="Gray">
+			<Button Content="Nazaj na Glavni Meni" Command="{Binding NavigateBackCommand}" HorizontalAlignment="Left"/>
+		</Border>
 
-	<ContentControl Content="{Binding RecipeList}" />
-
+		<ContentControl Content="{Binding CurrentAdminContent}"
+                        Margin="10"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch"/>
+	</DockPanel>
 </UserControl>
