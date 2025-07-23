@@ -11,7 +11,7 @@ namespace LM01_UI.Views
         {
             InitializeComponent();
 
-            // Poiščemo vnosna polja in tipkovnico
+            // Poiščemo vnosna polja in tipkovnico po njihovih imenih
             var nameTextBox = this.FindControl<TextBox>("NameTextBox");
             var descriptionTextBox = this.FindControl<TextBox>("DescriptionTextBox");
             var keypad = this.FindControl<QwertyKeypad>("Keypad");
@@ -27,20 +27,23 @@ namespace LM01_UI.Views
         // Ta metoda se izvede, ko je na tipkovnici pritisnjena tipka
         private void OnKeypadPressed(string key)
         {
+            // Če nobeno polje ni aktivno, ne naredimo nič
             if (_activeTextBox == null) return;
 
             if (key == "BACKSPACE")
             {
                 if (!string.IsNullOrEmpty(_activeTextBox.Text))
                 {
+                    // Izbrišemo zadnji znak
                     _activeTextBox.Text = _activeTextBox.Text[..^1];
                 }
             }
             else
             {
+                // Dodamo nov znak
                 _activeTextBox.Text += key;
             }
-            // Premaknemo kurzor na konec
+            // Premaknemo kurzor na konec besedila
             _activeTextBox.CaretIndex = _activeTextBox.Text?.Length ?? 0;
         }
     }
