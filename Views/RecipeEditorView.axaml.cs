@@ -1,7 +1,5 @@
 using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Markup.Xaml;
-using System.Linq;
+using Avalonia.Interactivity;
 
 namespace LM01_UI.Views
 {
@@ -13,44 +11,37 @@ namespace LM01_UI.Views
         {
             InitializeComponent();
 
+            // Poiščemo vnosna polja in tipkovnico
             var nameTextBox = this.FindControl<TextBox>("NameTextBox");
             var descriptionTextBox = this.FindControl<TextBox>("DescriptionTextBox");
-            var qwertyKeypad = this.FindControl<QwertyKeypad>("QwertyKeypad");
+            var keypad = this.FindControl<QwertyKeypad>("Keypad");
 
-            if (nameTextBox != null) nameTextBox.GotFocus += OnTextBoxGotFocus;
-            if (descriptionTextBox != null) descriptionTextBox.GotFocus += OnTextBoxGotFocus;
+            // Povežemo se na dogodek "GotFocus", da vemo, katero polje je aktivno
+            if (nameTextBox != null) nameTextBox.GotFocus += (s, e) => _activeTextBox = s as TextBox;
+            if (descriptionTextBox != null) descriptionTextBox.GotFocus += (s, e) => _activeTextBox = s as TextBox;
 
-            if (qwertyKeypad != null)
-            {
-                qwertyKeypad.KeyPressed += OnQwertyKeyPressed;
-            }
+            // Povežemo se na dogodek "KeyPressed" na tipkovnici
+            if (keypad != null) keypad.KeyPressed += OnKeypadPressed;
         }
 
-        private void OnTextBoxGotFocus(object? sender, GotFocusEventArgs e)
-        {
-            _activeTextBox = sender as TextBox;
-        }
-
-        private void OnQwertyKeyPressed(string key)
+        // Ta metoda se izvede, ko je na tipkovnici pritisnjena tipka
+        private void OnKeypadPressed(string key)
         {
             if (_activeTextBox == null) return;
+
             if (key == "BACKSPACE")
             {
                 if (!string.IsNullOrEmpty(_activeTextBox.Text))
                 {
-                    _activeTextBox.Text = _activeTextBox.Text.Substring(0, _activeTextBox.Text.Length - 1);
+                    _activeTextBox.Text = _activeTextBox.Text[..^1];
                 }
             }
             else
             {
                 _activeTextBox.Text += key;
             }
+            // Premaknemo kurzor na konec
             _activeTextBox.CaretIndex = _activeTextBox.Text?.Length ?? 0;
-        }
-
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
         }
     }
 }

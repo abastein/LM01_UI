@@ -1,65 +1,64 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using LM01_UI.Enums; // Uvozimo pravilen imenski prostor
+using LM01_UI.Enums;
 using LM01_UI.ViewModels;
-using System;
+using System.Linq;
 
 namespace LM01_UI.Views
 {
     public partial class StepEditorView : UserControl
     {
+        private TextBox? _activeTextBox;
+
         public StepEditorView()
         {
             InitializeComponent();
-            this.DataContextChanged += OnDataContextChanged;
+
+            // Poiščemo vsa vnosna polja in tipkovnico
+            var speedRpmTextBox = this.FindControl<TextBox>("SpeedRpmTextBox");
+            var targetXDegTextBox = this.FindControl<TextBox>("TargetXDegTextBox");
+            var repeatsTextBox = this.FindControl<TextBox>("RepeatsTextBox");
+            var pauseMsTextBox = this.FindControl<TextBox>("PauseMsTextBox");
+            var keypad = this.FindControl<NumericKeypad>("Keypad");
+
+            var textBoxes = new[] { speedRpmTextBox, targetXDegTextBox, repeatsTextBox, pauseMsTextBox };
+
+            // Povežemo se na dogodek "GotFocus" za vsa polja
+            foreach (var tb in textBoxes.Where(t => t != null))
+            {
+                tb!.GotFocus += (s, e) => _activeTextBox = s as TextBox;
+            }
+
+            // Povežemo se na dogodek "KeyPressed" na tipkovnici
+            if (keypad != null) keypad.KeyPressed += OnKeypadPressed;
         }
 
-        private void OnDataContextChanged(object? sender, EventArgs e)
+        // Ta metoda se izvede, ko je na tipkovnici pritisnjena tipka
+        private void OnKeypadPressed(string key)
+        {
+            if (_activeTextBox == null) return;
+
+            if (key == "BACKSPACE")
+            {
+                if (!string.IsNullOrEmpty(_activeTextBox.Text))
+                {
+                    _activeTextBox.Text = _activeTextBox.Text[..^1];
+                }
+            }
+            else
+            {
+                _activeTextBox.Text += key;
+            }
+            _activeTextBox.CaretIndex = _activeTextBox.Text?.Length ?? 0;
+        }
+
+        // Ta metoda je potrebna za posodabljanje vidnosti polj
+        private void OnFunctionSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             if (DataContext is StepEditorViewModel viewModel)
             {
-                UpdateParameterVisibility(viewModel);
-            }
-        }
-
-        private void OnFunctionSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (DataContext is StepEditorViewModel viewModel)
-            {
-                UpdateParameterVisibility(viewModel);
-            }
-        }
-
-        private void UpdateParameterVisibility(StepEditorViewModel viewModel)
-        {
-            var speedPanel = this.FindControl<StackPanel>("SpeedPanel");
-            var directionPanel = this.FindControl<StackPanel>("DirectionPanel");
-            var targetPanel = this.FindControl<StackPanel>("TargetPanel");
-            var repeatsPanel = this.FindControl<StackPanel>("RepeatsPanel");
-            var pausePanel = this.FindControl<StackPanel>("PausePanel");
-
-            if (speedPanel != null) speedPanel.IsVisible = false;
-            if (directionPanel != null) directionPanel.IsVisible = false;
-            if (targetPanel != null) targetPanel.IsVisible = false;
-            if (repeatsPanel != null) repeatsPanel.IsVisible = false;
-            if (pausePanel != null) pausePanel.IsVisible = false;
-
-            if (viewModel.SelectedFunction == null) return;
-
-            // POPRAVEK: Uporabimo pravilno ime 'FunctionType'
-            switch (viewModel.SelectedFunction.Function)
-            {
-                case FunctionType.Rotate:
-                    if (speedPanel != null) speedPanel.IsVisible = true;
-                    if (directionPanel != null) directionPanel.IsVisible = true;
-                    if (targetPanel != null) targetPanel.IsVisible = true;
-                    break;
-                case FunctionType.Wait:
-                    if (pausePanel != null) pausePanel.IsVisible = true;
-                    break;
-                case FunctionType.Repeat:
-                    if (repeatsPanel != null) repeatsPanel.IsVisible = true;
-                    break;
+                // Pustimo prazno, ker ViewModel že sam posodobi IsEnabled lastnosti.
+                // Klic je potreben samo, da se XAML osveži.
             }
         }
     }
