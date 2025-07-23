@@ -18,6 +18,7 @@ namespace LM01_UI.ViewModels
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly PlcTcpClient _tcpClient;
+        private readonly PlcService _plcService;
         private readonly Logger _logger;
         private CancellationTokenSource? _pollingCts;
 
@@ -39,10 +40,12 @@ namespace LM01_UI.ViewModels
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(LoadRecipeCommand))]
         [NotifyCanExecuteChangedFor(nameof(ToggleStartStopCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ClearSelectionCommand))]
         private bool _isPlcConnected;
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(ToggleStartStopCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ClearSelectionCommand))]
         private bool _isRecipeLoaded;
 
         [ObservableProperty]
@@ -58,37 +61,24 @@ namespace LM01_UI.ViewModels
         [ObservableProperty]
         private int _plcErrorCode;
 
-        // POPRAVEK: Nova lastnost, ki si zapomni ID naložene recepture
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(LoadRecipeCommand))]
         [NotifyCanExecuteChangedFor(nameof(ToggleStartStopCommand))]
         private int? _loadedRecipeId;
 
-
-        public MainPageViewModel(ApplicationDbContext dbContext,
-                                 PlcTcpClient tcpClient,
-                                 Logger logger)
+        public MainPageViewModel(ApplicationDbContext dbContext, PlcTcpClient tcpClient, PlcService plcService, Logger logger)
         {
             _dbContext = dbContext;
             _tcpClient = tcpClient;
+            _plcService = plcService;
             _logger = logger;
 
-            // POPRAVEK: Posodobljeni pogoji za izvajanje ukazov
-            LoadRecipeCommand = new AsyncRelayCommand(
-                LoadRecipeOnPlcAsync,
-                () => SelectedRecipe != null && IsPlcConnected && !IsRunning && SelectedRecipe.Id != LoadedRecipeId);
-
-            ToggleStartStopCommand = new AsyncRelayCommand(
-                ToggleStartStopAsync,
-                () => IsPlcConnected && IsRecipeLoaded && SelectedRecipe != null && SelectedRecipe.Id == LoadedRecipeId);
-
-            ClearSelectionCommand = new RelayCommand(
-                ClearSelection,
-                () => SelectedRecipe != null);
+            LoadRecipeCommand = new AsyncRelayCommand(LoadRecipeOnPlcAsync, () => SelectedRecipe != null && IsPlcConnected && !IsRunning && SelectedRecipe.Id != LoadedRecipeId);
+            ToggleStartStopCommand = new AsyncRelayCommand(ToggleStartStopAsync, () => IsPlcConnected && (IsRunning || (IsRecipeLoaded && SelectedRecipe != null && SelectedRecipe.Id == LoadedRecipeId)));
+            ClearSelectionCommand = new RelayCommand(ClearSelection, () => SelectedRecipe != null);
 
             _tcpClient.ConnectionStatusChanged += OnConnectionStatusChanged;
             OnConnectionStatusChanged(_tcpClient.IsConnected);
-
             _ = LoadRecipesAsync();
         }
 
@@ -98,19 +88,20 @@ namespace LM01_UI.ViewModels
         public IAsyncRelayCommand ToggleStartStopCommand { get; }
         public IRelayCommand ClearSelectionCommand { get; }
 
-
         partial void OnSelectedRecipeChanged(Recipe? value)
         {
-            // Ko se spremeni izbira, naložimo korake in ponastavimo stanje gumbov
+            if (value == null)
+            {
+                IsRecipeLoaded = false;
+                LoadedRecipeId = null;
+            }
             _ = LoadStepsForSelectedRecipeAsync();
         }
 
         private async Task ToggleStartStopAsync()
         {
-            if (IsRunning)
-                await StopPlcAsync();
-            else
-                await StartPlcAsync();
+            if (IsRunning) await StopPlcAsync();
+            else await StartPlcAsync();
         }
 
         private async Task LoadRecipesAsync()
@@ -118,9 +109,7 @@ namespace LM01_UI.ViewModels
             try
             {
                 var recipes = await _dbContext.Recipes.OrderBy(r => r.Name).ToListAsync();
-                await Dispatcher.UIThread.InvokeAsync(() =>
-                    Recipes = new ObservableCollection<Recipe>(recipes));
-
+                Recipes = new ObservableCollection<Recipe>(recipes);
                 StartPlcStatusPolling();
             }
             catch (Exception ex) { _logger.Inform(2, $"Napaka pri nalaganju receptur: {ex.Message}"); }
@@ -128,17 +117,14 @@ namespace LM01_UI.ViewModels
 
         private async Task LoadStepsForSelectedRecipeAsync()
         {
-            await Dispatcher.UIThread.InvokeAsync(() => SelectedRecipeSteps.Clear());
+            SelectedRecipeSteps.Clear();
             if (SelectedRecipe != null)
             {
                 var recipeWithSteps = await _dbContext.Recipes.Include(r => r.Steps).FirstOrDefaultAsync(r => r.Id == SelectedRecipe.Id);
                 if (recipeWithSteps != null)
                 {
-                    await Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        foreach (var step in recipeWithSteps.Steps.OrderBy(s => s.StepNumber))
-                            SelectedRecipeSteps.Add(step);
-                    });
+                    foreach (var step in recipeWithSteps.Steps.OrderBy(s => s.StepNumber))
+                        SelectedRecipeSteps.Add(step);
                 }
             }
         }
@@ -146,9 +132,6 @@ namespace LM01_UI.ViewModels
         private void ClearSelection()
         {
             SelectedRecipe = null;
-            // Počistimo tudi informacijo o naloženi recepturi
-            IsRecipeLoaded = false;
-            LoadedRecipeId = null;
         }
 
         private async Task LoadRecipeOnPlcAsync()
@@ -156,7 +139,7 @@ namespace LM01_UI.ViewModels
             if (SelectedRecipe == null) return;
             try
             {
-                string loadCommand = PlcService.BuildLoadCommand(SelectedRecipe);
+                string loadCommand = _plcService.BuildLoadCommand(SelectedRecipe);
                 string response = await _tcpClient.SendReceiveAsync(loadCommand, TimeSpan.FromSeconds(2));
                 await ProcessPlcResponse(response);
             }
@@ -167,7 +150,8 @@ namespace LM01_UI.ViewModels
         {
             try
             {
-                string response = await _tcpClient.SendReceiveAsync(PlcService.StartCommand, TimeSpan.FromSeconds(2));
+                // POPRAVEK: Uporaba instance '_plcService'
+                string response = await _tcpClient.SendReceiveAsync(_plcService.StartCommand, TimeSpan.FromSeconds(2));
                 await ProcessPlcResponse(response);
             }
             catch (Exception ex) { _logger.Inform(2, $"Napaka pri pošiljanju START: {ex.Message}"); }
@@ -177,7 +161,8 @@ namespace LM01_UI.ViewModels
         {
             try
             {
-                string response = await _tcpClient.SendReceiveAsync(PlcService.StopCommand, TimeSpan.FromSeconds(2));
+                // POPRAVEK: Uporaba instance '_plcService'
+                string response = await _tcpClient.SendReceiveAsync(_plcService.StopCommand, TimeSpan.FromSeconds(2));
                 await ProcessPlcResponse(response);
             }
             catch (Exception ex) { _logger.Inform(2, $"Napaka pri pošiljanju STOP: {ex.Message}"); }
@@ -212,10 +197,10 @@ namespace LM01_UI.ViewModels
             {
                 await Task.Delay(500, token);
                 if (token.IsCancellationRequested) break;
-
                 try
                 {
-                    string response = await _tcpClient.SendReceiveAsync(PlcService.StatusCommand, TimeSpan.FromSeconds(2));
+                    // POPRAVEK: Uporaba instance '_plcService'
+                    string response = await _tcpClient.SendReceiveAsync(_plcService.StatusCommand, TimeSpan.FromSeconds(2));
                     await ProcessPlcResponse(response);
                 }
                 catch (Exception)
@@ -229,7 +214,6 @@ namespace LM01_UI.ViewModels
         private async Task ProcessPlcResponse(string response)
         {
             if (string.IsNullOrEmpty(response) || response.Length < 10) return;
-
             string plcState = response.Substring(0, 1);
             int.TryParse(response.Substring(1, 3), out int loadedRecipeIdFromPlc);
             int.TryParse(response.Substring(4, 3), out int currentStep);
@@ -241,10 +225,7 @@ namespace LM01_UI.ViewModels
                 PlcErrorCode = errorCode;
                 IsRecipeLoaded = plcState is "1" or "2" or "9";
                 IsRunning = plcState == "2";
-
-                // POPRAVEK: Posodobimo ID naložene recepture glede na odgovor PLC-ja
                 LoadedRecipeId = IsRecipeLoaded ? loadedRecipeIdFromPlc : null;
-
                 PlcStatusText = plcState switch
                 {
                     "0" => "Pripravljen (Standby)",

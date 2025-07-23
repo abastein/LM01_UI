@@ -2,7 +2,6 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace LM01_UI.Services
@@ -11,10 +10,6 @@ namespace LM01_UI.Services
     {
         private TcpClient? _client;
         private NetworkStream? _stream;
-        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
-
-        // Notranji pomnilnik za zadnje naložene parametre
-        private string _lastParameters = new string('\0', 252);
 
         public bool IsConnected { get; private set; }
         public event Action<bool>? ConnectionStatusChanged;
@@ -46,55 +41,30 @@ namespace LM01_UI.Services
             ConnectionStatusChanged?.Invoke(false);
         }
 
-        // Nova metoda za brisanje shranjenih parametrov
-        public void ClearParameters()
+        public async Task SendAsync(string message)
         {
-            _lastParameters = new string('\0', 252);
+            if (!IsConnected || _stream == null) throw new InvalidOperationException("Not connected to PLC.");
+            var messageBytes = Encoding.ASCII.GetBytes(message);
+            await _stream.WriteAsync(messageBytes, 0, messageBytes.Length);
         }
 
-        // Nova, posebna metoda za pošiljanje LOAD ukaza, ki sprejme samo parametre
-        public async Task<string> SendLoadCommandAsync(string parameters, TimeSpan timeout)
+        public async Task<string> SendReceiveAsync(string message, TimeSpan timeout)
         {
-            // Preverimo, če je dolžina parametrov pravilna
-            if (parameters.Length != 252)
-                throw new ArgumentException("Parameter string must be 252 characters long.");
+            if (!IsConnected || _stream == null)
+                throw new InvalidOperationException("Not connected to PLC.");
 
-            // Posodobimo notranji pomnilnik in sestavimo celoten ukaz
-            _lastParameters = parameters;
-            string fullCommand = PlcService.LoadCommandPrefix + _lastParameters;
+            await SendAsync(message);
 
-            // Uporabimo zasebno metodo za pošiljanje in prejemanje
-            return await InternalSendReceiveAsync(fullCommand, timeout);
-        }
+            var readTask = ReadFixedLengthAsync(10);
+            var timeoutTask = Task.Delay(timeout);
+            var completedTask = await Task.WhenAny(readTask, timeoutTask);
 
-        // Ta metoda sedaj sprejme samo 4-znakovno kodo in sama doda parametre
-        public async Task<string> SendReceiveAsync(string commandCode, TimeSpan timeout)
-        {
-            if (commandCode.Length > 4) // Preprost način za ugotavljanje, ali je to samo koda
-                throw new ArgumentException("This method should be called with a 4-char command code.");
-
-            string fullCommand = commandCode + _lastParameters;
-            return await InternalSendReceiveAsync(fullCommand, timeout);
-        }
-
-        // Zasebna metoda, ki dejansko pošlje celoten 256-znakovni niz in preprečuje podvajanje kode
-        private async Task<string> InternalSendReceiveAsync(string fullCommand, TimeSpan timeout)
-        {
-            await _lock.WaitAsync();
-            try
+            if (completedTask == timeoutTask)
             {
-                if (!IsConnected || _stream == null)
-                    throw new InvalidOperationException("Not connected to PLC.");
-
-                var messageBytes = Encoding.ASCII.GetBytes(fullCommand);
-                await _stream.WriteAsync(messageBytes, 0, messageBytes.Length);
-
-                return await ReadFixedLengthAsync(10); // Odgovor je vedno 10 znakov
+                throw new TimeoutException("PLC response timed out.");
             }
-            finally
-            {
-                _lock.Release();
-            }
+
+            return await readTask;
         }
 
         private async Task<string> ReadFixedLengthAsync(int length)
