@@ -3,17 +3,74 @@ using CommunityToolkit.Mvvm.Input;
 using LM01_UI.Enums;
 using LM01_UI.Models;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace LM01_UI.ViewModels
 {
     public partial class StepEditorViewModel : ViewModelBase
     {
-        // POPRAVEK: Pravilen tip za closeAction
+        private readonly RecipeStep _step;
         private readonly Action<RecipeStep?> _closeAction;
-        public RecipeStep CurrentStep { get; private set; }
+
+        public ObservableCollection<FunctionViewModel> FunctionTypes { get; }
+        public Array DirectionTypes { get; } = Enum.GetValues(typeof(DirectionType));
+
+        // --- POPRAVEK: Vse lastnosti so napisane ročno, brez [ObservableProperty] ---
+
+        private FunctionViewModel? _selectedFunction;
+        public FunctionViewModel? SelectedFunction
+        {
+            get => _selectedFunction;
+            set
+            {
+                if (SetProperty(ref _selectedFunction, value))
+                {
+                    OnPropertyChanged(nameof(IsSpeedRpmEnabled));
+                    OnPropertyChanged(nameof(IsDirectionEnabled));
+                    OnPropertyChanged(nameof(IsTargetXDegEnabled));
+                    OnPropertyChanged(nameof(IsRepeatsEnabled));
+                    OnPropertyChanged(nameof(IsPauseMsEnabled));
+                }
+            }
+        }
+
+        private string _speedRpmString = string.Empty;
+        public string SpeedRpmString
+        {
+            get => _speedRpmString;
+            set => SetProperty(ref _speedRpmString, value);
+        }
+
+        private string _targetXDegString = string.Empty;
+        public string TargetXDegString
+        {
+            get => _targetXDegString;
+            set => SetProperty(ref _targetXDegString, value);
+        }
+
+        private string _repeatsString = string.Empty;
+        public string RepeatsString
+        {
+            get => _repeatsString;
+            set => SetProperty(ref _repeatsString, value);
+        }
+
+        private string _pauseMsString = string.Empty;
+        public string PauseMsString
+        {
+            get => _pauseMsString;
+            set => SetProperty(ref _pauseMsString, value);
+        }
+
+        private DirectionType _direction;
+        public DirectionType Direction
+        {
+            get => _direction;
+            set => SetProperty(ref _direction, value);
+        }
+
+        public string StepNumberString { get; }
 
         public bool IsSpeedRpmEnabled => SelectedFunction?.Function == FunctionType.Rotate;
         public bool IsDirectionEnabled => SelectedFunction?.Function == FunctionType.Rotate;
@@ -21,78 +78,54 @@ namespace LM01_UI.ViewModels
         public bool IsRepeatsEnabled => SelectedFunction?.Function == FunctionType.Repeat;
         public bool IsPauseMsEnabled => SelectedFunction?.Function == FunctionType.Wait;
 
-        [ObservableProperty]
-        private string _stepNumberString = "";
-        [ObservableProperty]
-        private string _speedRpmString = "";
-        [ObservableProperty]
-        private string _targetXDegString = "";
-        [ObservableProperty]
-        private string _repeatsString = "";
-        [ObservableProperty]
-        private string _pauseMsString = "";
-
-        public List<FunctionViewModel> FunctionTypes { get; }
-        public Array DirectionTypes { get; } = Enum.GetValues(typeof(DirectionType));
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(IsSpeedRpmEnabled))]
-        [NotifyPropertyChangedFor(nameof(IsDirectionEnabled))]
-        [NotifyPropertyChangedFor(nameof(IsTargetXDegEnabled))]
-        [NotifyPropertyChangedFor(nameof(IsRepeatsEnabled))]
-        [NotifyPropertyChangedFor(nameof(IsPauseMsEnabled))]
-        private FunctionViewModel? _selectedFunction;
+        public IRelayCommand SaveStepCommand { get; }
+        public IRelayCommand CancelCommand { get; }
 
         public StepEditorViewModel(RecipeStep step, Action<RecipeStep?> closeAction)
         {
+            _step = step;
             _closeAction = closeAction;
-            CurrentStep = step;
 
-            FunctionTypes = new List<FunctionViewModel>
+            StepNumberString = _step.StepNumber.ToString();
+
+            FunctionTypes = new ObservableCollection<FunctionViewModel>
             {
                 new FunctionViewModel { Function = FunctionType.Rotate, Name = "Vrtenje" },
                 new FunctionViewModel { Function = FunctionType.Wait, Name = "Pavza" },
                 new FunctionViewModel { Function = FunctionType.Repeat, Name = "Ponovi" }
             };
 
-            InitializeStringProperties();
-            InitializeCommands();
-        }
-
-        private void InitializeStringProperties()
-        {
-            StepNumberString = CurrentStep.StepNumber.ToString();
-            SpeedRpmString = CurrentStep.SpeedRPM.ToString();
-            TargetXDegString = CurrentStep.TargetXDeg.ToString();
-            RepeatsString = CurrentStep.Repeats.ToString();
-            PauseMsString = CurrentStep.PauseMs.ToString();
-            SelectedFunction = FunctionTypes.FirstOrDefault(f => f.Function == CurrentStep.Function);
-        }
-
-        private void InitializeCommands()
-        {
+            LoadStepProperties();
             SaveStepCommand = new RelayCommand(SaveStep);
             CancelCommand = new RelayCommand(Cancel);
         }
 
-        public IRelayCommand SaveStepCommand { get; private set; } = null!;
-        public IRelayCommand CancelCommand { get; private set; } = null!;
+        private void LoadStepProperties()
+        {
+            SelectedFunction = FunctionTypes.FirstOrDefault(f => f.Function == _step.Function);
+            Direction = _step.Direction;
+            SpeedRpmString = _step.SpeedRPM.ToString();
+            TargetXDegString = _step.TargetXDeg.ToString();
+            RepeatsString = _step.Repeats.ToString();
+            PauseMsString = _step.PauseMs.ToString();
+        }
 
         private void SaveStep()
         {
-            if (SelectedFunction != null) CurrentStep.Function = SelectedFunction.Function;
-            if (int.TryParse(StepNumberString, out var stepNum)) CurrentStep.StepNumber = stepNum;
-            if (int.TryParse(SpeedRpmString, out var speed)) CurrentStep.SpeedRPM = speed;
-            if (int.TryParse(TargetXDegString, out var target)) CurrentStep.TargetXDeg = target;
-            if (int.TryParse(RepeatsString, out var repeats)) CurrentStep.Repeats = repeats;
-            if (int.TryParse(PauseMsString, out var pause)) CurrentStep.PauseMs = pause;
+            if (SelectedFunction != null) _step.Function = SelectedFunction.Function;
+            _step.Direction = Direction;
 
-            _closeAction?.Invoke(CurrentStep);
+            if (int.TryParse(SpeedRpmString, out var speed)) _step.SpeedRPM = speed;
+            if (int.TryParse(TargetXDegString, out var target)) _step.TargetXDeg = target;
+            if (int.TryParse(RepeatsString, out var repeats)) _step.Repeats = repeats;
+            if (int.TryParse(PauseMsString, out var pause)) _step.PauseMs = pause;
+
+            _closeAction(_step);
         }
 
         private void Cancel()
         {
-            _closeAction?.Invoke(null);
+            _closeAction(null);
         }
     }
 }

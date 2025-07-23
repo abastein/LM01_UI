@@ -3,6 +3,7 @@
              x:Class="LM01_UI.Views.StepEditorView"
              xmlns:vm="clr-namespace:LM01_UI.ViewModels"
              xmlns:enums="clr-namespace:LM01_UI.Enums"
+             xmlns:views="clr-namespace:LM01_UI.Views"
              x:DataType="vm:StepEditorViewModel"
              Background="#FF202530">
 
