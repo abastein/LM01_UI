@@ -1,9 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input; // Potrebno za GotFocusEventArgs
 using Avalonia.Interactivity;
-using Avalonia.Threading; // Potrebno za Dispatcher
-using Avalonia.VisualTree; // Potrebno za VisualTreeAttachmentEventArgs
-using LM01_UI.Enums;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using LM01_UI.ViewModels;
 using System;
 using System.Linq;
@@ -32,15 +32,14 @@ namespace LM01_UI.Views
             var textBoxes = new[] { speedRpmTextBox, targetXDegTextBox, repeatsTextBox, pauseMsTextBox };
             foreach (var tb in textBoxes.Where(t => t != null))
             {
-                tb!.GotFocus += (s, ev) => _activeTextBox = s as TextBox;
+                // POPRAVEK: Vsa polja se sedaj vežejo na novo, pametnejšo metodo
+                tb!.GotFocus += NumericTextBox_GotFocus;
             }
             if (keypad != null) keypad.KeyPressed += OnKeypadPressed;
 
-            // POPRAVEK: Postavimo fokus na ComboBox in ga odpremo
             if (functionComboBox != null)
             {
                 functionComboBox.Focus();
-                // Akcijo za odprtje pošljemo v čakalno vrsto, da se izvede, ko bo UI pripravljen
                 Dispatcher.UIThread.Post(() =>
                 {
                     functionComboBox.IsDropDownOpen = true;
@@ -48,6 +47,22 @@ namespace LM01_UI.Views
             }
 
             this.AttachedToVisualTree -= StepEditorView_AttachedToVisualTree;
+        }
+
+        // POPRAVEK: Nova metoda, ki počisti polje, če je v njem "0"
+        private void NumericTextBox_GotFocus(object? sender, GotFocusEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                // Najprej nastavimo aktivno polje za tipkovnico
+                _activeTextBox = textBox;
+
+                // Nato preverimo, ali naj počistimo vsebino
+                if (textBox.Text == "0")
+                {
+                    textBox.Text = string.Empty;
+                }
+            }
         }
 
         private void OnKeypadPressed(string key)
@@ -71,7 +86,7 @@ namespace LM01_UI.Views
         {
             if (DataContext is StepEditorViewModel viewModel)
             {
-                // Pustimo prazno, ker ViewModel že sam posodobi IsEnabled lastnosti
+                // Klic je potreben samo, da se XAML osveži
             }
         }
     }

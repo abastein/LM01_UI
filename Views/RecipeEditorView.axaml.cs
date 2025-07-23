@@ -1,7 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.VisualTree; // POPRAVEK: Dodana manjkajoča using direktiva
+using Avalonia.Threading; // Potrebno za Dispatcher
+using Avalonia.VisualTree;
+using System.Diagnostics;
 
 namespace LM01_UI.Views
 {
@@ -12,7 +14,6 @@ namespace LM01_UI.Views
         public RecipeEditorView()
         {
             InitializeComponent();
-
             this.AttachedToVisualTree += RecipeEditorView_AttachedToVisualTree;
         }
 
@@ -22,15 +23,12 @@ namespace LM01_UI.Views
             var descriptionTextBox = this.FindControl<TextBox>("DescriptionTextBox");
             var keypad = this.FindControl<QwertyKeypad>("Keypad");
 
-            if (nameTextBox != null)
-            {
-                nameTextBox.GotFocus += (s, ev) => _activeTextBox = s as TextBox;
-                // Postavimo fokus ob zagonu
-                nameTextBox.Focus();
-            }
+            if (nameTextBox != null) nameTextBox.GotFocus += (s, ev) => _activeTextBox = s as TextBox;
             if (descriptionTextBox != null) descriptionTextBox.GotFocus += (s, ev) => _activeTextBox = s as TextBox;
-
             if (keypad != null) keypad.KeyPressed += OnKeypadPressed;
+
+            // POPRAVEK: Fokusiranje izvedemo preko Dispatcherja za večjo zanesljivost
+            Dispatcher.UIThread.Post(() => nameTextBox?.Focus(), DispatcherPriority.Loaded);
 
             this.AttachedToVisualTree -= RecipeEditorView_AttachedToVisualTree;
         }
