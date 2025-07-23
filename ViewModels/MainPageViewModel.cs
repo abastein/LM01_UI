@@ -75,7 +75,8 @@ namespace LM01_UI.ViewModels
 
             LoadRecipeCommand = new AsyncRelayCommand(LoadRecipeOnPlcAsync, () => SelectedRecipe != null && IsPlcConnected && !IsRunning && SelectedRecipe.Id != LoadedRecipeId);
             ToggleStartStopCommand = new AsyncRelayCommand(ToggleStartStopAsync, () => IsPlcConnected && (IsRunning || (IsRecipeLoaded && SelectedRecipe != null && SelectedRecipe.Id == LoadedRecipeId)));
-            ClearSelectionCommand = new RelayCommand(ClearSelection, () => SelectedRecipe != null);
+            //ClearSelectionCommand = new RelayCommand(ClearSelection, () => SelectedRecipe != null);
+            ClearSelectionCommand = new RelayCommand(ClearSelection,() => IsRecipeLoaded && !IsRunning);
 
             _tcpClient.ConnectionStatusChanged += OnConnectionStatusChanged;
             OnConnectionStatusChanged(_tcpClient.IsConnected);
