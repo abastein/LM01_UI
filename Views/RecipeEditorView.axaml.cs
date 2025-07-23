@@ -1,8 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.VisualTree;
-using System.Diagnostics;
+using Avalonia.VisualTree; // POPRAVEK: Dodana manjkajoča using direktiva
 
 namespace LM01_UI.Views
 {
@@ -13,31 +12,25 @@ namespace LM01_UI.Views
         public RecipeEditorView()
         {
             InitializeComponent();
+
             this.AttachedToVisualTree += RecipeEditorView_AttachedToVisualTree;
         }
 
         private void RecipeEditorView_AttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
         {
-            // POPRAVEK: Namesto FindControl, dostopamo do kontrol neposredno.
-            // Prevajalnik je samodejno ustvaril polja 'NameTextBox', 'DescriptionTextBox' in 'Keypad'
-            // na podlagi x:Name oznak v XAML datoteki.
+            var nameTextBox = this.FindControl<TextBox>("NameTextBox");
+            var descriptionTextBox = this.FindControl<TextBox>("DescriptionTextBox");
+            var keypad = this.FindControl<QwertyKeypad>("Keypad");
 
-            // Preverimo, ali je prevajalnik pravilno ustvaril polja.
-            if (this.NameTextBox == null) Debug.WriteLine("NAPAKA: Polje NameTextBox je null!");
-            else this.NameTextBox.GotFocus += (s, ev) => _activeTextBox = s as TextBox;
-
-            if (this.DescriptionTextBox == null) Debug.WriteLine("NAPAKA: Polje DescriptionTextBox je null!");
-            else this.DescriptionTextBox.GotFocus += (s, ev) => _activeTextBox = s as TextBox;
-
-            if (this.Keypad == null)
+            if (nameTextBox != null)
             {
-                Debug.WriteLine("KRITIČNA NAPAKA: Polje Keypad je null!");
+                nameTextBox.GotFocus += (s, ev) => _activeTextBox = s as TextBox;
+                // Postavimo fokus ob zagonu
+                nameTextBox.Focus();
             }
-            else
-            {
-                Debug.WriteLine("USPEH: Polje Keypad najdeno. Povezujem dogodek KeyPressed.");
-                this.Keypad.KeyPressed += OnKeypadPressed;
-            }
+            if (descriptionTextBox != null) descriptionTextBox.GotFocus += (s, ev) => _activeTextBox = s as TextBox;
+
+            if (keypad != null) keypad.KeyPressed += OnKeypadPressed;
 
             this.AttachedToVisualTree -= RecipeEditorView_AttachedToVisualTree;
         }

@@ -53,7 +53,7 @@ namespace LM01_UI.ViewModels
 
         private void AddNewRecipe()
         {
-            var newRecipe = new Recipe { Name = "Nova Receptura" };
+            var newRecipe = new Recipe { Name = "" };
             CurrentAdminContent = new RecipeEditorViewModel(newRecipe, _dbContext, _logger, ShowRecipeList);
         }
     }

@@ -1,7 +1,11 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Threading; // Potrebno za Dispatcher
+using Avalonia.VisualTree; // Potrebno za VisualTreeAttachmentEventArgs
 using LM01_UI.Enums;
 using LM01_UI.ViewModels;
+using System;
 using System.Linq;
 
 namespace LM01_UI.Views
@@ -13,31 +17,42 @@ namespace LM01_UI.Views
         public StepEditorView()
         {
             InitializeComponent();
+            this.AttachedToVisualTree += StepEditorView_AttachedToVisualTree;
+        }
 
-            // Poiščemo vsa vnosna polja in tipkovnico
+        private void StepEditorView_AttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+        {
             var speedRpmTextBox = this.FindControl<TextBox>("SpeedRpmTextBox");
             var targetXDegTextBox = this.FindControl<TextBox>("TargetXDegTextBox");
             var repeatsTextBox = this.FindControl<TextBox>("RepeatsTextBox");
             var pauseMsTextBox = this.FindControl<TextBox>("PauseMsTextBox");
             var keypad = this.FindControl<NumericKeypad>("Keypad");
+            var functionComboBox = this.FindControl<ComboBox>("FunctionComboBox");
 
             var textBoxes = new[] { speedRpmTextBox, targetXDegTextBox, repeatsTextBox, pauseMsTextBox };
-
-            // Povežemo se na dogodek "GotFocus" za vsa polja
             foreach (var tb in textBoxes.Where(t => t != null))
             {
-                tb!.GotFocus += (s, e) => _activeTextBox = s as TextBox;
+                tb!.GotFocus += (s, ev) => _activeTextBox = s as TextBox;
+            }
+            if (keypad != null) keypad.KeyPressed += OnKeypadPressed;
+
+            // POPRAVEK: Postavimo fokus na ComboBox in ga odpremo
+            if (functionComboBox != null)
+            {
+                functionComboBox.Focus();
+                // Akcijo za odprtje pošljemo v čakalno vrsto, da se izvede, ko bo UI pripravljen
+                Dispatcher.UIThread.Post(() =>
+                {
+                    functionComboBox.IsDropDownOpen = true;
+                }, DispatcherPriority.Loaded);
             }
 
-            // Povežemo se na dogodek "KeyPressed" na tipkovnici
-            if (keypad != null) keypad.KeyPressed += OnKeypadPressed;
+            this.AttachedToVisualTree -= StepEditorView_AttachedToVisualTree;
         }
 
-        // Ta metoda se izvede, ko je na tipkovnici pritisnjena tipka
         private void OnKeypadPressed(string key)
         {
             if (_activeTextBox == null) return;
-
             if (key == "BACKSPACE")
             {
                 if (!string.IsNullOrEmpty(_activeTextBox.Text))
@@ -52,13 +67,11 @@ namespace LM01_UI.Views
             _activeTextBox.CaretIndex = _activeTextBox.Text?.Length ?? 0;
         }
 
-        // Ta metoda je potrebna za posodabljanje vidnosti polj
         private void OnFunctionSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             if (DataContext is StepEditorViewModel viewModel)
             {
-                // Pustimo prazno, ker ViewModel že sam posodobi IsEnabled lastnosti.
-                // Klic je potreben samo, da se XAML osveži.
+                // Pustimo prazno, ker ViewModel že sam posodobi IsEnabled lastnosti
             }
         }
     }

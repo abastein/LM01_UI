@@ -56,7 +56,7 @@ namespace LM01_UI.ViewModels
 
         private async Task AddNewRecipeAsync()
         {
-            var newRecipe = new Recipe { Name = "Nova Receptura" };
+            var newRecipe = new Recipe { Name = "" };
             await OpenRecipeEditor(newRecipe);
         }
 
