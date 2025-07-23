@@ -17,7 +17,7 @@
 				<TextBox Text="{Binding CurrentRecipe.Description, Mode=TwoWay}" MinWidth="350" Height="150" TextWrapping="Wrap" AcceptsReturn="True"/>
 			</StackPanel>
 
-			<views:QwertyKeypad x:Name="QwertyKeypad" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top"/>
+			<views:QwertyKeypad x:Name="Keypad" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top"/>
 
 			<StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="10" Margin="0,20,0,10">
 				<TextBlock Text="Koraki Recepture:" FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
