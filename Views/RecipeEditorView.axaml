@@ -22,7 +22,7 @@
 
 			<StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="10" Margin="0,20,0,10">
 				<TextBlock Text="Koraki Recepture:" FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
-				<Button Content="Dodaj Korak" Command="{Binding AddNewStepCommand}"/>
+				<Button Content="Dodaj Korak" Command="{Binding AddStepCommand}"/>
 				<Button Content="Uredi Korak" Command="{Binding EditStepCommand}"/>
 				<Button Content="Izbriši Korak" Command="{Binding DeleteStepCommand}"/>
 			</StackPanel>
