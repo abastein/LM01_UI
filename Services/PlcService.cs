@@ -10,14 +10,14 @@ namespace LM01_UI.Services
         private const int CommandLength = 256;
         private const char PaddingChar = '\0';
 
-        public string StartCommand => "START".PadRight(CommandLength, PaddingChar);
-        public string StopCommand => "STOP".PadRight(CommandLength, PaddingChar);
-        public string StatusCommand => "STATUS".PadRight(CommandLength, PaddingChar);
+        public string StartCommand => "1001".PadRight(CommandLength, PaddingChar);
+        public string StopCommand => "1002".PadRight(CommandLength, PaddingChar);
+        public string StatusCommand => "1000".PadRight(CommandLength, PaddingChar);
 
         public string BuildLoadCommand(Recipe recipe)
         {
             var commandBuilder = new StringBuilder();
-            commandBuilder.Append("LOAD:");
+            commandBuilder.Append("1003");
             commandBuilder.Append(string.Format("{0:000}", recipe.Id));
             commandBuilder.Append(string.Format("{0:00}", recipe.Steps.Count));
             foreach (var step in recipe.Steps.OrderBy(s => s.StepNumber))
