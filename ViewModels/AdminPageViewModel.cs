@@ -6,7 +6,6 @@ using LM01_UI.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
-using LM01_UI; // POPRAVEK: Dodana using direktiva za dostop do PlcTcpClient in Logger
 
 namespace LM01_UI.ViewModels
 {
@@ -15,6 +14,8 @@ namespace LM01_UI.ViewModels
         private readonly Logger _logger;
         private readonly ApplicationDbContext _dbContext;
         private readonly Action<string> _navigate;
+
+        // Shraniva si instance pod-pogledov
         private readonly PlcTestViewModel _plcTestViewModel;
         private readonly RecipeListViewModel _recipeListViewModel;
 
@@ -26,14 +27,17 @@ namespace LM01_UI.ViewModels
             _logger = logger;
             _dbContext = dbContext;
             _navigate = navigate;
-            _plcTestViewModel = plcTestViewModel;
+            _plcTestViewModel = plcTestViewModel; // Shranimo posredovan PlcTestViewModel
 
+            // Ustvarimo RecipeListViewModel in mu posredujemo metode iz tega ViewModela
             _recipeListViewModel = new RecipeListViewModel(_dbContext, _logger, EditRecipe, AddNewRecipe);
 
+            // Definiramo ukaze za navigacijo
             NavigateBackCommand = new RelayCommand(() => _navigate("Welcome"));
             NavigateToRecipeListCommand = new RelayCommand(ShowRecipeList);
             NavigateToPlcTestCommand = new RelayCommand(ShowPlcTest);
 
+            // Ob zagonu prikažemo seznam receptur
             ShowRecipeList();
         }
 

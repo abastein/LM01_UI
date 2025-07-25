@@ -1,10 +1,11 @@
-﻿using System;
+﻿using LM01_UI.Services;
+using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LM01_UI // POPRAVEK: Pravilen imenski prostor
+namespace LM01_UI
 {
     public class PlcTcpClient
     {
@@ -50,6 +51,7 @@ namespace LM01_UI // POPRAVEK: Pravilen imenski prostor
             ConnectionStatusChanged?.Invoke(false);
         }
 
+        // POPRAVEK: Dodana ključna beseda 'public'
         public async Task SendAsync(string message)
         {
             if (!IsConnected || _stream == null) throw new InvalidOperationException("Not connected to PLC.");
@@ -61,6 +63,7 @@ namespace LM01_UI // POPRAVEK: Pravilen imenski prostor
             await _stream.WriteAsync(messageBytes, 0, messageBytes.Length);
         }
 
+        // POPRAVEK: Dodana ključna beseda 'public'
         public async Task<string> SendReceiveAsync(string message, TimeSpan timeout)
         {
             if (!IsConnected || _stream == null)

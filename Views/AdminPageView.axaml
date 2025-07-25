@@ -5,7 +5,11 @@
              x:DataType="vm:AdminPageViewModel">
 	<DockPanel>
 		<Border DockPanel.Dock="Top" Padding="10" BorderThickness="0,0,0,1" BorderBrush="Gray">
-			<Button Content="Nazaj na Glavni Meni" Command="{Binding NavigateBackCommand}" HorizontalAlignment="Left"/>
+			<StackPanel Orientation="Horizontal" Spacing="10">
+				<Button Content="Recepture" Command="{Binding NavigateToRecipeListCommand}"/>
+				<Button Content="PLC Test (Log)" Command="{Binding NavigateToPlcTestCommand}"/>
+				<Button Content="Nazaj na Glavni Meni" Command="{Binding NavigateBackCommand}"/>
+			</StackPanel>
 		</Border>
 
 		<ContentControl Content="{Binding CurrentAdminContent}"
