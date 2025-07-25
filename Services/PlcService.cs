@@ -31,14 +31,14 @@ namespace LM01_UI.Services
         {
             // STOP ukaz vedno pošlje prazen payload in ponastavi shranjenega
             _parameterPayload = string.Empty;
-            string emptyPayload = new string(PaddingChar, CommandLength - 4);
+            string emptyPayload = new string(PaddingChar, CommandLength - "001002".Length);
             return BuildPaddedCommand("001002", emptyPayload);
         }
 
         public string BuildLoadCommand(Recipe recipe)
         {
             var parameterBuilder = new StringBuilder();
-            parameterBuilder.Append(string.Format("{0:003}", recipe.Id));
+            parameterBuilder.Append(string.Format("{0:000}", recipe.Id));
             parameterBuilder.Append(string.Format("{0:00}", recipe.Steps.Count));
             foreach (var step in recipe.Steps.OrderBy(s => s.StepNumber))
             {
