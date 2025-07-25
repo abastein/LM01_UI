@@ -74,7 +74,7 @@ namespace LM01_UI.ViewModels
             _plcService = plcService;
             _logger = logger;
 
-            // --- POPRAVLJENI POGOJI ZA GUMBE ---
+            // --- DOKONČNA PRAVILA ZA GUMBE ---
             LoadRecipeCommand = new AsyncRelayCommand(LoadRecipeOnPlcAsync,
                 () => SelectedRecipe != null && IsPlcConnected && !IsRunning);
 
@@ -97,6 +97,7 @@ namespace LM01_UI.ViewModels
 
         partial void OnSelectedRecipeChanged(Recipe? value)
         {
+            // Ob vsaki novi izbiri ponastavimo stanje "naloženosti"
             IsRecipeLoaded = false;
             _ = LoadStepsForSelectedRecipeAsync();
         }
@@ -214,16 +215,19 @@ namespace LM01_UI.ViewModels
         private async Task ProcessPlcResponse(string response)
         {
             if (string.IsNullOrEmpty(response) || response.Length < 10) return;
+
+            // POPRAVEK: Razčlenjevanje je prilagojeno novemu formatu (1-3-2-4)
             string plcState = response.Substring(0, 1);
             int.TryParse(response.Substring(1, 3), out int loadedRecipeIdFromPlc);
-            int.TryParse(response.Substring(4, 3), out int currentStep);
-            int.TryParse(response.Substring(7, 3), out int errorCode);
+            int.TryParse(response.Substring(4, 2), out int currentStep);
+            int.TryParse(response.Substring(6, 4), out int errorCode);
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 CurrentStepNumber = currentStep;
                 PlcErrorCode = errorCode;
-                IsRecipeLoaded = plcState is "1" or "2" or "9";
+                // POPRAVEK: Upoštevamo, da je '3' novo stanje za napako
+                IsRecipeLoaded = plcState is "1" or "2" or "3";
                 IsRunning = plcState == "2";
                 LoadedRecipeId = IsRecipeLoaded ? loadedRecipeIdFromPlc : null;
                 PlcStatusText = plcState switch
@@ -231,7 +235,7 @@ namespace LM01_UI.ViewModels
                     "0" => "Pripravljen (Standby)",
                     "1" => $"Receptura naložena (ID: {loadedRecipeIdFromPlc})",
                     "2" => $"Izvajanje… (Receptura: {loadedRecipeIdFromPlc}, Korak: {currentStep})",
-                    "9" => $"NAPAKA (Koda: {errorCode})",
+                    "3" => $"NAPAKA (Koda: {errorCode})", // POPRAVEK: Prej je bilo "9"
                     _ => "Neznano stanje PLC-ja"
                 };
             });
