@@ -8,7 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace LM01_UI.ViewModels
 {
-    public class MainWindowViewModel : ViewModelBase
+    public class MainWindowViewModel : ViewModelBase, IDisposable
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly PlcTcpClient _plcClient;
@@ -27,29 +27,35 @@ namespace LM01_UI.ViewModels
         {
             _dbContext = dbContext;
             _logger = new Logger();
-            _plcClient = new PlcTcpClient();
             _plcService = new PlcService();
+            _plcClient = new PlcTcpClient(_logger);
 
             _welcomeViewModel = new WelcomeViewModel(_plcClient, _logger, Navigate);
-            _adminPageViewModel = new AdminPageViewModel(_plcClient, _logger, _dbContext, Navigate);
+
+            var plcTestViewModel = new PlcTestViewModel(_plcClient, _logger);
+            _adminPageViewModel = new AdminPageViewModel(_plcClient, _logger, _dbContext, Navigate, plcTestViewModel);
+
             _mainPageViewModel = new MainPageViewModel(_dbContext, _plcClient, _plcService, _logger);
 
             CurrentPageViewModel = _welcomeViewModel;
             ExitApplicationCommand = new RelayCommand(ExitApplication);
         }
 
+        public void Dispose()
+        {
+            _logger.Dispose();
+        }
+
         private void Navigate(object target)
         {
             if (target is string pageName)
             {
-                // Vedno ustavimo preverjanje, ko zapustimo stran RUN
-                _mainPageViewModel.StopPolling();
+                if (_currentPageViewModel is MainPageViewModel mvm) mvm.StopPolling();
 
                 switch (pageName)
                 {
                     case "Run":
                         CurrentPageViewModel = _mainPageViewModel;
-                        // Zaženemo preverjanje šele, ko pridemo na stran RUN
                         _mainPageViewModel.StartPlcStatusPolling();
                         break;
                     case "Admin":
@@ -66,6 +72,7 @@ namespace LM01_UI.ViewModels
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 _plcClient.Disconnect();
+                Dispose();
                 desktop.Shutdown();
             }
         }

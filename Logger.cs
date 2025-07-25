@@ -1,29 +1,42 @@
 ﻿using Avalonia.Threading;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 
-namespace LM01_UI.Services
+namespace LM01_UI // POPRAVEK: Pravilen imenski prostor
 {
-    public class Logger
+    public class Logger : IDisposable
     {
-        /// <summary>
-        /// A collection of all log messages that the UI can bind to.
-        /// </summary>
+        private readonly StreamWriter _logWriter;
+
         public ObservableCollection<string> Messages { get; } = new();
 
-        /// <summary>
-        /// Adds a new formatted message to the collection.
-        /// </summary>
+        public Logger()
+        {
+            string logFilePath = Path.Combine(AppContext.BaseDirectory, "communication_log.txt");
+            _logWriter = new StreamWriter(logFilePath, append: true) { AutoFlush = true };
+            _logWriter.WriteLine($"--- Nova Seja Začeta: {DateTime.Now} ---");
+        }
+
         public void Inform(int type, string message)
         {
-            string formattedMessage = $"{DateTime.Now:HH:mm:ss} | {message}";
+            string formattedMessage = $"{DateTime.Now:HH:mm:ss.fff} | {message}";
+            _logWriter.WriteLine(formattedMessage);
 
-            // Use the dispatcher to ensure the collection is always modified on the UI thread,
-            // which is required for UI binding to work safely.
             Dispatcher.UIThread.Invoke(() =>
             {
                 Messages.Insert(0, formattedMessage);
+                if (Messages.Count > 200)
+                {
+                    Messages.RemoveAt(Messages.Count - 1);
+                }
             });
+        }
+
+        public void Dispose()
+        {
+            _logWriter.WriteLine($"--- Seja Končana: {DateTime.Now} ---");
+            _logWriter.Dispose();
         }
     }
 }

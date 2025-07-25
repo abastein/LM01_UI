@@ -6,6 +6,7 @@ using LM01_UI.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using LM01_UI; // POPRAVEK: Dodana using direktiva za dostop do PlcTcpClient in Logger
 
 namespace LM01_UI.ViewModels
 {
@@ -14,30 +15,40 @@ namespace LM01_UI.ViewModels
         private readonly Logger _logger;
         private readonly ApplicationDbContext _dbContext;
         private readonly Action<string> _navigate;
+        private readonly PlcTestViewModel _plcTestViewModel;
+        private readonly RecipeListViewModel _recipeListViewModel;
 
-        // POPRAVEK: Ročno implementirana lastnost za odpravo napake
+        [ObservableProperty]
         private ViewModelBase? _currentAdminContent;
-        public ViewModelBase? CurrentAdminContent
-        {
-            get => _currentAdminContent;
-            set => SetProperty(ref _currentAdminContent, value);
-        }
 
-        public IRelayCommand NavigateBackCommand { get; }
-
-        public AdminPageViewModel(PlcTcpClient plcClient, Logger logger, ApplicationDbContext dbContext, Action<string> navigate)
+        public AdminPageViewModel(PlcTcpClient plcClient, Logger logger, ApplicationDbContext dbContext, Action<string> navigate, PlcTestViewModel plcTestViewModel)
         {
             _logger = logger;
             _dbContext = dbContext;
             _navigate = navigate;
+            _plcTestViewModel = plcTestViewModel;
+
+            _recipeListViewModel = new RecipeListViewModel(_dbContext, _logger, EditRecipe, AddNewRecipe);
 
             NavigateBackCommand = new RelayCommand(() => _navigate("Welcome"));
+            NavigateToRecipeListCommand = new RelayCommand(ShowRecipeList);
+            NavigateToPlcTestCommand = new RelayCommand(ShowPlcTest);
+
             ShowRecipeList();
         }
 
+        public IRelayCommand NavigateBackCommand { get; }
+        public IRelayCommand NavigateToRecipeListCommand { get; }
+        public IRelayCommand NavigateToPlcTestCommand { get; }
+
         private void ShowRecipeList()
         {
-            CurrentAdminContent = new RecipeListViewModel(_dbContext, _logger, EditRecipe, AddNewRecipe);
+            CurrentAdminContent = _recipeListViewModel;
+        }
+
+        private void ShowPlcTest()
+        {
+            CurrentAdminContent = _plcTestViewModel;
         }
 
         private void EditRecipe(Recipe recipe)
@@ -53,7 +64,7 @@ namespace LM01_UI.ViewModels
 
         private void AddNewRecipe()
         {
-            var newRecipe = new Recipe { Name = "" };
+            var newRecipe = new Recipe { Name = "Nova Receptura" };
             CurrentAdminContent = new RecipeEditorViewModel(newRecipe, _dbContext, _logger, ShowRecipeList);
         }
     }
