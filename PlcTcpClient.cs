@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LM01_UI
@@ -12,6 +13,7 @@ namespace LM01_UI
         private TcpClient? _client;
         private NetworkStream? _stream;
         private readonly Logger _logger;
+        private readonly SemaphoreSlim _ioLock = new SemaphoreSlim(1, 1);
 
         public bool IsConnected { get; private set; }
         public event Action<bool>? ConnectionStatusChanged;
@@ -56,11 +58,24 @@ namespace LM01_UI
         {
             if (!IsConnected || _stream == null) throw new InvalidOperationException("Not connected to PLC.");
 
+            await _ioLock.WaitAsync();
+            try
+            {
+                await SendInternalAsync(message);
+            }
+            finally
+            {
+                _ioLock.Release();
+            }
+        }
+
+        private async Task SendInternalAsync(string message)
+        {
             var trimmedMessage = message.TrimEnd('\0');
             _logger.Inform(0, $"CLIENT > {trimmedMessage}");
 
             var messageBytes = Encoding.ASCII.GetBytes(message);
-            await _stream.WriteAsync(messageBytes, 0, messageBytes.Length);
+            await _stream!.WriteAsync(messageBytes, 0, messageBytes.Length);
         }
 
         // POPRAVEK: Dodana ključna beseda 'public'
@@ -69,18 +84,26 @@ namespace LM01_UI
             if (!IsConnected || _stream == null)
                 throw new InvalidOperationException("Not connected to PLC.");
 
-            await SendAsync(message);
-
-            var readTask = ReadFixedLengthAsync(10);
-            var timeoutTask = Task.Delay(timeout);
-            var completedTask = await Task.WhenAny(readTask, timeoutTask);
-
-            if (completedTask == timeoutTask)
+            await _ioLock.WaitAsync();
+            try
             {
-                throw new TimeoutException("PLC response timed out.");
-            }
+                await SendInternalAsync(message);
 
-            return await readTask;
+                var readTask = ReadFixedLengthAsync(10);
+                var timeoutTask = Task.Delay(timeout);
+                var completedTask = await Task.WhenAny(readTask, timeoutTask);
+
+                if (completedTask == timeoutTask)
+                {
+                    throw new TimeoutException("PLC response timed out.");
+                }
+
+                return await readTask;
+            }
+            finally
+            {
+                _ioLock.Release();
+            }
         }
 
         private async Task<string> ReadFixedLengthAsync(int length)
