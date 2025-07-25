@@ -8,36 +8,54 @@ namespace LM01_UI.Services
     public class PlcService
     {
         private const int CommandLength = 256;
-        private const char PaddingChar = '\0'; // Uporabimo null znak za polnjenje
+        private const char PaddingChar = '\0';
 
-        // Ukazi so sedaj lastnosti, ki vedno vrnejo niz pravilne dolžine
-        public string StartCommand => "1001".PadRight(CommandLength, PaddingChar);
-        public string StopCommand => "1002".PadRight(CommandLength, PaddingChar);
-        public string StatusCommand => "1000".PadRight(CommandLength, PaddingChar);
+        // "Spomin" za zadnje veljavne parametre recepture
+        private string _parameterPayload = string.Empty;
+
+        // Metoda za sestavljanje sporočila, ki upošteva trenutni payload
+        private string BuildPaddedCommand(string commandCode, string? payload = null)
+        {
+            // Če je podan specifičen payload (npr. za STOP), ga uporabimo.
+            // Sicer uporabimo shranjen _parameterPayload.
+            string payloadToUse = payload ?? _parameterPayload;
+            string fullCommand = commandCode + payloadToUse;
+            return fullCommand.PadRight(CommandLength, PaddingChar);
+        }
+
+        // Ukazi so sedaj metode, ker je njihova vsebina odvisna od stanja
+        public string GetStartCommand() => BuildPaddedCommand("001001");
+        public string GetStatusCommand() => BuildPaddedCommand("001000");
+
+        public string GetStopCommand()
+        {
+            // STOP ukaz vedno pošlje prazen payload in ponastavi shranjenega
+            _parameterPayload = string.Empty;
+            string emptyPayload = new string(PaddingChar, CommandLength - 4);
+            return BuildPaddedCommand("001002", emptyPayload);
+        }
 
         public string BuildLoadCommand(Recipe recipe)
         {
-            var commandBuilder = new StringBuilder();
-
-            // Zgradimo jedro ukaza
-            commandBuilder.Append("1003"); // Koda za LOAD
-            commandBuilder.Append(string.Format("{0:003}", recipe.Id));
-            commandBuilder.Append(string.Format("{0:00}", recipe.Steps.Count));
+            var parameterBuilder = new StringBuilder();
+            parameterBuilder.Append(string.Format("{0:003}", recipe.Id));
+            parameterBuilder.Append(string.Format("{0:00}", recipe.Steps.Count));
             foreach (var step in recipe.Steps.OrderBy(s => s.StepNumber))
             {
-                commandBuilder.Append(string.Format("{0:00}", step.StepNumber));
-                commandBuilder.Append(string.Format("{0:0}", (int)step.Function));
-                commandBuilder.Append(string.Format("{0:000}", step.SpeedRPM));
-                commandBuilder.Append(string.Format("{0:0}", (int)step.Direction));
-                commandBuilder.Append(string.Format("{0:0000}", step.TargetXDeg));
-                commandBuilder.Append(string.Format("{0:00}", step.Repeats));
-                commandBuilder.Append(string.Format("{0:00000}", step.PauseMs));
+                parameterBuilder.Append(string.Format("{0:00}", step.StepNumber));
+                parameterBuilder.Append(string.Format("{0:0}", (int)step.Function));
+                parameterBuilder.Append(string.Format("{0:000}", step.SpeedRPM));
+                parameterBuilder.Append(string.Format("{0:0}", (int)step.Direction));
+                parameterBuilder.Append(string.Format("{0:0000}", step.TargetXDeg));
+                parameterBuilder.Append(string.Format("{0:00}", step.Repeats));
+                parameterBuilder.Append(string.Format("{0:00000}", step.PauseMs));
             }
 
-            string command = commandBuilder.ToString();
+            // Shranimo nov payload v "spomin"
+            _parameterPayload = parameterBuilder.ToString();
 
-            // Vrnemo niz, dopolnjen do točne dolžine 256
-            return command.PadRight(CommandLength, PaddingChar);
+            // Sestavimo celoten LOAD ukaz
+            return BuildPaddedCommand("001003");
         }
     }
 }

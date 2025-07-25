@@ -43,7 +43,9 @@ namespace LM01_UI.Services
 
         public async Task SendAsync(string message)
         {
-            if (!IsConnected || _stream == null) throw new InvalidOperationException("Not connected to PLC.");
+            if (!IsConnected || _stream == null)
+                throw new InvalidOperationException("Not connected to PLC.");
+
             var messageBytes = Encoding.ASCII.GetBytes(message);
             await _stream.WriteAsync(messageBytes, 0, messageBytes.Length);
         }
@@ -55,29 +57,37 @@ namespace LM01_UI.Services
 
             await SendAsync(message);
 
-            var readTask = ReadFixedLengthAsync(10);
+            var readTask = ReadFixedLengthAsync(12);
             var timeoutTask = Task.Delay(timeout);
             var completedTask = await Task.WhenAny(readTask, timeoutTask);
 
             if (completedTask == timeoutTask)
-            {
                 throw new TimeoutException("PLC response timed out.");
-            }
 
-            return await readTask;
+            // Retrieve full 12‑char response
+            string fullResponse = await readTask;   // e.g. "XX1234567890"
+
+            // Drop the first two characters and return the last 10 chars
+            return fullResponse[2..];               // returns "1234567890"
         }
 
         private async Task<string> ReadFixedLengthAsync(int length)
         {
-            if (_stream == null) throw new InvalidOperationException("Stream is not available.");
+            if (_stream == null)
+                throw new InvalidOperationException("Stream is not available.");
+
             var buffer = new byte[length];
             int totalBytesRead = 0;
+
             while (totalBytesRead < length)
             {
                 int bytesRead = await _stream.ReadAsync(buffer, totalBytesRead, length - totalBytesRead);
-                if (bytesRead == 0) throw new IOException("Connection closed prematurely.");
+                if (bytesRead == 0)
+                    throw new IOException("Connection closed prematurely.");
+
                 totalBytesRead += bytesRead;
             }
+
             return Encoding.ASCII.GetString(buffer, 0, totalBytesRead);
         }
     }

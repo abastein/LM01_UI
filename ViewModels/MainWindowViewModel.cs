@@ -28,11 +28,11 @@ namespace LM01_UI.ViewModels
             _dbContext = dbContext;
             _logger = new Logger();
             _plcClient = new PlcTcpClient();
-            _plcService = new PlcService(); // Ustvarimo instanco
+            _plcService = new PlcService();
 
             _welcomeViewModel = new WelcomeViewModel(_plcClient, _logger, Navigate);
             _adminPageViewModel = new AdminPageViewModel(_plcClient, _logger, _dbContext, Navigate);
-            _mainPageViewModel = new MainPageViewModel(_dbContext, _plcClient, _plcService, _logger); // Posredujemo instanco
+            _mainPageViewModel = new MainPageViewModel(_dbContext, _plcClient, _plcService, _logger);
 
             CurrentPageViewModel = _welcomeViewModel;
             ExitApplicationCommand = new RelayCommand(ExitApplication);
@@ -42,12 +42,15 @@ namespace LM01_UI.ViewModels
         {
             if (target is string pageName)
             {
-                if (_currentPageViewModel is MainPageViewModel mvm) mvm.StopPolling();
+                // Vedno ustavimo preverjanje, ko zapustimo stran RUN
+                _mainPageViewModel.StopPolling();
 
                 switch (pageName)
                 {
                     case "Run":
                         CurrentPageViewModel = _mainPageViewModel;
+                        // Zaženemo preverjanje šele, ko pridemo na stran RUN
+                        _mainPageViewModel.StartPlcStatusPolling();
                         break;
                     case "Admin":
                         CurrentPageViewModel = _adminPageViewModel;
