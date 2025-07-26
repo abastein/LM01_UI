@@ -67,7 +67,7 @@ namespace LM01_UI.ViewModels
 
             LoadRecipeCommand = new AsyncRelayCommand(LoadRecipeOnPlcAsync, () => SelectedRecipe != null && IsPlcConnected && !IsRunning);
             ToggleStartStopCommand = new AsyncRelayCommand(ToggleStartStopAsync, () => IsPlcConnected && (IsRunning || IsRecipeLoaded));
-            ClearSelectionCommand = new RelayCommand(ClearSelection, () => IsRecipeLoaded && !IsRunning);
+            ClearSelectionCommand = new AsyncRelayCommand(ClearSelectionAsync, () => IsRecipeLoaded && !IsRunning);
 
             _tcpClient.ConnectionStatusChanged += OnConnectionStatusChanged;
             OnConnectionStatusChanged(_tcpClient.IsConnected);
@@ -78,7 +78,7 @@ namespace LM01_UI.ViewModels
         public IBrush StartStopButtonBrush => IsRunning ? Brushes.IndianRed : Brushes.MediumSeaGreen;
         public IAsyncRelayCommand LoadRecipeCommand { get; }
         public IAsyncRelayCommand ToggleStartStopCommand { get; }
-        public IRelayCommand ClearSelectionCommand { get; }
+        public IAsyncRelayCommand ClearSelectionCommand { get; }
 
         partial void OnSelectedRecipeChanged(Recipe? value)
         {
@@ -118,9 +118,18 @@ namespace LM01_UI.ViewModels
             }
         }
 
-        private void ClearSelection()
+        private async Task ClearSelectionAsync()
         {
             SelectedRecipe = null;
+            try
+            {
+                string response = await _tcpClient.SendReceiveAsync(_plcService.GetUnloadCommand(), TimeSpan.FromSeconds(2));
+                await ProcessPlcResponse(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.Inform(2, $"Napaka pri pošiljanju UNLOAD: {ex.Message}");
+            }
         }
 
         private async Task LoadRecipeOnPlcAsync()

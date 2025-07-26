@@ -8,7 +8,7 @@
  
  namespace LM01_UI
 {
-    public class PlcTcpClient
+    public class PlcTcpClient : IDisposable
     {
         private TcpClient? _client;
         private NetworkStream? _stream;
@@ -126,6 +126,12 @@
             _logger.Inform(0, $"PLC    < {response}");
 
             return response;
+        }
+
+        public void Dispose()
+        {
+            _ioLock.Dispose();
+            Disconnect();
         }
     }
 }

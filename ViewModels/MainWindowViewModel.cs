@@ -43,6 +43,7 @@ namespace LM01_UI.ViewModels
 
         public void Dispose()
         {
+            _plcClient.Dispose();
             _logger.Dispose();
         }
 
@@ -71,7 +72,6 @@ namespace LM01_UI.ViewModels
         {
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                _plcClient.Disconnect();
                 Dispose();
                 desktop.Shutdown();
             }

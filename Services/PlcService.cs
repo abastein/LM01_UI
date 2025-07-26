@@ -20,6 +20,10 @@ namespace LM01_UI.Services
             // Sicer uporabimo shranjen _parameterPayload.
             string payloadToUse = payload ?? _parameterPayload;
             string fullCommand = commandCode + payloadToUse;
+            if (fullCommand.Length > CommandLength)
+            {
+                fullCommand = fullCommand.Substring(0, CommandLength);
+            }
             return fullCommand.PadRight(CommandLength, PaddingChar);
         }
 
@@ -31,9 +35,11 @@ namespace LM01_UI.Services
         {
             // STOP ukaz vedno pošlje prazen payload in ponastavi shranjenega
             _parameterPayload = string.Empty;
-            string emptyPayload = new string(PaddingChar, CommandLength - "001002".Length);
+            string emptyPayload = new string(PaddingChar, CommandLength - 6);
             return BuildPaddedCommand("001002", emptyPayload);
         }
+
+        public string GetUnloadCommand() => BuildPaddedCommand("001004");
 
         public string BuildLoadCommand(Recipe recipe)
         {
