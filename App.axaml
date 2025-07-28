@@ -22,6 +22,9 @@
                                          TrueBrush="Green"
                                          FalseBrush="Red" />
 		<converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
+		<converters:DegreesToPulsesConverter x:Key="DegreesToPulsesConverter"/>
+		<converters:RpmToPulsesPerSecondConverter x:Key="RpmToPulsesPerSecondConverter"/>
+		<converters:DirectionToSymbolConverter x:Key="DirectionToSymbolConverter"/>
 	</Application.Resources>
 
 	<Application.DataTemplates>

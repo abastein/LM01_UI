@@ -1,10 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LM01_UI;
 using LM01_UI.Enums;
 using LM01_UI.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Globalization;
 
 namespace LM01_UI.ViewModels
 {
@@ -12,6 +14,10 @@ namespace LM01_UI.ViewModels
     {
         private readonly RecipeStep _step;
         private readonly Action<RecipeStep?> _closeAction;
+
+        private static readonly DegreesToPulsesConverter _degConverter = new();
+        private static readonly RpmToPulsesPerSecondConverter _speedConverter = new();
+        private static readonly DirectionToSymbolConverter _directionConverter = new();
 
         public ObservableCollection<FunctionViewModel> FunctionTypes { get; }
         public Array DirectionTypes { get; } = Enum.GetValues(typeof(DirectionType));
@@ -39,14 +45,26 @@ namespace LM01_UI.ViewModels
         public string SpeedRpmString
         {
             get => _speedRpmString;
-            set => SetProperty(ref _speedRpmString, value);
+            set
+            {
+                if (SetProperty(ref _speedRpmString, value))
+                {
+                    OnPropertyChanged(nameof(SpeedPulsesPerSecondString));
+                }
+            }
         }
 
         private string _targetXDegString = string.Empty;
         public string TargetXDegString
         {
             get => _targetXDegString;
-            set => SetProperty(ref _targetXDegString, value);
+            set
+            {
+                if (SetProperty(ref _targetXDegString, value))
+                {
+                    OnPropertyChanged(nameof(TargetPulsesString));
+                }
+            }
         }
 
         private string _repeatsString = string.Empty;
@@ -67,10 +85,44 @@ namespace LM01_UI.ViewModels
         public DirectionType Direction
         {
             get => _direction;
-            set => SetProperty(ref _direction, value);
+            set
+            {
+                if (SetProperty(ref _direction, value))
+                {
+                    OnPropertyChanged(nameof(DirectionSymbol));
+                }
+            }
         }
 
         public string StepNumberString { get; }
+
+        public string SpeedPulsesPerSecondString
+        {
+            get
+            {
+                var result = _speedConverter.Convert(SpeedRpmString, typeof(string), null, CultureInfo.InvariantCulture);
+                return result?.ToString() ?? string.Empty;
+            }
+        }
+
+        public string TargetPulsesString
+        {
+            get
+            {
+                var result = _degConverter.Convert(TargetXDegString, typeof(string), null, CultureInfo.InvariantCulture);
+                return result?.ToString() ?? string.Empty;
+            }
+        }
+
+        public string DirectionSymbol
+        {
+            get
+            {
+                var result = _directionConverter.Convert(Direction, typeof(string), null, CultureInfo.InvariantCulture);
+                return result?.ToString() ?? string.Empty;
+            }
+        }
+
 
         public bool IsSpeedRpmEnabled => SelectedFunction?.Function == FunctionType.Rotate;
         public bool IsDirectionEnabled => SelectedFunction?.Function == FunctionType.Rotate;
