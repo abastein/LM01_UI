@@ -22,6 +22,7 @@ namespace LM01_UI.ViewModels
         private readonly Logger _logger;
         private CancellationTokenSource? _pollingCts;
 
+
         [ObservableProperty]
         private ObservableCollection<Recipe> _recipes = new();
         [ObservableProperty]

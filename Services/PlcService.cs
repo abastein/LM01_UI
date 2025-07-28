@@ -29,6 +29,7 @@ namespace LM01_UI.Services
 
         // Ukazi so sedaj metode, ker je njihova vsebina odvisna od stanja
         public string GetStartCommand() => BuildPaddedCommand("001001");
+      //  public string GetStatusCommand() => BuildPaddedCommand("001000", string.Empty);
         public string GetStatusCommand() => BuildPaddedCommand("001000");
 
         public string GetStopCommand()
