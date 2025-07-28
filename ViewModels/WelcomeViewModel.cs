@@ -73,7 +73,7 @@ namespace LM01_UI.ViewModels
                 if (!_plcClient.IsConnected)
                 {
                     // You mentioned you changed this line, which is correct.
-                    await _plcClient.ConnectAsync("10.100.1.143", 2001);
+                    await _plcClient.ConnectAsync("10.100.1.113", 2001);
                 }
             }
             catch (Exception ex)
