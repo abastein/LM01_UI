@@ -49,12 +49,12 @@ namespace LM01_UI.Services
             foreach (var step in recipe.Steps.OrderBy(s => s.StepNumber))
             {
                 parameterBuilder.Append(string.Format("{0:00}", step.StepNumber));
-                parameterBuilder.Append(string.Format("{0:0}", (int)step.Function));
-                parameterBuilder.Append(string.Format("{0:000}", step.SpeedRPM));
+                parameterBuilder.Append(string.Format("{0:00}", (int)step.Function));
+                parameterBuilder.Append(string.Format("{0:0000}", step.SpeedRPM));
                 parameterBuilder.Append(string.Format("{0:0}", (int)step.Direction));
                 parameterBuilder.Append(string.Format("{0:0000}", step.TargetXDeg));
-                parameterBuilder.Append(string.Format("{0:00}", step.Repeats));
-                parameterBuilder.Append(string.Format("{0:00000}", step.PauseMs));
+               // parameterBuilder.Append(string.Format("{0:00}", step.Repeats));
+                parameterBuilder.Append(string.Format("{0:0000}", step.PauseMs));
             }
 
             // Shranimo nov payload v "spomin"

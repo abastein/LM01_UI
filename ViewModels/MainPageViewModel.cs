@@ -99,7 +99,7 @@ namespace LM01_UI.ViewModels
             {
                 var recipes = await _dbContext.Recipes.OrderBy(r => r.Name).ToListAsync();
                 Recipes = new ObservableCollection<Recipe>(recipes);
-                StartPlcStatusPolling();
+              //  StartPlcStatusPolling();
             }
             catch (Exception ex) { _logger.Inform(2, $"Napaka pri nalaganju receptur: {ex.Message}"); }
         }
@@ -168,6 +168,14 @@ namespace LM01_UI.ViewModels
 
         private void OnConnectionStatusChanged(bool isConnected)
         {
+            if (isConnected)
+            {
+                StartPlcStatusPolling();
+            }
+            else
+            {
+                StopPolling();
+            }
             Dispatcher.UIThread.InvokeAsync(() =>
             {
                 IsPlcConnected = isConnected;
@@ -184,7 +192,7 @@ namespace LM01_UI.ViewModels
 
         public void StartPlcStatusPolling()
         {
-            if (_pollingCts != null) return;
+            if (_pollingCts != null || !_tcpClient.IsConnected) return;
             _pollingCts = new CancellationTokenSource();
             _ = PollStatusLoop(_pollingCts.Token);
         }
