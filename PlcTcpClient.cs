@@ -71,10 +71,11 @@
             
                     private async Task SendInternalAsync(string message)
         {
-             var trimmedMessage = message.TrimEnd('\0');
-        _logger.Inform(0, $"CLIENT > {trimmedMessage}");
- 
-             var messageBytes = Encoding.ASCII.GetBytes(message);
+            var logMessage = message.TrimEnd('\0', '\r', '\n');
+            _logger.Inform(0, $"CLIENT > {logMessage}");
+
+            var messageWithTerminators = message + "\r\n";
+            var messageBytes = Encoding.ASCII.GetBytes(messageWithTerminators);
 
             await _stream!.WriteAsync(messageBytes, 0, messageBytes.Length);
          }
@@ -113,15 +114,15 @@
         private async Task<string> ReadFixedLengthAsync(int length)
         {
             if (_stream == null) throw new InvalidOperationException("Stream is not available.");
-            var buffer = new byte[length];
+            var buffer = new byte[length + 2];
             int totalBytesRead = 0;
-            while (totalBytesRead < length)
+            while (totalBytesRead < length + 2)
             {
-                int bytesRead = await _stream.ReadAsync(buffer, totalBytesRead, length - totalBytesRead);
+                int bytesRead = await _stream.ReadAsync(buffer, totalBytesRead, length + 2 - totalBytesRead);
                 if (bytesRead == 0) throw new IOException("Connection closed prematurely.");
                 totalBytesRead += bytesRead;
             }
-            string response = Encoding.ASCII.GetString(buffer, 0, totalBytesRead);
+            string response = Encoding.ASCII.GetString(buffer, 0, totalBytesRead).TrimEnd('\r', '\n');
 
             _logger.Inform(0, $"PLC    < {response}");
 
