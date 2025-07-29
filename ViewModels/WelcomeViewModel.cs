@@ -37,7 +37,7 @@ namespace LM01_UI.ViewModels
             ConnectToPlcCommand.Execute(null);
         }
 
-        public IAsyncRelayCommand ConnectToPlcCommand { get; }
+        public IAsyncRelayCommand ConnectToPlcCommand { get; } 
 
         private void OnPlcConnectionStatusChanged(bool isConnected)
         {

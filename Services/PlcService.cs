@@ -26,12 +26,13 @@ namespace LM01_UI.Services
             //    fullCommand = fullCommand.Substring(0, CommandLength);
             //}
             //return fullCommand.PadRight(CommandLength, PaddingChar);
-            return fullCommand;
+            //return fullCommand;
+            return commandCode + "$R$L";
         }
 
         // Ukazi so sedaj metode, ker je njihova vsebina odvisna od stanja
         public string GetStartCommand() => BuildPaddedCommand("001001");
-        public string GetStatusCommand() => BuildPaddedCommand("001000", string.Empty);
+        public string GetStatusCommand() => BuildPaddedCommand("001000");
         //public string GetStatusCommand() => BuildPaddedCommand("001000");
 
         public string GetStopCommand()
@@ -39,7 +40,7 @@ namespace LM01_UI.Services
             // STOP ukaz vedno pošlje prazen payload in ponastavi shranjenega
             _parameterPayload = string.Empty;
             //string emptyPayload = new string(PaddingChar, CommandLength - 6);
-            return BuildPaddedCommand("001002", string.Empty);
+            return BuildPaddedCommand("001002");
         }
 
         public string GetUnloadCommand() => BuildPaddedCommand("001004");
@@ -65,13 +66,16 @@ namespace LM01_UI.Services
                 parameterBuilder.Append(string.Format("{0:000}", targetPulses));
                 // parameterBuilder.Append(string.Format("{0:00}", step.Repeats));
                 parameterBuilder.Append(string.Format("{0:0000}", step.PauseMs));
+                //parameterBuilder.Append("$R$L"); 
             }
 
             // Shranimo nov payload v "spomin"
             _parameterPayload = parameterBuilder.ToString();
+            
 
             // Sestavimo celoten LOAD ukaz
-            return BuildPaddedCommand("001003");
+            //return BuildPaddedCommand("001003");
+            return BuildPaddedCommand("001003" + _parameterPayload);
         }
     }
 }
