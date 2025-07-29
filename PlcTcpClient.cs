@@ -114,11 +114,11 @@
         private async Task<string> ReadFixedLengthAsync(int length)
         {
             if (_stream == null) throw new InvalidOperationException("Stream is not available.");
-            var buffer = new byte[length + 2];
+            var buffer = new byte[length];
             int totalBytesRead = 0;
-            while (totalBytesRead < length + 2)
+            while (totalBytesRead < length)
             {
-                int bytesRead = await _stream.ReadAsync(buffer, totalBytesRead, length + 2 - totalBytesRead);
+                int bytesRead = await _stream.ReadAsync(buffer, totalBytesRead, length - totalBytesRead);
                 if (bytesRead == 0) throw new IOException("Connection closed prematurely.");
                 totalBytesRead += bytesRead;
             }

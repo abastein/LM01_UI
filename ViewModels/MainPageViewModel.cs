@@ -224,14 +224,6 @@ namespace LM01_UI.ViewModels
 
         private async Task ProcessPlcResponse(string response)
         {
-            // 1. PREVERJANJE: Če je nov odgovor enak prejšnjemu, ne naredi ničesar.
-            if (response == _lastPlcResponse)
-            {
-                return;
-            }
-
-            // 2. SHRANJEVANJE: Če je odgovor nov, ga shrani za naslednjo primerjavo.
-            _lastPlcResponse = response;
 
             // Vaša obstoječa logika se nadaljuje samo, če je prišlo do spremembe.
             if (string.IsNullOrEmpty(response) || response.Length < 10) return;
