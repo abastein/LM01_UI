@@ -21,6 +21,7 @@ namespace LM01_UI.ViewModels
         private readonly PlcService _plcService;
         private readonly Logger _logger;
         private CancellationTokenSource? _pollingCts;
+        private string? _lastStatusResponse;
 
 
         [ObservableProperty]
@@ -204,9 +205,12 @@ namespace LM01_UI.ViewModels
             {
                 try
                 {
-                    // POPRAVEK: Kličemo novo metodo
                     string response = await _tcpClient.SendReceiveAsync(_plcService.GetStatusCommand(), TimeSpan.FromSeconds(2));
-                    await ProcessPlcResponse(response);
+                    if (response != _lastStatusResponse)
+                    {
+                        _lastStatusResponse = response;
+                        await ProcessPlcResponse(response);
+                    }
                 }
                 catch (Exception)
                 {
