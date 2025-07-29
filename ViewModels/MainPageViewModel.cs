@@ -103,6 +103,7 @@ namespace LM01_UI.ViewModels
         partial void OnSelectedRecipeChanged(Recipe? oldValue, Recipe? newValue)
         {
             OnPropertyChanged(nameof(CanLoadRecipe));
+            _ = LoadStepsForSelectedRecipeAsync();
         }
 
         partial void OnIsPlcConnectedChanged(bool oldValue, bool newValue)
