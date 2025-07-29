@@ -59,6 +59,7 @@ namespace LM01_UI.ViewModels
         [NotifyCanExecuteChangedFor(nameof(LoadRecipeCommand))]
         [NotifyCanExecuteChangedFor(nameof(ToggleStartStopCommand))]
         private int? _loadedRecipeId;
+        private string? _lastPlcResponse;
 
         public MainPageViewModel(ApplicationDbContext dbContext, PlcTcpClient tcpClient, PlcService plcService, Logger logger)
         {
@@ -223,7 +224,18 @@ namespace LM01_UI.ViewModels
 
         private async Task ProcessPlcResponse(string response)
         {
+            // 1. PREVERJANJE: Če je nov odgovor enak prejšnjemu, ne naredi ničesar.
+            if (response == _lastPlcResponse)
+            {
+                return;
+            }
+
+            // 2. SHRANJEVANJE: Če je odgovor nov, ga shrani za naslednjo primerjavo.
+            _lastPlcResponse = response;
+
+            // Vaša obstoječa logika se nadaljuje samo, če je prišlo do spremembe.
             if (string.IsNullOrEmpty(response) || response.Length < 10) return;
+
             string plcState = response.Substring(0, 1);
             int.TryParse(response.Substring(1, 3), out int loadedRecipeIdFromPlc);
             int.TryParse(response.Substring(4, 2), out int currentStep);
@@ -244,6 +256,8 @@ namespace LM01_UI.ViewModels
                     "3" => $"NAPAKA (Koda: {errorCode})",
                     _ => "Neznano stanje PLC-ja"
                 };
+
+                // Ta metoda se bo sedaj klicala samo ob spremembi.
                 RefreshButtonStates();
             });
         }
