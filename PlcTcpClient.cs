@@ -16,6 +16,11 @@ namespace LM01_UI
         private readonly SemaphoreSlim _ioLock = new SemaphoreSlim(1, 1);
 
         /// <summary>
+        /// Expected length of responses from the PLC.
+        /// </summary>
+        private const int PlcResponseLength = 12;
+
+        /// <summary>
         /// Terminator, ki ga PLC pričakuje; npr. "\r", "\n" ali String.Empty.
         /// Če PLC ne želi nobenih dodatnih znakov, nastavimo prazni niz.
         /// </summary>
@@ -98,7 +103,7 @@ namespace LM01_UI
             {
                 await SendInternalAsync(message).ConfigureAwait(false);
 
-                var readTask = ReadFixedLengthAsync(10);
+                var readTask = ReadFixedLengthAsync();
                 var timeoutTask = Task.Delay(timeout);
                 var completedTask = await Task.WhenAny(readTask, timeoutTask).ConfigureAwait(false);
 
@@ -115,14 +120,14 @@ namespace LM01_UI
             }
         }
 
-        private async Task<string> ReadFixedLengthAsync(int length)
+        private async Task<string> ReadFixedLengthAsync()
         {
             if (_stream == null) throw new InvalidOperationException("Stream is not available.");
-            var buffer = new byte[length];
+            var buffer = new byte[PlcResponseLength];
             int totalBytesRead = 0;
-            while (totalBytesRead < length)
+            while (totalBytesRead < PlcResponseLength)
             {
-                int bytesRead = await _stream.ReadAsync(buffer, totalBytesRead, length - totalBytesRead).ConfigureAwait(false);
+                int bytesRead = await _stream.ReadAsync(buffer, totalBytesRead, PlcResponseLength - totalBytesRead).ConfigureAwait(false);
                 if (bytesRead == 0) throw new IOException("Connection closed prematurely.");
                 totalBytesRead += bytesRead;
             }

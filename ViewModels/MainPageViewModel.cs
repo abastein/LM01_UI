@@ -262,20 +262,28 @@ namespace LM01_UI.ViewModels
                     await ProcessPlcResponse(response);
                 }
 
-                await Task.Delay(1000, token);
+                await Task.Delay(400, token);
             }
         }
 
         private async Task ProcessPlcResponse(string response)
         {
-            if (string.IsNullOrEmpty(response) || response.Length < 10)
+            if (string.IsNullOrEmpty(response))
+                return;
+
+            // Strip any non-digit characters and take the last 10 digits
+            var digits = new string(response.Where(char.IsDigit).ToArray());
+            if (digits.Length >= 10)
+                digits = digits[^10..];
+
+            if (digits.Length < 10)
                 return;
 
             // First character indicates state: 0=standby,1=loaded,2=running,3=error
-            string plcState = response.Substring(0, 1);
-            int.TryParse(response.Substring(1, 3), out int loadedId);
-            int.TryParse(response.Substring(4, 2), out int step);
-            int.TryParse(response.Substring(6, 4), out int err);
+            string plcState = digits.Substring(0, 1);
+            int.TryParse(digits.Substring(1, 3), out int loadedId);
+            int.TryParse(digits.Substring(4, 2), out int step);
+            int.TryParse(digits.Substring(6, 4), out int err);
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
