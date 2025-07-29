@@ -2,7 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="LM01_UI.Views.MainPageView"
              xmlns:vm="clr-namespace:LM01_UI.ViewModels"
-             xmlns:models="clr-namespace:LM01_UI.Models"
              xmlns:local="clr-namespace:LM01_UI"
              x:DataType="vm:MainPageViewModel"
              Background="#FF202530">
@@ -36,9 +35,19 @@
 	</UserControl.Styles>
 
 	<Grid RowDefinitions="Auto,*,Auto" Margin="10">
-		<TextBlock Grid.Row="0" Text="Izberi proceduro" FontSize="40" FontWeight="Bold" Foreground="#FFDCA400" Margin="10,0,0,20"/>
+		<!-- Header -->
+		<TextBlock Grid.Row="0"
+                   Text="Izberi proceduro"
+                   FontSize="40"
+                   FontWeight="Bold"
+                   Foreground="#FFDCA400"
+                   Margin="10,0,0,20"/>
+
+		<!-- DataGrids -->
 		<Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="20">
-			<DataGrid Grid.Column="0" ItemsSource="{Binding Recipes}" SelectedItem="{Binding SelectedRecipe}">
+			<DataGrid Grid.Column="0"
+                      ItemsSource="{Binding Recipes}"
+                      SelectedItem="{Binding SelectedRecipe}">
 				<DataGrid.Columns>
 					<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="70"/>
 					<DataGridTextColumn Header="Ime Recepture" Binding="{Binding Name}" Width="*"/>
@@ -46,32 +55,43 @@
 				</DataGrid.Columns>
 			</DataGrid>
 
-			<DataGrid Grid.Column="1" ItemsSource="{Binding SelectedRecipeSteps}" IsVisible="{Binding SelectedRecipe, Converter={StaticResource NullToBoolConverter}}" CanUserResizeColumns="False">
+			<DataGrid Grid.Column="1"
+                      ItemsSource="{Binding SelectedRecipeSteps}"
+                      IsVisible="{Binding SelectedRecipe, Converter={StaticResource NullToBoolConverter}}"
+                      CanUserResizeColumns="False">
 				<DataGrid.Columns>
 					<DataGridTemplateColumn Header="Št." Width="Auto">
 						<DataTemplate>
-							<Border Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+							<Border Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch">
 								<TextBlock Text="{Binding StepNumber}" VerticalAlignment="Center" Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
 					<DataGridTemplateColumn Header="Funkcija" Width="*">
 						<DataTemplate>
-							<Border Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+							<Border Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch">
 								<TextBlock Text="{Binding Function}" VerticalAlignment="Center" Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
 					<DataGridTemplateColumn Header="Hitrost(RPM)" Width="Auto">
 						<DataTemplate>
-							<Border Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+							<Border Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch">
 								<TextBlock Text="{Binding SpeedRPM}" VerticalAlignment="Center" Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
 					<DataGridTemplateColumn Header="Smer" Width="Auto">
 						<DataTemplate>
-							<Border Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+							<Border Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch">
 								<TextBlock Text="{Binding Direction}" VerticalAlignment="Center" Margin="5,0"/>
 							</Border>
 						</DataTemplate>
@@ -79,12 +99,30 @@
 				</DataGrid.Columns>
 			</DataGrid>
 		</Grid>
-		<Grid Grid.Row="2" RowDefinitions="Auto, Auto" Margin="0,10,0,0" RowSpacing="10">
+
+		<!-- Buttons -->
+		<Grid Grid.Row="2" RowDefinitions="Auto,Auto" Margin="0,10,0,0" RowSpacing="10">
 			<Grid Grid.Row="0" ColumnDefinitions="*,*" ColumnSpacing="20">
-				<Button Grid.Column="0" Content="Naloži" Background="#007BFF" Command="{Binding LoadRecipeCommand}"/>
-				<Button Grid.Column="1" Content="Počisti" Background="#FD7E14" Command="{Binding ClearSelectionCommand}"/>
+				<Button Grid.Column="0"
+                        Content="Naloži"
+                        Background="#007BFF"
+                        Command="{Binding LoadRecipeCommand}"
+                        IsEnabled="{Binding CanLoadRecipe}"/>
+
+				<Button Grid.Column="1"
+                        Content="Počisti"
+                        Background="#FD7E14"
+                        Command="{Binding ClearSelectionCommand}"
+                        IsEnabled="{Binding CanClearRecipe}"/>
 			</Grid>
-			<Button Grid.Row="1" Name="StartStopButton" Background="{Binding StartStopButtonBrush}" Content="{Binding StartStopButtonText}" Command="{Binding ToggleStartStopCommand}"/>
+
+			<Button Grid.Row="1"
+                    Name="StartStopButton"
+                    Background="{Binding StartStopButtonBrush}"
+                    Content="{Binding StartStopButtonText}"
+                    Command="{Binding ToggleStartStopCommand}"
+                    IsEnabled="{Binding CanToggleRunning}"/>
 		</Grid>
+
 	</Grid>
 </UserControl>

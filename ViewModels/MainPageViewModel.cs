@@ -23,88 +23,120 @@ namespace LM01_UI.ViewModels
         private CancellationTokenSource? _pollingCts;
         private string? _lastStatusResponse;
 
-
         [ObservableProperty]
         private ObservableCollection<Recipe> _recipes = new();
+
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(LoadRecipeCommand))]
-        [NotifyCanExecuteChangedFor(nameof(ClearSelectionCommand))]
-        [NotifyCanExecuteChangedFor(nameof(ToggleStartStopCommand))]
         private Recipe? _selectedRecipe;
+
         [ObservableProperty]
         private ObservableCollection<RecipeStep> _selectedRecipeSteps = new();
+
         [ObservableProperty]
         private string _plcStatusText = "Povezava ni vzpostavljena";
+
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(LoadRecipeCommand))]
-        [NotifyCanExecuteChangedFor(nameof(ToggleStartStopCommand))]
-        [NotifyCanExecuteChangedFor(nameof(ClearSelectionCommand))]
         private bool _isPlcConnected;
+
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(ToggleStartStopCommand))]
-        [NotifyCanExecuteChangedFor(nameof(ClearSelectionCommand))]
         private bool _isRecipeLoaded;
+
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(LoadRecipeCommand))]
-        [NotifyCanExecuteChangedFor(nameof(ToggleStartStopCommand))]
-        [NotifyCanExecuteChangedFor(nameof(ClearSelectionCommand))]
         [NotifyPropertyChangedFor(nameof(StartStopButtonText))]
         [NotifyPropertyChangedFor(nameof(StartStopButtonBrush))]
         private bool _isRunning;
+
         [ObservableProperty]
         private int _currentStepNumber;
+
         [ObservableProperty]
         private int _plcErrorCode;
-        [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(LoadRecipeCommand))]
-        [NotifyCanExecuteChangedFor(nameof(ToggleStartStopCommand))]
-        private int? _loadedRecipeId;
-        private string? _lastPlcResponse;
 
-        public MainPageViewModel(ApplicationDbContext dbContext, PlcTcpClient tcpClient, PlcService plcService, Logger logger)
+        [ObservableProperty]
+        private int? _loadedRecipeId;
+
+        /// <summary>
+        /// Controls button enabled state in the UI.
+        /// </summary>
+        public bool CanLoadRecipe => SelectedRecipe != null && IsPlcConnected && !IsRunning;
+        public bool CanClearRecipe => IsRecipeLoaded && !IsRunning;
+        public bool CanToggleRunning => IsPlcConnected && (IsRecipeLoaded || IsRunning);
+
+        /// <summary>
+        /// Text displayed on Start/Stop button.
+        /// </summary>
+        public string StartStopButtonText => IsRunning ? "Stop" : "Start";
+
+        /// <summary>
+        /// Background brush for Start/Stop button.
+        /// </summary>
+        public IBrush StartStopButtonBrush => IsRunning ? Brushes.IndianRed : Brushes.MediumSeaGreen;
+
+        public IAsyncRelayCommand LoadRecipeCommand { get; }
+        public IAsyncRelayCommand ToggleStartStopCommand { get; }
+        public IAsyncRelayCommand ClearSelectionCommand { get; }
+
+        public MainPageViewModel(
+            ApplicationDbContext dbContext,
+            PlcTcpClient tcpClient,
+            PlcService plcService,
+            Logger logger)
         {
             _dbContext = dbContext;
             _tcpClient = tcpClient;
             _plcService = plcService;
             _logger = logger;
 
-            LoadRecipeCommand = new AsyncRelayCommand(LoadRecipeOnPlcAsync, () => SelectedRecipe != null && IsPlcConnected && !IsRunning);
-            ToggleStartStopCommand = new AsyncRelayCommand(ToggleStartStopAsync, () => IsPlcConnected && (IsRunning || IsRecipeLoaded));
-            ClearSelectionCommand = new AsyncRelayCommand(ClearSelectionAsync, () => IsRecipeLoaded && !IsRunning);
+            LoadRecipeCommand = new AsyncRelayCommand(LoadRecipeOnPlcAsync);
+            ClearSelectionCommand = new AsyncRelayCommand(ClearSelectionAsync);
+            ToggleStartStopCommand = new AsyncRelayCommand(ToggleStartStopAsync);
 
-            _tcpClient.ConnectionStatusChanged += OnConnectionStatusChanged;
-            OnConnectionStatusChanged(_tcpClient.IsConnected);
+            _tcpClient.ConnectionStatusChanged += isConnected =>
+            {
+                Dispatcher.UIThread.InvokeAsync(() => IsPlcConnected = isConnected);
+                StartPlcStatusPolling();
+            };
+
             _ = LoadRecipesAsync();
         }
 
-        public string StartStopButtonText => IsRunning ? "Stop" : "Start";
-        public IBrush StartStopButtonBrush => IsRunning ? Brushes.IndianRed : Brushes.MediumSeaGreen;
-        public IAsyncRelayCommand LoadRecipeCommand { get; }
-        public IAsyncRelayCommand ToggleStartStopCommand { get; }
-        public IAsyncRelayCommand ClearSelectionCommand { get; }
-
-        partial void OnSelectedRecipeChanged(Recipe? value)
+        partial void OnSelectedRecipeChanged(Recipe? oldValue, Recipe? newValue)
         {
-            IsRecipeLoaded = false;
-            RefreshButtonStates();
-            _ = LoadStepsForSelectedRecipeAsync();
+            OnPropertyChanged(nameof(CanLoadRecipe));
         }
 
-        private async Task ToggleStartStopAsync()
+        partial void OnIsPlcConnectedChanged(bool oldValue, bool newValue)
         {
-            if (IsRunning) await StopPlcAsync();
-            else await StartPlcAsync();
+            OnPropertyChanged(nameof(CanLoadRecipe));
+            OnPropertyChanged(nameof(CanToggleRunning));
+        }
+
+        partial void OnIsRecipeLoadedChanged(bool oldValue, bool newValue)
+        {
+            OnPropertyChanged(nameof(CanClearRecipe));
+            OnPropertyChanged(nameof(CanToggleRunning));
+        }
+
+        partial void OnIsRunningChanged(bool oldValue, bool newValue)
+        {
+            OnPropertyChanged(nameof(CanLoadRecipe));
+            OnPropertyChanged(nameof(CanClearRecipe));
+            OnPropertyChanged(nameof(CanToggleRunning));
         }
 
         private async Task LoadRecipesAsync()
         {
             try
             {
-                var recipes = await _dbContext.Recipes.OrderBy(r => r.Name).ToListAsync();
+                var recipes = await _dbContext.Recipes
+                    .OrderBy(r => r.Name)
+                    .ToListAsync();
                 Recipes = new ObservableCollection<Recipe>(recipes);
-              //  StartPlcStatusPolling();
             }
-            catch (Exception ex) { _logger.Inform(2, $"Napaka pri nalaganju receptur: {ex.Message}"); }
+            catch (Exception ex)
+            {
+                _logger.Inform(2, $"Napaka pri nalaganju receptur: {ex.Message}");
+            }
         }
 
         private async Task LoadStepsForSelectedRecipeAsync()
@@ -112,7 +144,9 @@ namespace LM01_UI.ViewModels
             SelectedRecipeSteps.Clear();
             if (SelectedRecipe != null)
             {
-                var recipeWithSteps = await _dbContext.Recipes.Include(r => r.Steps).FirstOrDefaultAsync(r => r.Id == SelectedRecipe.Id);
+                var recipeWithSteps = await _dbContext.Recipes
+                    .Include(r => r.Steps)
+                    .FirstOrDefaultAsync(r => r.Id == SelectedRecipe.Id);
                 if (recipeWithSteps != null)
                 {
                     foreach (var step in recipeWithSteps.Steps.OrderBy(s => s.StepNumber))
@@ -121,13 +155,33 @@ namespace LM01_UI.ViewModels
             }
         }
 
+        private async Task LoadRecipeOnPlcAsync()
+        {
+            if (SelectedRecipe == null)
+                return;
+
+            try
+            {
+                string command = _plcService.BuildLoadCommand(SelectedRecipe);
+                string response = await _tcpClient.SendReceiveAsync(command, TimeSpan.FromSeconds(2));
+                _lastStatusResponse = response;
+                await ProcessPlcResponse(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.Inform(2, $"Napaka pri pošiljanju LOAD: {ex.Message}");
+            }
+        }
+
         private async Task ClearSelectionAsync()
         {
-            SelectedRecipe = null;
+            if (!IsRecipeLoaded) return;
             try
             {
                 string response = await _tcpClient.SendReceiveAsync(_plcService.GetUnloadCommand(), TimeSpan.FromSeconds(2));
+                _lastStatusResponse = response;
                 await ProcessPlcResponse(response);
+                SelectedRecipe = null;
             }
             catch (Exception ex)
             {
@@ -135,130 +189,48 @@ namespace LM01_UI.ViewModels
             }
         }
 
-        private async Task LoadRecipeOnPlcAsync()
+        private async Task ToggleStartStopAsync()
         {
-            if (SelectedRecipe == null) return;
-            try
-            {
-                string loadCommand = _plcService.BuildLoadCommand(SelectedRecipe);
-                string response = await _tcpClient.SendReceiveAsync(loadCommand, TimeSpan.FromSeconds(2));
-                await ProcessPlcResponse(response);
-            }
-            catch (Exception ex) { _logger.Inform(2, $"Napaka pri pošiljanju LOAD: {ex.Message}"); }
+            if (IsRunning)
+                await StopPlcAsync();
+            else
+                await StartPlcAsync();
         }
 
         private async Task StartPlcAsync()
         {
             try
             {
-                // POPRAVEK: Kličemo novo metodo
                 string response = await _tcpClient.SendReceiveAsync(_plcService.GetStartCommand(), TimeSpan.FromSeconds(2));
+                _lastStatusResponse = response;
                 await ProcessPlcResponse(response);
             }
-            catch (Exception ex) { _logger.Inform(2, $"Napaka pri pošiljanju START: {ex.Message}"); }
+            catch (Exception ex)
+            {
+                _logger.Inform(2, $"Napaka pri pošiljanju START: {ex.Message}");
+            }
         }
 
         private async Task StopPlcAsync()
         {
             try
             {
-                // POPRAVEK: Kličemo novo metodo
                 string response = await _tcpClient.SendReceiveAsync(_plcService.GetStopCommand(), TimeSpan.FromSeconds(2));
+                _lastStatusResponse = response;
                 await ProcessPlcResponse(response);
             }
-            catch (Exception ex) { _logger.Inform(2, $"Napaka pri pošiljanju STOP: {ex.Message}"); }
-        }
-
-        private void OnConnectionStatusChanged(bool isConnected)
-        {
-            if (isConnected)
+            catch (Exception ex)
             {
-                StartPlcStatusPolling();
+                _logger.Inform(2, $"Napaka pri pošiljanju STOP: {ex.Message}");
             }
-            else
-            {
-                StopPolling();
-            }
-            Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                IsPlcConnected = isConnected;
-                if (!isConnected)
-                {
-                    PlcStatusText = "Povezava prekinjena";
-                    IsRecipeLoaded = false;
-                    IsRunning = false;
-                    LoadedRecipeId = null;
-                }
-                RefreshButtonStates();
-            });
         }
 
         public void StartPlcStatusPolling()
         {
-            if (_pollingCts != null || !_tcpClient.IsConnected) return;
+            if (_pollingCts != null || !_tcpClient.IsConnected)
+                return;
             _pollingCts = new CancellationTokenSource();
             _ = PollStatusLoop(_pollingCts.Token);
-        }
-
-        private async Task PollStatusLoop(CancellationToken token)
-        {
-            while (!token.IsCancellationRequested)
-            {
-                try
-                {
-                    string response = await _tcpClient.SendReceiveAsync(_plcService.GetStatusCommand(), TimeSpan.FromSeconds(2));
-                    if (response != _lastStatusResponse)
-                    {
-                        _lastStatusResponse = response;
-                        await ProcessPlcResponse(response);
-                    }
-                }
-                catch (Exception)
-                {
-                    _tcpClient.Disconnect();
-                    break;
-                }
-                await Task.Delay(500, token);
-            }
-        }
-
-        private async Task ProcessPlcResponse(string response)
-        {
-
-            // Vaša obstoječa logika se nadaljuje samo, če je prišlo do spremembe.
-            if (string.IsNullOrEmpty(response) || response.Length < 10) return;
-
-            string plcState = response.Substring(0, 1);
-            int.TryParse(response.Substring(1, 3), out int loadedRecipeIdFromPlc);
-            int.TryParse(response.Substring(4, 2), out int currentStep);
-            int.TryParse(response.Substring(6, 4), out int errorCode);
-
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                CurrentStepNumber = currentStep;
-                PlcErrorCode = errorCode;
-                IsRecipeLoaded = plcState is "1" or "2" or "3";
-                IsRunning = plcState == "2";
-                LoadedRecipeId = IsRecipeLoaded ? loadedRecipeIdFromPlc : null;
-                PlcStatusText = plcState switch
-                {
-                    "0" => "Pripravljen (Standby)",
-                    "1" => $"Receptura naložena (ID: {loadedRecipeIdFromPlc})",
-                    "2" => $"Izvajanje… (Receptura: {loadedRecipeIdFromPlc}, Korak: {currentStep})",
-                    "3" => $"NAPAKA (Koda: {errorCode})",
-                    _ => "Neznano stanje PLC-ja"
-                };
-
-                // Ta metoda se bo sedaj klicala samo ob spremembi.
-                RefreshButtonStates();
-            });
-        }
-
-        private void RefreshButtonStates()
-        {
-            LoadRecipeCommand.NotifyCanExecuteChanged();
-            ToggleStartStopCommand.NotifyCanExecuteChanged();
-            ClearSelectionCommand.NotifyCanExecuteChanged();
         }
 
         public void StopPolling()
@@ -266,6 +238,64 @@ namespace LM01_UI.ViewModels
             _pollingCts?.Cancel();
             _pollingCts?.Dispose();
             _pollingCts = null;
+        }
+
+        private async Task PollStatusLoop(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                string response;
+                try
+                {
+                    response = await _tcpClient.SendReceiveAsync(_plcService.GetStatusCommand(), TimeSpan.FromSeconds(2));
+                }
+                catch
+                {
+                    _tcpClient.Disconnect();
+                    break;
+                }
+
+                if (response != _lastStatusResponse)
+                {
+                    _lastStatusResponse = response;
+                    await ProcessPlcResponse(response);
+                }
+
+                await Task.Delay(1000, token);
+            }
+        }
+
+        private async Task ProcessPlcResponse(string response)
+        {
+            if (string.IsNullOrEmpty(response) || response.Length < 10)
+                return;
+
+            // First character indicates state: 0=standby,1=loaded,2=running,3=error
+            string plcState = response.Substring(0, 1);
+            int.TryParse(response.Substring(1, 3), out int loadedId);
+            int.TryParse(response.Substring(4, 2), out int step);
+            int.TryParse(response.Substring(6, 4), out int err);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                CurrentStepNumber = step;
+                PlcErrorCode = err;
+
+                if (plcState != "0")
+                {
+                    IsRecipeLoaded = plcState is "1" or "2" or "3";
+                    IsRunning = plcState == "2";
+                }
+
+                LoadedRecipeId = IsRecipeLoaded ? loadedId : null;
+                PlcStatusText = plcState switch
+                {
+                    "1" => $"Receptura naložena (ID: {loadedId})",
+                    "2" => $"Izvajanje… (Receptura: {loadedId}, Korak: {step})",
+                    "3" => $"NAPAKA (Koda: {err})",
+                    _ => PlcStatusText
+                };
+            });
         }
     }
 }
