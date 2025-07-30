@@ -2,8 +2,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
-             x:Class="LM01_UI.Views.WelcomeView" x:DataType="vm:WelcomeViewModel"      Background="#FF202530"                xmlns:vm="clr-namespace:LM01_UI.ViewModels"     xmlns:converters="clr-namespace:LM01_UI">
+             mc:Ignorable="d" 
+			 d:DesignWidth="800" 
+			 d:DesignHeight="600"
+             x:Class="LM01_UI.Views.WelcomeView" 
+			 x:DataType="vm:WelcomeViewModel"      
+			 Background="#FF202530"                
+			 xmlns:vm="clr-namespace:LM01_UI.ViewModels"     
+			 xmlns:converters="clr-namespace:LM01_UI">
+	
+	
 	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="30">
 		<TextBlock Text="Mixer Turbo"
                    FontSize="48"

@@ -38,6 +38,11 @@ namespace LM01_UI
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                //var mainViewModel = new MainWindowViewModel(dbContext);
+                //desktop.MainWindow = new MainWindow
+                //{
+                //    DataContext = mainViewModel
+                //};
                 var mainViewModel = new MainWindowViewModel(dbContext);
                 desktop.MainWindow = new MainWindow
                 {

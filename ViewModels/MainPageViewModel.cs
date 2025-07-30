@@ -250,14 +250,14 @@ namespace LM01_UI.ViewModels
                 {
                     response = await _tcpClient.SendReceiveAsync(
                         _plcService.GetStatusCommand(),
-                        TimeSpan.FromSeconds(2));
+                        TimeSpan.FromSeconds(0.5));
                 }
                 catch (TimeoutException)
                 {
                     // If the PLC doesn't reply in time, keep the connection
                     // open and try again on the next iteration.
                     _logger.Inform(2, "Status polling timed out.");
-                    await Task.Delay(1000, token);
+                    await Task.Delay(250, token);
                     continue;
                 }
                 catch (Exception ex)
@@ -273,7 +273,7 @@ namespace LM01_UI.ViewModels
                     await ProcessPlcResponse(response);
                 }
 
-                await Task.Delay(400, token);
+                await Task.Delay(250, token);
             }
         }
 
