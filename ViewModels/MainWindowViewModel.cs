@@ -23,6 +23,9 @@ namespace LM01_UI.ViewModels
         public object? CurrentPageViewModel { get => _currentPageViewModel; set => SetProperty(ref _currentPageViewModel, value); }
 
         public IRelayCommand ExitApplicationCommand { get; }
+        public IRelayCommand NavigateProgramiCommand { get; }
+        public IRelayCommand NavigateAdminCommand { get; }
+        public IRelayCommand NavigateManualCommand { get; }
 
         public MainWindowViewModel(ApplicationDbContext dbContext)
         {
@@ -32,11 +35,17 @@ namespace LM01_UI.ViewModels
             _plcClient = new PlcTcpClient(_logger);
 
             var plcTestViewModel = new PlcTestViewModel(_plcClient, _logger);
-  
+
+            _welcomeViewModel = new WelcomeViewModel(_plcClient, _logger, Navigate);
             _mainPageViewModel = new MainPageViewModel(_dbContext, _plcClient, _plcService, _logger);
+            _adminPageViewModel = new AdminPageViewModel(_plcClient, _logger, _dbContext, Navigate, plcTestViewModel);
 
             CurrentPageViewModel = _welcomeViewModel;
+
             ExitApplicationCommand = new RelayCommand(ExitApplication);
+            NavigateProgramiCommand = new RelayCommand(() => Navigate("Run"));
+            NavigateAdminCommand = new RelayCommand(() => Navigate("Admin"));
+            NavigateManualCommand = new RelayCommand(() => Navigate("Manual"));
         }
 
         public void Dispose()
@@ -50,6 +59,25 @@ namespace LM01_UI.ViewModels
             {
                 Dispose();
                 desktop.Shutdown();
+            }
+        }
+
+        private void Navigate(string destination)
+        {
+            switch (destination)
+            {
+                case "Run":
+                    CurrentPageViewModel = _mainPageViewModel;
+                    break;
+                case "Admin":
+                    CurrentPageViewModel = _adminPageViewModel;
+                    break;
+                case "Welcome":
+                    CurrentPageViewModel = _welcomeViewModel;
+                    break;
+                case "Manual":
+                    // Placeholder for future manual mode view
+                    break;
             }
         }
     }

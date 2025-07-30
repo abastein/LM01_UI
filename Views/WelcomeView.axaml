@@ -7,12 +7,15 @@
 			 d:DesignHeight="600"
              x:Class="LM01_UI.Views.WelcomeView" 
 			 x:DataType="vm:WelcomeViewModel"      
-			 Background="#FF202530"                
+			 Background="White"
 			 xmlns:vm="clr-namespace:LM01_UI.ViewModels"     
 			 xmlns:converters="clr-namespace:LM01_UI">
 	
 	
-	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="30">
+	<StackPanel HorizontalAlignment="Center" 
+				VerticalAlignment="Center" 
+				Spacing="30">
+		<!--
 		<TextBlock Text="Mixer Turbo"
                    FontSize="48"
                    FontWeight="Bold"
@@ -34,8 +37,8 @@
                     FontSize="32"
                     Background="Blue"
                     Foreground="White"
-                    Command="{Binding NavigateToAdminCommand}"/>
-		</StackPanel>
+                    Command="{Binding NavigateToAdminCommand}"/> 
+		</StackPanel>-->
 
 		<StackPanel Orientation="Horizontal" Spacing="15" HorizontalAlignment="Center">
 			<TextBlock Text="PLC Status:"
@@ -54,5 +57,6 @@
                        Foreground="White"
                        VerticalAlignment="Center"/>
 		</StackPanel>
+		
 	</StackPanel>
 </UserControl>
