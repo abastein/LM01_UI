@@ -95,6 +95,7 @@ namespace LM01_UI.ViewModels
             {
                 Dispatcher.UIThread.InvokeAsync(() => IsPlcConnected = isConnected);
                 StartPlcStatusPolling();
+                _ = RefreshStatusAsync();
             };
 
             // In case the connection was established before this view model was
@@ -130,6 +131,12 @@ namespace LM01_UI.ViewModels
             OnPropertyChanged(nameof(CanLoadRecipe));
             OnPropertyChanged(nameof(CanClearRecipe));
             OnPropertyChanged(nameof(CanToggleRunning));
+            // Explicitly notify bindings that depend on IsRunning such as the
+            // Start/Stop button text and background brush. In some cases the
+            // source generator may not raise these notifications correctly,
+            // so we do it manually to ensure the UI updates immediately.
+            OnPropertyChanged(nameof(StartStopButtonText));
+            OnPropertyChanged(nameof(StartStopButtonBrush));
         }
 
         private async Task LoadRecipesAsync()
