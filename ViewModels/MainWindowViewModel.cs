@@ -9,7 +9,7 @@ using System.ComponentModel;
 
 namespace LM01_UI.ViewModels
 {
-    public class MainWindowViewModel : ViewModelBase, IDisposable
+    public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly PlcTcpClient _plcClient;
