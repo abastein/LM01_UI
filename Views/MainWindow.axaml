@@ -29,18 +29,42 @@
 				<RowDefinition Height="20"/>
 			</Grid.RowDefinitions>
 
-			<StackPanel DockPanel.Dock="Top" Grid.Column="0" Grid.Row="1"
-			Orientation="Horizontal"
-			Spacing="20"
-			Margin="20"
-			HorizontalAlignment="Left">
+				<StackPanel DockPanel.Dock="Top" Grid.Column="0" Grid.Row="1"
+				Orientation="Horizontal"
+				Spacing="20"
+				Margin="20"
+				HorizontalAlignment="Left">
 
-				<Image Source="avares://LM01_UI/Assets/Images/LogoLM.png"
+
+					<Image Source="avares://LM01_UI/Assets/Images/LogoLM.png"
                        Width="240"
                        Stretch="Uniform"
                        VerticalAlignment="Center"/>
 
-			</StackPanel>
+				</StackPanel>
+
+				<StackPanel Grid.Column="2" Grid.Row="1"
+							Orientation="Horizontal"
+							Spacing="15"
+							Margin="20"
+							HorizontalAlignment="Right">
+					<TextBlock Text="PLC Status:"
+							   FontSize="20"
+							   Foreground="Black"
+							   VerticalAlignment="Center"/>
+
+					<Border Width="24" Height="24"
+							CornerRadius="12"
+							Background="{Binding IsPlcConnected, Converter={StaticResource BoolToBrushConverter}}"
+							BorderBrush="Black"
+							BorderThickness="1"
+							VerticalAlignment="Center"/>
+
+					<TextBlock Text="{Binding PlcStatusText}"
+							   FontSize="20"
+							   Foreground="Black"
+							   VerticalAlignment="Center"/>
+				</StackPanel>
 
 				<ContentControl Content="{Binding CurrentPageViewModel}"
 								Grid.Column="1"

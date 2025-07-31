@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.ComponentModel;
 
 namespace LM01_UI.ViewModels
 {
@@ -17,6 +18,12 @@ namespace LM01_UI.ViewModels
         private readonly WelcomeViewModel _welcomeViewModel;
         private readonly AdminPageViewModel _adminPageViewModel;
         private readonly MainPageViewModel _mainPageViewModel;
+
+        [ObservableProperty]
+        private string _plcStatusText = "PLC ni povezan";
+
+        [ObservableProperty]
+        private bool _isPlcConnected;
 
 
         private object? _currentPageViewModel;
@@ -40,6 +47,9 @@ namespace LM01_UI.ViewModels
             _mainPageViewModel = new MainPageViewModel(_dbContext, _plcClient, _plcService, _logger);
             _adminPageViewModel = new AdminPageViewModel(_plcClient, _logger, _dbContext, Navigate, plcTestViewModel);
 
+            _mainPageViewModel.PropertyChanged += MainPageViewModel_PropertyChanged;
+            _plcClient.ConnectionStatusChanged += OnPlcConnectionStatusChanged;
+
             CurrentPageViewModel = _welcomeViewModel;
 
             ExitApplicationCommand = new RelayCommand(ExitApplication);
@@ -50,6 +60,8 @@ namespace LM01_UI.ViewModels
 
         public void Dispose()
         {
+            _mainPageViewModel.PropertyChanged -= MainPageViewModel_PropertyChanged;
+            _plcClient.ConnectionStatusChanged -= OnPlcConnectionStatusChanged;
             _plcClient.Dispose();
             _logger.Dispose();
         }
@@ -79,6 +91,21 @@ namespace LM01_UI.ViewModels
                     // Placeholder for future manual mode view
                     break;
             }
+        }
+
+        private void MainPageViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(MainPageViewModel.PlcStatusText))
+            {
+                PlcStatusText = _mainPageViewModel.PlcStatusText;
+            }
+        }
+
+        private void OnPlcConnectionStatusChanged(bool isConnected)
+        {
+            IsPlcConnected = isConnected;
+            if (!isConnected)
+                PlcStatusText = "PLC ni povezan";
         }
     }
 }

@@ -15,31 +15,7 @@
 	<StackPanel HorizontalAlignment="Center" 
 				VerticalAlignment="Center" 
 				Spacing="30">
-		<!--
-		<TextBlock Text="Mixer Turbo"
-                   FontSize="48"
-                   FontWeight="Bold"
-                   Foreground="White"
-                   HorizontalAlignment="Center"/>
-
-		<StackPanel Orientation="Horizontal" Spacing="40" HorizontalAlignment="Center">
-			<Button Content="RUN"
-                    Width="200"
-                    Height="80"
-                    FontSize="32"
-                    Background="Blue"
-                    Foreground="White"
-                    Command="{Binding NavigateToRunCommand}"/>
-
-			<Button Content="ADMIN"
-                    Width="200"
-                    Height="80"
-                    FontSize="32"
-                    Background="Blue"
-                    Foreground="White"
-                    Command="{Binding NavigateToAdminCommand}"/> 
-		</StackPanel>-->
-
+	
 		<StackPanel Orientation="Horizontal" Spacing="15" HorizontalAlignment="Center">
 			<TextBlock Text="PLC Status:"
                        FontSize="20"
