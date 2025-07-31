@@ -43,18 +43,18 @@
 		<StackPanel Orientation="Horizontal" Spacing="15" HorizontalAlignment="Center">
 			<TextBlock Text="PLC Status:"
                        FontSize="20"
-                       Foreground="White"
+                       Foreground="Black"
                        VerticalAlignment="Center"/>
 
 			<Border Width="24" Height="24"
                     CornerRadius="12"
-                    Background="{Binding IsPlcConnected, Converter={StaticResource BoolToBrushConverter}}" BorderBrush="White"
+                    Background="{Binding IsPlcConnected, Converter={StaticResource BoolToBrushConverter}}" BorderBrush="Black"
                     BorderThickness="1"
                     VerticalAlignment="Center"/>
 
 			<TextBlock Text="{Binding PlcStatusText}"
                        FontSize="20"
-                       Foreground="White"
+                       Foreground="Black"
                        VerticalAlignment="Center"/>
 		</StackPanel>
 		
