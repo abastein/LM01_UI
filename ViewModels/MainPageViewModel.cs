@@ -331,11 +331,8 @@ namespace LM01_UI.ViewModels
                 CurrentStepNumber = step;
                 PlcErrorCode = err;
 
-                if (plcState != "0")
-                {
-                    IsRecipeLoaded = plcState is "1" or "2" or "3";
-                    IsRunning = plcState == "2";
-                }
+                IsRecipeLoaded = plcState is "1" or "2" or "3";
+                IsRunning = plcState == "2";
 
                 LoadedRecipeId = IsRecipeLoaded ? loadedId : null;
                 PlcStatusText = plcState switch
