@@ -59,7 +59,7 @@ namespace LM01_UI.Services
                 parameterBuilder.Append(string.Format("{0:0000}", speedPps));
 
                 // Convert direction enum to "+" or "-" expected by the PLC
-                parameterBuilder.Append(step.Direction == DirectionType.CW ? "0+" : "0-");
+                parameterBuilder.Append(step.Direction == DirectionType.CW ? "1+" : "2-");
 
                 // Convert target degrees to pulses
                 var targetPulses = (int)Math.Round(step.TargetXDeg / 1.8);

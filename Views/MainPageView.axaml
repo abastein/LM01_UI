@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:LM01_UI.ViewModels"
              xmlns:local="clr-namespace:LM01_UI"
              x:DataType="vm:MainPageViewModel"
-             Background="#FF202530">
+             Background="White">
 
 	<UserControl.Resources>
 		<local:NullToBoolConverter x:Key="NullToBoolConverter" />
@@ -14,6 +14,7 @@
 	</UserControl.Resources>
 
 	<UserControl.Styles>
+		<!-- Large, touch-friendly Buttons -->
 		<Style Selector="Button">
 			<Setter Property="Height" Value="100"/>
 			<Setter Property="FontSize" Value="36"/>
@@ -22,32 +23,66 @@
 			<Setter Property="HorizontalAlignment" Value="Stretch"/>
 			<Setter Property="VerticalAlignment" Value="Stretch"/>
 		</Style>
+
+		<!-- Base DataGrid styling -->
 		<Style Selector="DataGrid">
-			<Setter Property="FontSize" Value="28"/>
 			<Setter Property="IsReadOnly" Value="True"/>
 			<Setter Property="AutoGenerateColumns" Value="False"/>
 			<Setter Property="CanUserSortColumns" Value="False"/>
-			<Setter Property="Background" Value="#FF4E5E74"/>
-			<Setter Property="BorderBrush" Value="#FF66CCFF"/>
+			<Setter Property="Background" Value="White"/>
+			<Setter Property="BorderBrush" Value="DarkGreen"/>
 			<Setter Property="BorderThickness" Value="2"/>
-			<Setter Property="CornerRadius" Value="4"/>
+			<Setter Property="CornerRadius" Value="3"/>
+		</Style>
+
+		<!-- Common row backgrounds via selectors (replace AlternatingRowBackground) -->
+		<Style Selector="DataGridRow">
+			<Setter Property="Background" Value="White"/>
+		</Style>
+		<Style Selector="DataGridRow:nth-child(2n)">
+			<Setter Property="Background" Value="#F5F5F5"/>
+		</Style>
+
+		<!-- Header font size, padding, brushes -->
+		<Style Selector="DataGridColumnHeader">
+			<Setter Property="FontSize" Value="24"/>
+			<Setter Property="Foreground" Value="DarkGreen"/>
+			<Setter Property="Background" Value="#EEE"/>
+			<Setter Property="Padding" Value="12,8"/>
+		</Style>
+
+		<!-- Cell font size, padding, background -->
+		<Style Selector="DataGridCell">
+			<Setter Property="FontSize" Value="30"/>
+			<Setter Property="Padding" Value="10,6"/>
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="0"/>
+		</Style>
+
+		<!-- Row hover and selection states -->
+		<Style Selector="DataGridRow:pointerover">
+			<Setter Property="Background" Value="#D5F5E3"/>
+		</Style>
+		<Style Selector="DataGridRow:selected">
+			<Setter Property="Background" Value="#82E0AA"/>
+			<Setter Property="Foreground" Value="Black"/>
 		</Style>
 	</UserControl.Styles>
 
 	<Grid RowDefinitions="Auto,*,Auto" Margin="10">
 		<!-- Header -->
 		<TextBlock Grid.Row="0"
-                   Text="Izberi proceduro"
-                   FontSize="40"
+                   Text="Izberi program"
+                   FontSize="30"
                    FontWeight="Bold"
-                   Foreground="#FFDCA400"
+                   Foreground="Black"
                    Margin="10,0,0,20"/>
 
 		<!-- DataGrids -->
-		<Grid Grid.Row="1" 
-			  ColumnDefinitions="*,*" 
-			  ColumnSpacing="20">
-			
+		<Grid Grid.Row="1"
+              ColumnDefinitions="*,*"
+              ColumnSpacing="20">
+
 			<DataGrid Grid.Column="0"
                       ItemsSource="{Binding Recipes}"
                       SelectedItem="{Binding SelectedRecipe}">

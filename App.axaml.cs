@@ -44,10 +44,14 @@ namespace LM01_UI
                 //    DataContext = mainViewModel
                 //};
                 var mainViewModel = new MainWindowViewModel(dbContext);
-                desktop.MainWindow = new MainWindow
+                var mainWindow = new MainWindow
                 {
-                    DataContext = mainViewModel
+                    DataContext = mainViewModel,
+                    WindowState = WindowState.FullScreen,
+                    SystemDecorations = SystemDecorations.None
                 };
+
+                desktop.MainWindow = mainWindow;
             }
 
             base.OnFrameworkInitializationCompleted();
