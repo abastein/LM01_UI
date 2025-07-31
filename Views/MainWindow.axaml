@@ -46,7 +46,7 @@
 				<StackPanel Grid.Column="2" Grid.Row="1"
 							Orientation="Horizontal"
 							Spacing="15"
-							Margin="20"
+							Margin="40"
 							HorizontalAlignment="Right">
 					<TextBlock Text="PLC Status:"
 							   FontSize="20"

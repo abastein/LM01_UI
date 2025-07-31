@@ -54,10 +54,10 @@
 	<Grid RowDefinitions="Auto,*,Auto" RowSpacing="10" Margin="10">
 		<!-- Title -->
 		<TextBlock Grid.Row="0"
-                   Text="Seznam Receptur"
-                   FontSize="40"
+                   Text="Seznam programov"
+                   FontSize="30"
                    FontWeight="Bold"
-                   Foreground="Green"
+                   Foreground="Black"
                    Margin="0,0,0,10"/>
 
 		<!-- DataGrid -->

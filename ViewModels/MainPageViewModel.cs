@@ -97,6 +97,13 @@ namespace LM01_UI.ViewModels
                 StartPlcStatusPolling();
             };
 
+            // In case the connection was established before this view model was
+            // created, ensure the UI state and polling loop are initialized.
+            if (_tcpClient.IsConnected)
+            {
+                IsPlcConnected = true;
+                StartPlcStatusPolling();
+            }
             _ = LoadRecipesAsync();
         }
 
@@ -167,6 +174,7 @@ namespace LM01_UI.ViewModels
                 string response = await _tcpClient.SendReceiveAsync(command, TimeSpan.FromSeconds(2));
                 _lastStatusResponse = response;
                 await ProcessPlcResponse(response);
+                await RefreshStatusAsync();
             }
             catch (Exception ex)
             {
@@ -183,6 +191,7 @@ namespace LM01_UI.ViewModels
                 _lastStatusResponse = response;
                 await ProcessPlcResponse(response);
                 SelectedRecipe = null;
+                await RefreshStatusAsync();
             }
             catch (Exception ex)
             {
@@ -205,6 +214,7 @@ namespace LM01_UI.ViewModels
                 string response = await _tcpClient.SendReceiveAsync(_plcService.GetStartCommand(), TimeSpan.FromSeconds(2));
                 _lastStatusResponse = response;
                 await ProcessPlcResponse(response);
+                await RefreshStatusAsync();
             }
             catch (Exception ex)
             {
@@ -219,6 +229,7 @@ namespace LM01_UI.ViewModels
                 string response = await _tcpClient.SendReceiveAsync(_plcService.GetStopCommand(), TimeSpan.FromSeconds(2));
                 _lastStatusResponse = response;
                 await ProcessPlcResponse(response);
+                await RefreshStatusAsync();
             }
             catch (Exception ex)
             {
@@ -232,6 +243,25 @@ namespace LM01_UI.ViewModels
                 return;
             _pollingCts = new CancellationTokenSource();
             _ = PollStatusLoop(_pollingCts.Token);
+        }
+
+        private async Task RefreshStatusAsync()
+        {
+            if (!_tcpClient.IsConnected)
+                return;
+
+            try
+            {
+                string statusResponse = await _tcpClient.SendReceiveAsync(
+                    _plcService.GetStatusCommand(),
+                    TimeSpan.FromSeconds(0.5));
+                _lastStatusResponse = statusResponse;
+                await ProcessPlcResponse(statusResponse);
+            }
+            catch (Exception ex)
+            {
+                _logger.Inform(2, $"Status refresh failed: {ex.Message}");
+            }
         }
 
         public void StopPolling()
