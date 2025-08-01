@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace LM01_UI.ViewModels
 {
-    public partial class WelcomeViewModel : ViewModelBase
+    public partial class WelcomeViewModel : ViewModelBase, IDisposable
     {
         private readonly PlcTcpClient _plcClient;
         private readonly Logger _logger;
@@ -80,6 +80,11 @@ namespace LM01_UI.ViewModels
             {
                 _logger.Inform(2, $"Napaka pri povezovanju s PLC: {ex.Message}");
             }
+        }
+
+        public void Dispose()
+        {
+            _plcClient.ConnectionStatusChanged -= OnPlcConnectionStatusChanged;
         }
     }
 }

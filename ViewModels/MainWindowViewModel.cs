@@ -60,9 +60,15 @@ namespace LM01_UI.ViewModels
 
         public void Dispose()
         {
+            // Stop background polling before disposing shared services
+            _mainPageViewModel.StopPolling();
+
+            // Detach event handlers to avoid potential memory leaks
             _mainPageViewModel.PropertyChanged -= MainPageViewModel_PropertyChanged;
             _plcClient.ConnectionStatusChanged -= OnPlcConnectionStatusChanged;
-            _mainPageViewModel.StopPolling();
+            _welcomeViewModel.Dispose();
+
+            // Dispose managed resources
             _plcClient.Dispose();
             _logger.Dispose();
         }
