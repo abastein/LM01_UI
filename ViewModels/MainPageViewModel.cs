@@ -270,12 +270,12 @@ namespace LM01_UI.ViewModels
 
         private async Task PollStatusLoop(CancellationToken token)
         {
-  //          
+      
             try
             {
                while (!token.IsCancellationRequested)
                 {
-                    string response;
+                    string? response = null;
                     try
                     {
                         response = await _tcpClient.SendReceiveAsync(
@@ -287,8 +287,7 @@ namespace LM01_UI.ViewModels
                         // If the PLC doesn't reply in time, keep the connection
                         // open and try again on the next iteration.
                         _logger.Inform(2, "Status polling timed out.");
-                        await Task.Delay(250, token);
-                        continue;
+
                     }
                     catch (Exception ex)
                     {
@@ -297,12 +296,14 @@ namespace LM01_UI.ViewModels
                         break;
                     }
 
-                    if (response != _lastStatusResponse)
+                    if (response != null && response != _lastStatusResponse)
                     {
                         _lastStatusResponse = response;
                         await ProcessPlcResponse(response);
                     }
+
                     await Task.Delay(250, token);
+
                 }
             }
             catch (OperationCanceledException)
