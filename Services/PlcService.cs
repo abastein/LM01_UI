@@ -49,7 +49,7 @@ namespace LM01_UI.Services
             return BuildPaddedCommand("001002");
         }
 
-        public string GetUnloadCommand() => BuildPaddedCommand("001004");
+        public string GetUnloadCommand() => BuildPaddedCommand("00100300000");
 
         public string BuildLoadCommand(Recipe recipe)
         {

@@ -32,9 +32,6 @@ namespace LM01_UI.ViewModels
             ConnectToPlcCommand = new AsyncRelayCommand(ConnectToPlcAsync);
 
             _plcClient.ConnectionStatusChanged += OnPlcConnectionStatusChanged;
-
-            // THE FIX: Automatically execute the connect command on startup.
-            ConnectToPlcCommand.Execute(null);
         }
 
         public IAsyncRelayCommand ConnectToPlcCommand { get; } 

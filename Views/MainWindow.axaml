@@ -44,7 +44,7 @@
 				</StackPanel>
 
 				<StackPanel Grid.Column="1" Grid.Row="1"
-							Orientation="Horizontal"
+							Orientation="Vertical"
 							Spacing="15"
 							Margin="40"
 							HorizontalAlignment="Left">
@@ -53,7 +53,7 @@
 							   Foreground="Black"
 							   VerticalAlignment="Center"/>
 
-					<Border Width="24" Height="24"
+					<Border Width="96" Height="24"
 							CornerRadius="12"
 							Background="{Binding IsPlcConnected, Converter={StaticResource BoolToBrushConverter}}"
 							BorderBrush="Black"

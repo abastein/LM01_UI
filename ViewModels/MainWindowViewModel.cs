@@ -50,6 +50,11 @@ namespace LM01_UI.ViewModels
             _mainPageViewModel.PropertyChanged += MainPageViewModel_PropertyChanged;
             _plcClient.ConnectionStatusChanged += OnPlcConnectionStatusChanged;
 
+
+            // Establish PLC connection after all view models subscribed to
+            // connection events so that polling and status updates start correctly.
+            _welcomeViewModel.ConnectToPlcCommand.Execute(null);
+
             CurrentPageViewModel = _welcomeViewModel;
 
             ExitApplicationCommand = new RelayCommand(ExitApplication);

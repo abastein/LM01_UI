@@ -42,8 +42,6 @@ namespace LM01_UI.ViewModels
         private bool _isRecipeLoaded;
 
         [ObservableProperty]
-        //[NotifyPropertyChangedFor(nameof(StartStopButtonText))]
-        //[NotifyPropertyChangedFor(nameof(StartStopButtonBrush))]
         private bool _isRunning;
 
         [ObservableProperty]
@@ -303,12 +301,14 @@ namespace LM01_UI.ViewModels
                     {
                         _lastStatusResponse = response;
                         await ProcessPlcResponse(response);
-                        await Task.Delay(250, token);
                     }
-
+                    await Task.Delay(250, token);
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                // Polling was canceled.
 
-                await Task.Delay(250, token);
             }
             finally
             {
