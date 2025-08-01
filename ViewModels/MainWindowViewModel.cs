@@ -62,6 +62,7 @@ namespace LM01_UI.ViewModels
         {
             _mainPageViewModel.PropertyChanged -= MainPageViewModel_PropertyChanged;
             _plcClient.ConnectionStatusChanged -= OnPlcConnectionStatusChanged;
+            _mainPageViewModel.StopPolling();
             _plcClient.Dispose();
             _logger.Dispose();
         }

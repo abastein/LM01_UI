@@ -272,37 +272,49 @@ namespace LM01_UI.ViewModels
 
         private async Task PollStatusLoop(CancellationToken token)
         {
-            while (!token.IsCancellationRequested)
+  //          
+            try
             {
-                string response;
-                try
+               while (!token.IsCancellationRequested)
                 {
-                    response = await _tcpClient.SendReceiveAsync(
-                        _plcService.GetStatusCommand(),
-                        TimeSpan.FromSeconds(0.5));
-                }
-                catch (TimeoutException)
-                {
-                    // If the PLC doesn't reply in time, keep the connection
-                    // open and try again on the next iteration.
-                    _logger.Inform(2, "Status polling timed out.");
-                    await Task.Delay(250, token);
-                    continue;
-                }
-                catch (Exception ex)
-                {
-                    _logger.Inform(2, $"Status polling failed: {ex.Message}");
-                    _tcpClient.Disconnect();
-                    break;
-                }
+                    string response;
+                    try
+                    {
+                        response = await _tcpClient.SendReceiveAsync(
+                            _plcService.GetStatusCommand(),
+                            TimeSpan.FromSeconds(0.5));
+                    }
+                    catch (TimeoutException)
+                    {
+                        // If the PLC doesn't reply in time, keep the connection
+                        // open and try again on the next iteration.
+                        _logger.Inform(2, "Status polling timed out.");
+                        await Task.Delay(250, token);
+                        continue;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Inform(2, $"Status polling failed: {ex.Message}");
+                        _tcpClient.Disconnect();
+                        break;
+                    }
 
-                if (response != _lastStatusResponse)
-                {
-                    _lastStatusResponse = response;
-                    await ProcessPlcResponse(response);
+                    if (response != _lastStatusResponse)
+                    {
+                        _lastStatusResponse = response;
+                        await ProcessPlcResponse(response);
+                        await Task.Delay(250, token);
+                    }
+
                 }
 
                 await Task.Delay(250, token);
+            }
+            finally
+            {
+                // Ensure the polling resources are cleaned up so polling can be restarted
+                // if the connection is re-established.
+                StopPolling();
             }
         }
 
@@ -327,6 +339,11 @@ namespace LM01_UI.ViewModels
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
+                foreach (var recipeStep in SelectedRecipeSteps)
+                {
+                    recipeStep.IsActive = step > 0 && recipeStep.StepNumber == step;
+                }
+
                 CurrentStepNumber = step;
                 PlcErrorCode = err;
 
