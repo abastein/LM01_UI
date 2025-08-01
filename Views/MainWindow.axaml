@@ -61,9 +61,20 @@
 							VerticalAlignment="Center"/>
 
 					<TextBlock Text="{Binding PlcStatusText}"
-							   FontSize="20"
-							   Foreground="Black"
-							   VerticalAlignment="Center"/>
+									   FontSize="20"
+									   Foreground="Black"
+									   VerticalAlignment="Center"/>
+					<Button Content="Refresh"
+							Command="{Binding RefreshCommand}"
+							Width="160"
+							Height="40"
+							FontSize="20"
+							FontWeight="Bold"
+							Background="White"
+							Foreground="Black"
+							BorderBrush="DarkGray"
+							BorderThickness="3"
+							CornerRadius="10"/>
 				</StackPanel>
 
 				<ContentControl Content="{Binding CurrentPageViewModel}"

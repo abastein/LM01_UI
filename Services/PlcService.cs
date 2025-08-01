@@ -24,8 +24,8 @@ namespace LM01_UI.Services
         {
             // Če je podan specifičen payload (npr. za STOP), ga uporabimo.
             // Sicer uporabimo shranjen _parameterPayload.
-            string payloadToUse = payload ?? _parameterPayload;
-            string fullCommand = commandCode + payloadToUse;
+           // string payloadToUse = payload ?? _parameterPayload;
+            string fullCommand = commandCode + payload;
             //if (fullCommand.Length > CommandLength)
             //{
             //    fullCommand = fullCommand.Substring(0, CommandLength);

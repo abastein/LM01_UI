@@ -253,7 +253,7 @@ namespace LM01_UI.ViewModels
             _ = PollStatusLoop(_pollingCts.Token);
         }
 
-        private async Task RefreshStatusAsync()
+        public async Task RefreshStatusAsync()
         {
             if (!_tcpClient.IsConnected)
                 return;

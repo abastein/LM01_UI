@@ -6,6 +6,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace LM01_UI.ViewModels
 {
@@ -33,6 +34,7 @@ namespace LM01_UI.ViewModels
         public IRelayCommand NavigateProgramiCommand { get; }
         public IRelayCommand NavigateAdminCommand { get; }
         public IRelayCommand NavigateManualCommand { get; }
+        public IAsyncRelayCommand RefreshCommand { get; }
 
         public MainWindowViewModel(ApplicationDbContext dbContext)
         {
@@ -61,6 +63,7 @@ namespace LM01_UI.ViewModels
             NavigateProgramiCommand = new RelayCommand(() => Navigate("Run"));
             NavigateAdminCommand = new RelayCommand(() => Navigate("Admin"));
             NavigateManualCommand = new RelayCommand(() => Navigate("Manual"));
+            RefreshCommand = new AsyncRelayCommand(RefreshAsync);
         }
 
         public void Dispose()
@@ -118,6 +121,11 @@ namespace LM01_UI.ViewModels
             IsPlcConnected = isConnected;
             if (!isConnected)
                 PlcStatusText = "PLC ni povezan";
+        }
+
+        private async Task RefreshAsync()
+        {
+            await _mainPageViewModel.RefreshStatusAsync();
         }
     }
 }
