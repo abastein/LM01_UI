@@ -14,6 +14,11 @@ namespace LM01_UI.Services
         // "Spomin" za zadnje veljavne parametre recepture
         private string _parameterPayload = string.Empty;
 
+        /// <summary>
+        /// Sequence PLC expects at the end of each command.
+        /// </summary>
+        private const string Terminator = "$R$L";
+
         // Metoda za sestavljanje sporočila, ki upošteva trenutni payload
         private string BuildPaddedCommand(string commandCode, string? payload = null)
         {
@@ -27,7 +32,8 @@ namespace LM01_UI.Services
             //}
             //return fullCommand.PadRight(CommandLength, PaddingChar);
             //return fullCommand;
-            return commandCode + "$R$L";
+           // return commandCode + "$R$L";
+            return fullCommand + Terminator;
         }
 
         // Ukazi so sedaj metode, ker je njihova vsebina odvisna od stanja
@@ -71,11 +77,12 @@ namespace LM01_UI.Services
 
             // Shranimo nov payload v "spomin"
             _parameterPayload = parameterBuilder.ToString();
-            
+
 
             // Sestavimo celoten LOAD ukaz
             //return BuildPaddedCommand("001003");
-            return BuildPaddedCommand("001003" + _parameterPayload);
+            //return BuildPaddedCommand("001003" + _parameterPayload);
+            return BuildPaddedCommand("001003", _parameterPayload);
         }
     }
 }

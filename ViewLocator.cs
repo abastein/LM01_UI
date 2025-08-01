@@ -13,15 +13,19 @@ namespace LM01_UI
             if (param is null)
                 return null;
 
-            var name = param.GetType().FullName!.Replace("ViewModel", "View", StringComparison.Ordinal);
-            var type = Type.GetType(name);
+            // App.axaml already provides DataTemplates for most view models;
+            // this locator is a fallback used when no explicit template exists.
+            var vmName = param.GetType().FullName!;
+            var viewName = vmName.Replace(".ViewModels.", ".Views.")
+                                 .Replace("ViewModel", "View");
+            var type = Type.GetType(viewName);
 
             if (type != null)
             {
                 return (Control)Activator.CreateInstance(type)!;
             }
 
-            return new TextBlock { Text = "Not Found: " + name };
+            return new TextBlock { Text = "Not Found: " + viewName };
         }
 
         public bool Match(object? data)

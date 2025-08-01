@@ -42,9 +42,15 @@ namespace LM01_UI.ViewModels
         private bool _isRecipeLoaded;
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(StartStopButtonText))]
-        [NotifyPropertyChangedFor(nameof(StartStopButtonBrush))]
+        //[NotifyPropertyChangedFor(nameof(StartStopButtonText))]
+        //[NotifyPropertyChangedFor(nameof(StartStopButtonBrush))]
         private bool _isRunning;
+
+        [ObservableProperty]
+        private string _startStopButtonText = "Start";
+
+        [ObservableProperty]
+        private IBrush _startStopButtonBrush = Brushes.MediumSeaGreen;
 
         [ObservableProperty]
         private int _currentStepNumber;
@@ -61,16 +67,6 @@ namespace LM01_UI.ViewModels
         public bool CanLoadRecipe => SelectedRecipe != null && IsPlcConnected && !IsRunning;
         public bool CanClearRecipe => IsRecipeLoaded && !IsRunning;
         public bool CanToggleRunning => IsPlcConnected && (IsRecipeLoaded || IsRunning);
-
-        /// <summary>
-        /// Text displayed on Start/Stop button.
-        /// </summary>
-        public string StartStopButtonText => IsRunning ? "Stop" : "Start";
-
-        /// <summary>
-        /// Background brush for Start/Stop button.
-        /// </summary>
-        public IBrush StartStopButtonBrush => IsRunning ? Brushes.IndianRed : Brushes.MediumSeaGreen;
 
         public IAsyncRelayCommand LoadRecipeCommand { get; }
         public IAsyncRelayCommand ToggleStartStopCommand { get; }
@@ -131,12 +127,8 @@ namespace LM01_UI.ViewModels
             OnPropertyChanged(nameof(CanLoadRecipe));
             OnPropertyChanged(nameof(CanClearRecipe));
             OnPropertyChanged(nameof(CanToggleRunning));
-            // Explicitly notify bindings that depend on IsRunning such as the
-            // Start/Stop button text and background brush. In some cases the
-            // source generator may not raise these notifications correctly,
-            // so we do it manually to ensure the UI updates immediately.
-            OnPropertyChanged(nameof(StartStopButtonText));
-            OnPropertyChanged(nameof(StartStopButtonBrush));
+            StartStopButtonText = IsRunning ? "Stop" : "Start";
+            StartStopButtonBrush = IsRunning ? Brushes.IndianRed : Brushes.MediumSeaGreen;
         }
 
         private async Task LoadRecipesAsync()
