@@ -81,9 +81,14 @@ namespace LM01_UI.ViewModels
             _plcService = plcService;
             _logger = logger;
 
-            LoadRecipeCommand = new AsyncRelayCommand(LoadRecipeOnPlcAsync);
-            ClearSelectionCommand = new AsyncRelayCommand(ClearSelectionAsync);
-            ToggleStartStopCommand = new AsyncRelayCommand(ToggleStartStopAsync);
+            // ========================= Revision Start =========================
+            // The command constructor now takes a second argument: a function
+            // that determines if the command can execute. The UI button's
+            // IsEnabled state will automatically reflect this.
+            LoadRecipeCommand = new AsyncRelayCommand(LoadRecipeOnPlcAsync, () => CanLoadRecipe);
+            ClearSelectionCommand = new AsyncRelayCommand(ClearSelectionAsync, () => CanClearRecipe);
+            ToggleStartStopCommand = new AsyncRelayCommand(ToggleStartStopAsync, () => CanToggleRunning);
+            // ========================== Revision End ==========================
 
             _tcpClient.ConnectionStatusChanged += isConnected =>
             {
@@ -92,8 +97,6 @@ namespace LM01_UI.ViewModels
                 _ = RefreshStatusAsync();
             };
 
-            // In case the connection was established before this view model was
-            // created, ensure the UI state and polling loop are initialized.
             if (_tcpClient.IsConnected)
             {
                 IsPlcConnected = true;
@@ -102,32 +105,40 @@ namespace LM01_UI.ViewModels
             _ = LoadRecipesAsync();
         }
 
+        // ========================= Revision Start =========================
+        // The partial methods now notify the commands to re-evaluate their
+        // CanExecute status, which will enable/disable the buttons in the UI.
+
         partial void OnSelectedRecipeChanged(Recipe? oldValue, Recipe? newValue)
         {
-            OnPropertyChanged(nameof(CanLoadRecipe));
+            LoadRecipeCommand.NotifyCanExecuteChanged();
             _ = LoadStepsForSelectedRecipeAsync();
         }
 
         partial void OnIsPlcConnectedChanged(bool oldValue, bool newValue)
         {
-            OnPropertyChanged(nameof(CanLoadRecipe));
-            OnPropertyChanged(nameof(CanToggleRunning));
+            LoadRecipeCommand.NotifyCanExecuteChanged();
+            ToggleStartStopCommand.NotifyCanExecuteChanged();
         }
 
         partial void OnIsRecipeLoadedChanged(bool oldValue, bool newValue)
         {
-            OnPropertyChanged(nameof(CanClearRecipe));
-            OnPropertyChanged(nameof(CanToggleRunning));
+            ClearSelectionCommand.NotifyCanExecuteChanged();
+            ToggleStartStopCommand.NotifyCanExecuteChanged();
         }
 
         partial void OnIsRunningChanged(bool oldValue, bool newValue)
         {
-            OnPropertyChanged(nameof(CanLoadRecipe));
-            OnPropertyChanged(nameof(CanClearRecipe));
-            OnPropertyChanged(nameof(CanToggleRunning));
+            LoadRecipeCommand.NotifyCanExecuteChanged();
+            ClearSelectionCommand.NotifyCanExecuteChanged();
+            ToggleStartStopCommand.NotifyCanExecuteChanged();
+
             StartStopButtonText = IsRunning ? "Stop" : "Start";
             StartStopButtonBrush = IsRunning ? Brushes.IndianRed : Brushes.MediumSeaGreen;
         }
+        // ========================== Revision End ==========================
+
+        // ... The rest of your file remains unchanged ...
 
         private async Task LoadRecipesAsync()
         {
@@ -270,10 +281,10 @@ namespace LM01_UI.ViewModels
 
         private async Task PollStatusLoop(CancellationToken token)
         {
-      
+
             try
             {
-               while (!token.IsCancellationRequested)
+                while (!token.IsCancellationRequested)
                 {
                     string? response = null;
                     try
@@ -284,10 +295,7 @@ namespace LM01_UI.ViewModels
                     }
                     catch (TimeoutException)
                     {
-                        // If the PLC doesn't reply in time, keep the connection
-                        // open and try again on the next iteration.
                         _logger.Inform(2, "Status polling timed out.");
-
                     }
                     catch (Exception ex)
                     {
@@ -303,18 +311,11 @@ namespace LM01_UI.ViewModels
                     }
 
                     await Task.Delay(250, token);
-
                 }
             }
-            catch (OperationCanceledException)
-            {
-                // Polling was canceled.
-
-            }
+            catch (OperationCanceledException) { /* Polling was canceled. */ }
             finally
             {
-                // Ensure the polling resources are cleaned up so polling can be restarted
-                // if the connection is re-established.
                 StopPolling();
             }
         }
@@ -324,7 +325,6 @@ namespace LM01_UI.ViewModels
             if (string.IsNullOrEmpty(response))
                 return;
 
-            // Strip any non-digit characters and take the last 10 digits
             var digits = new string(response.Where(char.IsDigit).ToArray());
             if (digits.Length >= 10)
                 digits = digits[^10..];
@@ -332,7 +332,6 @@ namespace LM01_UI.ViewModels
             if (digits.Length < 10)
                 return;
 
-            // First character indicates state: 0=standby,1=loaded,2=running,3=error
             string plcState = digits.Substring(0, 1);
             int.TryParse(digits.Substring(1, 3), out int loadedId);
             int.TryParse(digits.Substring(4, 2), out int step);
