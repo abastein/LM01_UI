@@ -44,7 +44,7 @@
 				</StackPanel>
 
 				<StackPanel Grid.Column="1" Grid.Row="1"
-							Orientation="Vertical"
+							Orientation="Horizontal"
 							Spacing="15"
 							Margin="40"
 							HorizontalAlignment="Left">
@@ -75,6 +75,14 @@
 							BorderBrush="DarkGray"
 							BorderThickness="3"
 							CornerRadius="10"/>
+					<TextBlock Text="Last PLC String:"
+									   FontSize="16"
+									   Foreground="Gray"
+									   VerticalAlignment="Center"/>
+					<TextBlock Text="{Binding LastStatusResponse}"
+									   FontSize="16"
+									   Foreground="Gray"
+									   VerticalAlignment="Center"/>
 				</StackPanel>
 
 				<ContentControl Content="{Binding CurrentPageViewModel}"

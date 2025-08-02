@@ -26,6 +26,9 @@ namespace LM01_UI.ViewModels
         [ObservableProperty]
         private bool _isPlcConnected;
 
+        [ObservableProperty]
+        private string _lastStatusResponse = string.Empty;
+
 
         private object? _currentPageViewModel;
         public object? CurrentPageViewModel { get => _currentPageViewModel; set => SetProperty(ref _currentPageViewModel, value); }
@@ -113,6 +116,10 @@ namespace LM01_UI.ViewModels
             if (e.PropertyName == nameof(MainPageViewModel.PlcStatusText))
             {
                 PlcStatusText = _mainPageViewModel.PlcStatusText;
+            }
+            else if (e.PropertyName == nameof(MainPageViewModel.LastStatusResponse))
+            {
+                LastStatusResponse = _mainPageViewModel.LastStatusResponse;
             }
         }
 

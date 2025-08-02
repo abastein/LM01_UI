@@ -21,7 +21,9 @@ namespace LM01_UI.ViewModels
         private readonly PlcService _plcService;
         private readonly Logger _logger;
         private CancellationTokenSource? _pollingCts;
-        private string? _lastStatusResponse;
+
+        [ObservableProperty]
+        private string _lastStatusResponse = string.Empty;
 
         [ObservableProperty]
         private ObservableCollection<Recipe> _recipes = new();
