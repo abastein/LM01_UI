@@ -6,7 +6,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel;
+using Avalonia.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace LM01_UI.ViewModels
 {
@@ -15,6 +17,7 @@ namespace LM01_UI.ViewModels
         private readonly ApplicationDbContext _dbContext;
         private readonly PlcTcpClient _plcClient;
         private readonly PlcService _plcService;
+        private readonly PlcStatusService _plcStatusService;
         private readonly Logger _logger;
         private readonly WelcomeViewModel _welcomeViewModel;
         private readonly AdminPageViewModel _adminPageViewModel;
@@ -37,7 +40,6 @@ namespace LM01_UI.ViewModels
         public IRelayCommand NavigateProgramiCommand { get; }
         public IRelayCommand NavigateAdminCommand { get; }
         public IRelayCommand NavigateManualCommand { get; }
-        public IAsyncRelayCommand RefreshCommand { get; }
 
         public MainWindowViewModel(ApplicationDbContext dbContext)
         {
@@ -45,14 +47,15 @@ namespace LM01_UI.ViewModels
             _logger = new Logger();
             _plcService = new PlcService();
             _plcClient = new PlcTcpClient(_logger);
+            _plcStatusService = new PlcStatusService(_plcClient, _plcService, _logger);
 
             var plcTestViewModel = new PlcTestViewModel(_plcClient, _logger);
 
             _welcomeViewModel = new WelcomeViewModel(_plcClient, _logger, Navigate);
-            _mainPageViewModel = new MainPageViewModel(_dbContext, _plcClient, _plcService, _logger);
+            _mainPageViewModel = new MainPageViewModel(_dbContext, _plcClient, _plcService, _plcStatusService, _logger);
             _adminPageViewModel = new AdminPageViewModel(_plcClient, _logger, _dbContext, Navigate, plcTestViewModel);
 
-            _mainPageViewModel.PropertyChanged += MainPageViewModel_PropertyChanged;
+            _plcStatusService.StatusUpdated += OnStatusUpdated;
             _plcClient.ConnectionStatusChanged += OnPlcConnectionStatusChanged;
 
 
@@ -66,20 +69,15 @@ namespace LM01_UI.ViewModels
             NavigateProgramiCommand = new RelayCommand(() => Navigate("Run"));
             NavigateAdminCommand = new RelayCommand(() => Navigate("Admin"));
             NavigateManualCommand = new RelayCommand(() => Navigate("Manual"));
-            RefreshCommand = new AsyncRelayCommand(RefreshAsync);
         }
 
         public void Dispose()
         {
-            // Stop background polling before disposing shared services
-            _mainPageViewModel.StopPolling();
-
-            // Detach event handlers to avoid potential memory leaks
-            _mainPageViewModel.PropertyChanged -= MainPageViewModel_PropertyChanged;
+            _plcStatusService.StatusUpdated -= OnStatusUpdated;
             _plcClient.ConnectionStatusChanged -= OnPlcConnectionStatusChanged;
             _welcomeViewModel.Dispose();
 
-            // Dispose managed resources
+            _plcStatusService.Dispose();
             _plcClient.Dispose();
             _logger.Dispose();
         }
@@ -111,18 +109,6 @@ namespace LM01_UI.ViewModels
             }
         }
 
-        private void MainPageViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(MainPageViewModel.PlcStatusText))
-            {
-                PlcStatusText = _mainPageViewModel.PlcStatusText;
-            }
-            else if (e.PropertyName == nameof(MainPageViewModel.LastStatusResponse))
-            {
-                LastStatusResponse = _mainPageViewModel.LastStatusResponse;
-            }
-        }
-
         private void OnPlcConnectionStatusChanged(bool isConnected)
         {
             IsPlcConnected = isConnected;
@@ -130,9 +116,30 @@ namespace LM01_UI.ViewModels
                 PlcStatusText = "PLC ni povezan";
         }
 
-        private async Task RefreshAsync()
+        private async void OnStatusUpdated(object? sender, string response)
         {
-            await _mainPageViewModel.RefreshStatusAsync();
+            var digits = new string(response.Where(char.IsDigit).ToArray());
+            if (digits.Length >= 10)
+                digits = digits[^10..];
+            if (digits.Length < 10)
+                return;
+
+            string plcState = digits.Substring(0, 1);
+            int.TryParse(digits.Substring(1, 3), out int loadedId);
+            int.TryParse(digits.Substring(4, 2), out int step);
+            int.TryParse(digits.Substring(6, 4), out int err);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                LastStatusResponse = response;
+                PlcStatusText = plcState switch
+                {
+                    "1" => $"Receptura naložena (ID: {loadedId})",
+                    "2" => $"Izvajanje… (Receptura: {loadedId}, Korak: {step})",
+                    "3" => $"NAPAKA (Koda: {err})",
+                    _ => PlcStatusText
+                };
+            });
         }
     }
 }

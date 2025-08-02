@@ -49,9 +49,9 @@
 							Margin="40"
 							HorizontalAlignment="Left">
 					<TextBlock Text="PLC Status:"
-							   FontSize="20"
-							   Foreground="Black"
-							   VerticalAlignment="Center"/>
+							FontSize="20"
+							Foreground="Black"
+							VerticalAlignment="Center"/>
 
 					<Border Width="96" Height="24"
 							CornerRadius="12"
@@ -61,28 +61,13 @@
 							VerticalAlignment="Center"/>
 
 					<TextBlock Text="{Binding PlcStatusText}"
-									   FontSize="20"
-									   Foreground="Black"
-									   VerticalAlignment="Center"/>
-					<Button Content="Refresh"
-							Command="{Binding RefreshCommand}"
-							Width="160"
-							Height="40"
 							FontSize="20"
-							FontWeight="Bold"
-							Background="White"
 							Foreground="Black"
-							BorderBrush="DarkGray"
-							BorderThickness="3"
-							CornerRadius="10"/>
+							VerticalAlignment="Center"/>
 					<TextBlock Text="Last PLC String:"
-									   FontSize="16"
-									   Foreground="Gray"
-									   VerticalAlignment="Center"/>
-					<TextBlock Text="{Binding LastStatusResponse}"
-									   FontSize="16"
-									   Foreground="Gray"
-									   VerticalAlignment="Center"/>
+							FontSize="16"
+							Foreground="Gray"
+							VerticalAlignment="Center"/>
 				</StackPanel>
 
 				<ContentControl Content="{Binding CurrentPageViewModel}"

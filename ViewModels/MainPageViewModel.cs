@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace LM01_UI.ViewModels
@@ -19,8 +18,8 @@ namespace LM01_UI.ViewModels
         private readonly ApplicationDbContext _dbContext;
         private readonly PlcTcpClient _tcpClient;
         private readonly PlcService _plcService;
+        private readonly PlcStatusService _statusService;
         private readonly Logger _logger;
-        private CancellationTokenSource? _pollingCts;
 
         [ObservableProperty]
         private string _lastStatusResponse = string.Empty;
@@ -76,11 +75,13 @@ namespace LM01_UI.ViewModels
             ApplicationDbContext dbContext,
             PlcTcpClient tcpClient,
             PlcService plcService,
+            PlcStatusService statusService,
             Logger logger)
         {
             _dbContext = dbContext;
             _tcpClient = tcpClient;
             _plcService = plcService;
+            _statusService = statusService;
             _logger = logger;
 
             // ========================= Revision Start =========================
@@ -93,17 +94,13 @@ namespace LM01_UI.ViewModels
             // ========================== Revision End ==========================
 
             _tcpClient.ConnectionStatusChanged += isConnected =>
-            {
-                Dispatcher.UIThread.InvokeAsync(() => IsPlcConnected = isConnected);
-                StartPlcStatusPolling();
-                _ = RefreshStatusAsync();
-            };
 
             if (_tcpClient.IsConnected)
             {
                 IsPlcConnected = true;
-                StartPlcStatusPolling();
             }
+            _statusService.StatusUpdated += OnStatusUpdated;
+
             _ = LoadRecipesAsync();
         }
 
@@ -184,7 +181,6 @@ namespace LM01_UI.ViewModels
                 string response = await _tcpClient.SendReceiveAsync(command, TimeSpan.FromSeconds(2));
                 await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
                 await ProcessPlcResponse(response);
-                await RefreshStatusAsync();
             }
             catch (Exception ex)
             {
@@ -201,7 +197,6 @@ namespace LM01_UI.ViewModels
                 await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
                 await ProcessPlcResponse(response);
                 SelectedRecipe = null;
-                await RefreshStatusAsync();
             }
             catch (Exception ex)
             {
@@ -224,7 +219,6 @@ namespace LM01_UI.ViewModels
                 string response = await _tcpClient.SendReceiveAsync(_plcService.GetStartCommand(), TimeSpan.FromSeconds(2));
                 await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
                 await ProcessPlcResponse(response);
-                await RefreshStatusAsync();
             }
             catch (Exception ex)
             {
@@ -239,7 +233,6 @@ namespace LM01_UI.ViewModels
                 string response = await _tcpClient.SendReceiveAsync(_plcService.GetStopCommand(), TimeSpan.FromSeconds(2));
                 await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
                 await ProcessPlcResponse(response);
-                await RefreshStatusAsync();
             }
             catch (Exception ex)
             {
@@ -247,79 +240,12 @@ namespace LM01_UI.ViewModels
             }
         }
 
-        public void StartPlcStatusPolling()
-        {
-            if (_pollingCts != null || !_tcpClient.IsConnected)
-                return;
-            _pollingCts = new CancellationTokenSource();
-            _ = PollStatusLoop(_pollingCts.Token);
-        }
-
-        public async Task RefreshStatusAsync()
-        {
-            if (!_tcpClient.IsConnected)
-                return;
-
-            try
-            {
-                string statusResponse = await _tcpClient.SendReceiveAsync(
-                    _plcService.GetStatusCommand(),
-                    TimeSpan.FromSeconds(0.5));
-                await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = statusResponse);
-                await ProcessPlcResponse(statusResponse);
-            }
-            catch (Exception ex)
-            {
-                _logger.Inform(2, $"Status refresh failed: {ex.Message}");
-            }
-        }
-
-        public void StopPolling()
-        {
-            _pollingCts?.Cancel();
-            _pollingCts?.Dispose();
-            _pollingCts = null;
-        }
-
-        private async Task PollStatusLoop(CancellationToken token)
+        private async void OnStatusUpdated(object? sender, string response)
         {
 
-            try
-            {
-                while (!token.IsCancellationRequested)
-                {
-                    string? response = null;
-                    try
-                    {
-                        response = await _tcpClient.SendReceiveAsync(
-                            _plcService.GetStatusCommand(),
-                            TimeSpan.FromSeconds(0.5));
-                    }
-                    catch (TimeoutException)
-                    {
-                        _logger.Inform(2, "Status polling timed out.");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Inform(2, $"Status polling failed: {ex.Message}");
-                        _tcpClient.Disconnect();
-                        break;
-                    }
+        await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
+        await ProcessPlcResponse(response);
 
-                    if (response != null && response != LastStatusResponse)
-                    {
-                        await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
-                        await ProcessPlcResponse(response);
-                    }
-
-                    await Task.Delay(250, token);
-                }
-            }
-            catch (OperationCanceledException) { /* Polling was canceled. */ }
-            finally
-            {
-                StopPolling();
-            }
         }
 
         private async Task ProcessPlcResponse(string response)
