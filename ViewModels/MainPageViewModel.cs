@@ -84,10 +84,6 @@ namespace LM01_UI.ViewModels
             _statusService = statusService;
             _logger = logger;
 
-            // ========================= Revision Start =========================
-            // The command constructor now takes a second argument: a function
-            // that determines if the command can execute. The UI button's
-            // IsEnabled state will automatically reflect this.
             LoadRecipeCommand = new AsyncRelayCommand(LoadRecipeOnPlcAsync, () => CanLoadRecipe);
             ClearSelectionCommand = new AsyncRelayCommand(ClearSelectionAsync, () => CanClearRecipe);
             ToggleStartStopCommand = new AsyncRelayCommand(ToggleStartStopAsync, () => CanToggleRunning);
@@ -97,8 +93,11 @@ namespace LM01_UI.ViewModels
 
             if (_tcpClient.IsConnected)
             {
-                IsPlcConnected = true;
-            }
+                IsPlcConnected = isConnected;
+                if (isConnected) _statusService.Start();
+                else _statusService.Stop();
+            };
+
             _statusService.StatusUpdated += OnStatusUpdated;
 
             _ = LoadRecipesAsync();
@@ -240,11 +239,34 @@ namespace LM01_UI.ViewModels
             }
         }
 
-        private async void OnStatusUpdated(object? sender, string response)
+        private async void OnStatusUpdated(object? sender, PlcStatusEventArgs e)
         {
+            var status = e.Status;
 
-        await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
-        await ProcessPlcResponse(response);
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                LastStatusResponse = status.Raw;
+
+                foreach (var recipeStep in SelectedRecipeSteps)
+                {
+                    recipeStep.IsActive = status.Step > 0 && recipeStep.StepNumber == status.Step;
+                }
+
+                CurrentStepNumber = status.Step;
+                PlcErrorCode = status.ErrorCode;
+
+                IsRecipeLoaded = status.State is "1" or "2" or "3";
+                IsRunning = status.State == "2";
+
+                LoadedRecipeId = IsRecipeLoaded ? status.LoadedRecipeId : null;
+                PlcStatusText = status.State switch
+                {
+                    "1" => $"Receptura naložena (ID: {status.LoadedRecipeId})",
+                    "2" => $"Izvajanje… (Receptura: {status.LoadedRecipeId}, Korak: {status.Step})",
+                    "3" => $"NAPAKA (Koda: {status.ErrorCode})",
+                    _ => PlcStatusText
+                };
+            });
 
         }
 

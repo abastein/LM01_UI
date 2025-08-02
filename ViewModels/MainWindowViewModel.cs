@@ -8,7 +8,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel;
 using Avalonia.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace LM01_UI.ViewModels
 {
@@ -47,7 +46,7 @@ namespace LM01_UI.ViewModels
             _logger = new Logger();
             _plcService = new PlcService();
             _plcClient = new PlcTcpClient(_logger);
-            _plcStatusService = new PlcStatusService(_plcClient, _plcService, _logger);
+            _plcStatusService = new PlcStatusService(_plcClient, _plcService);
 
             var plcTestViewModel = new PlcTestViewModel(_plcClient, _logger);
 
@@ -116,27 +115,18 @@ namespace LM01_UI.ViewModels
                 PlcStatusText = "PLC ni povezan";
         }
 
-        private async void OnStatusUpdated(object? sender, string response)
+        private async void OnStatusUpdated(object? sender, PlcStatusEventArgs e)
         {
-            var digits = new string(response.Where(char.IsDigit).ToArray());
-            if (digits.Length >= 10)
-                digits = digits[^10..];
-            if (digits.Length < 10)
-                return;
-
-            string plcState = digits.Substring(0, 1);
-            int.TryParse(digits.Substring(1, 3), out int loadedId);
-            int.TryParse(digits.Substring(4, 2), out int step);
-            int.TryParse(digits.Substring(6, 4), out int err);
+            var status = e.Status;
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                LastStatusResponse = response;
-                PlcStatusText = plcState switch
+                LastStatusResponse = status.Raw;
+                PlcStatusText = status.State switch
                 {
-                    "1" => $"Receptura naložena (ID: {loadedId})",
-                    "2" => $"Izvajanje… (Receptura: {loadedId}, Korak: {step})",
-                    "3" => $"NAPAKA (Koda: {err})",
+                    "1" => $"Receptura naložena (ID: {status.LoadedRecipeId})",
+                    "2" => $"Izvajanje… (Receptura: {status.LoadedRecipeId}, Korak: {status.Step})",
+                    "3" => $"NAPAKA (Koda: {status.ErrorCode})",
                     _ => PlcStatusText
                 };
             });
