@@ -182,7 +182,7 @@ namespace LM01_UI.ViewModels
             {
                 string command = _plcService.BuildLoadCommand(SelectedRecipe);
                 string response = await _tcpClient.SendReceiveAsync(command, TimeSpan.FromSeconds(2));
-                _lastStatusResponse = response;
+                await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
                 await ProcessPlcResponse(response);
                 await RefreshStatusAsync();
             }
@@ -198,7 +198,7 @@ namespace LM01_UI.ViewModels
             try
             {
                 string response = await _tcpClient.SendReceiveAsync(_plcService.GetUnloadCommand(), TimeSpan.FromSeconds(2));
-                _lastStatusResponse = response;
+                await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
                 await ProcessPlcResponse(response);
                 SelectedRecipe = null;
                 await RefreshStatusAsync();
@@ -222,7 +222,7 @@ namespace LM01_UI.ViewModels
             try
             {
                 string response = await _tcpClient.SendReceiveAsync(_plcService.GetStartCommand(), TimeSpan.FromSeconds(2));
-                _lastStatusResponse = response;
+                await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
                 await ProcessPlcResponse(response);
                 await RefreshStatusAsync();
             }
@@ -237,7 +237,7 @@ namespace LM01_UI.ViewModels
             try
             {
                 string response = await _tcpClient.SendReceiveAsync(_plcService.GetStopCommand(), TimeSpan.FromSeconds(2));
-                _lastStatusResponse = response;
+                await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
                 await ProcessPlcResponse(response);
                 await RefreshStatusAsync();
             }
@@ -265,7 +265,7 @@ namespace LM01_UI.ViewModels
                 string statusResponse = await _tcpClient.SendReceiveAsync(
                     _plcService.GetStatusCommand(),
                     TimeSpan.FromSeconds(0.5));
-                _lastStatusResponse = statusResponse;
+                await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = statusResponse);
                 await ProcessPlcResponse(statusResponse);
             }
             catch (Exception ex)
@@ -306,9 +306,9 @@ namespace LM01_UI.ViewModels
                         break;
                     }
 
-                    if (response != null && response != _lastStatusResponse)
+                    if (response != null && response != LastStatusResponse)
                     {
-                        _lastStatusResponse = response;
+                        await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
                         await ProcessPlcResponse(response);
                     }
 
