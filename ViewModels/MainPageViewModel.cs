@@ -202,7 +202,7 @@ namespace LM01_UI.ViewModels
         {
             try
             {
-                await _tcpClient.SendAsync(_plcService.GetStopCommand());
+                await _tcpClient.SendAsync(_plcService.GetStartCommand());
             }
             catch (Exception ex)
             {
@@ -214,9 +214,7 @@ namespace LM01_UI.ViewModels
         {
             try
             {
-                string response = await _tcpClient.SendReceiveAsync(_plcService.GetStopCommand(), TimeSpan.FromSeconds(2));
-                await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
-                await ProcessPlcResponse(response);
+                await _tcpClient.SendAsync(_plcService.GetStopCommand());
             }
             catch (Exception ex)
             {
@@ -228,9 +226,26 @@ namespace LM01_UI.ViewModels
         {
             var status = e.Status;
             _logger.Inform(1, $"MainPageViewModel.OnStatusUpdated start: State={status.State}, LoadedRecipeId={status.LoadedRecipeId}, Step={status.Step}, ErrorCode={status.ErrorCode}");
+
+            Recipe? recipe = null;
+            try
+            {
+                recipe = await _dbContext.Recipes
+                    .Include(r => r.Steps)
+                    .FirstOrDefaultAsync(r => r.Id == status.LoadedRecipeId);
+            }
+            catch (Exception ex)
+            {
+                _logger.Inform(2, $"Napaka pri pridobivanju recepture: {ex.Message}");
+            }
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 LastStatusResponse = status.Raw;
+
+                if (status.State is "1" or "2" && recipe != null && SelectedRecipe?.Id != recipe.Id)
+                {
+                    SelectedRecipe = recipe;
+                }
 
                 foreach (var recipeStep in SelectedRecipeSteps)
                 {

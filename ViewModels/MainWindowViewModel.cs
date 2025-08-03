@@ -36,6 +36,7 @@ namespace LM01_UI.ViewModels
         private string _lastStatusResponse = string.Empty;
 
 
+        private bool _startupStatusHandled;
         private object? _currentPageViewModel;
         public object? CurrentPageViewModel { get => _currentPageViewModel; set => SetProperty(ref _currentPageViewModel, value); }
 
@@ -146,6 +147,12 @@ namespace LM01_UI.ViewModels
                     "3" => $"NAPAKA (Koda: {status.ErrorCode})",
                     _ => PlcStatusText
                 };
+
+                if (!_startupStatusHandled && (status.State == "1" || status.State == "2"))
+                {
+                    Navigate("Run");
+                    _startupStatusHandled = true;
+                }
             });
 
 

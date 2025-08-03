@@ -3,11 +3,6 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace LM01_UI.Data.Persistence
 {
-    /// <summary>
-    /// Ta razred uporablja samo Entity Framework orodje (npr. Add-Migration),
-    /// da ve, kako ustvariti DbContext med razvojem.
-    /// Ne uporablja se med normalnim delovanjem aplikacije.
-    /// </summary>
     public class DbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
     {
         public ApplicationDbContext CreateDbContext(string[] args)
