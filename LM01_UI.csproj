@@ -95,6 +95,11 @@
       <DependentUpon>Views\UITestView.axaml</DependentUpon>
     </Compile>
 
+	  <AvaloniaXaml Update="Views\DebugLogView.axaml" />
+	  <Compile Update="Views\DebugLogView.axaml.cs">
+		  <DependentUpon>Views\DebugLogView.axaml</DependentUpon>
+	  </Compile>
+
     <Compile Update="BoolToBrushConverter.cs" />
     <Compile Update="Logger.cs" />
     <Compile Update="PlcTcpClient.cs" />
@@ -115,7 +120,9 @@
     <Compile Update="ViewModels\MainPageViewModel.cs" />
     <Compile Update="ViewModels\PlcTestViewModel.cs" />
     <Compile Update="ViewModels\ParameterEditorViewModel.cs" />
-    <Compile Update="ViewModels\RecipeListViewModel.cs" /> <Compile Update="ViewModels\UITestViewModel.cs" />
+    <Compile Update="ViewModels\RecipeListViewModel.cs" /> 
+	<Compile Update="ViewModels\UITestViewModel.cs" />
+	<Compile Update="ViewModels\DebugLogViewModel.cs" />
   </ItemGroup>
 
   <ItemGroup>

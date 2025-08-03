@@ -233,7 +233,7 @@ namespace LM01_UI.ViewModels
         private async void OnStatusUpdated(object? sender, PlcStatusEventArgs e)
         {
             var status = e.Status;
-
+            _logger.Inform(1, $"MainPageViewModel.OnStatusUpdated start: State={status.State}, LoadedRecipeId={status.LoadedRecipeId}, Step={status.Step}, ErrorCode={status.ErrorCode}");
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 LastStatusResponse = status.Raw;
@@ -249,7 +249,7 @@ namespace LM01_UI.ViewModels
                 IsRecipeLoaded = status.State is "1" or "2" or "3";
                 IsRunning = status.State == "2";
 
-                LoadedRecipeId = IsRecipeLoaded ? status.LoadedRecipeId : null;
+                LoadedRecipeId = IsRecipeLoaded ? status.LoadedRecipeId : (int?)null;
                 PlcStatusText = status.State switch
                 {
                     "1" => $"Receptura naložena (ID: {status.LoadedRecipeId})",
@@ -258,6 +258,8 @@ namespace LM01_UI.ViewModels
                     _ => PlcStatusText
                 };
             });
+
+            _logger.Inform(1, $"MainPageViewModel.OnStatusUpdated end: State={status.State}, LoadedRecipeId={status.LoadedRecipeId}, Step={status.Step}, ErrorCode={status.ErrorCode}");
 
         }
 

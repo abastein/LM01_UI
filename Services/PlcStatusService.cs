@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
+using LM01_UI;
 
 namespace LM01_UI.Services
 {
@@ -14,14 +15,16 @@ namespace LM01_UI.Services
     {
         private readonly PlcTcpClient _tcpClient;
         private readonly PlcService _plcService;
+        private readonly Logger _logger;
         private CancellationTokenSource? _cts;
 
         public event EventHandler<PlcStatusEventArgs>? StatusUpdated;
 
-        public PlcStatusService(PlcTcpClient tcpClient, PlcService plcService)
+        public PlcStatusService(PlcTcpClient tcpClient, PlcService plcService, Logger logger)
         {
             _tcpClient = tcpClient;
             _plcService = plcService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -51,15 +54,21 @@ namespace LM01_UI.Services
                 {
                     try
                     {
+                        var command = _plcService.GetStatusCommand();
+                        _logger.Inform(0, $"STATUS → sent: {command}");
                         string response = await _tcpClient.SendReceiveAsync(
-                            _plcService.GetStatusCommand(),
+                            command,
                             TimeSpan.FromSeconds(0.5));
+                        _logger.Inform(0, $"STATUS ← response: {response}");
 
                         var status = ParseStatus(response);
                         if (status != null)
                         {
                             Dispatcher.UIThread.Post(() =>
-                                StatusUpdated?.Invoke(this, new PlcStatusEventArgs(status)));
+                            {
+                                _logger.Inform(0, $"STATUS event: state={status.State}, recipe={status.LoadedRecipeId}, step={status.Step}, error={status.ErrorCode}");
+                                StatusUpdated?.Invoke(this, new PlcStatusEventArgs(status));
+                            });
                         }
                     }
                     catch (TimeoutException)
@@ -89,14 +98,21 @@ namespace LM01_UI.Services
         private PlcStatus? ParseStatus(string response)
         {
             if (string.IsNullOrEmpty(response))
+            {
+                _logger.Inform(0, "STATUS parsed FAIL");
                 return null;
+            }
 
             var digits = new string(response.Where(char.IsDigit).ToArray());
             if (digits.Length >= 10)
                 digits = digits[^10..];
             if (digits.Length < 10)
+            {
+                _logger.Inform(0, "STATUS parsed FAIL");
                 return null;
+            }
 
+            _logger.Inform(0, "STATUS parsed OK");
             return new PlcStatus
             {
                 Raw = response,

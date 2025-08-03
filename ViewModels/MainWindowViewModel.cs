@@ -2,12 +2,14 @@
 using LM01_UI.Services;
 using System;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel;
 using Avalonia.Threading;
 using System.Threading.Tasks;
+using LM01_UI.Views;
 
 namespace LM01_UI.ViewModels
 {
@@ -18,6 +20,8 @@ namespace LM01_UI.ViewModels
         private readonly PlcService _plcService;
         private readonly PlcStatusService _plcStatusService;
         private readonly Logger _logger;
+        private readonly DebugLogViewModel _debugLogViewModel;
+        private readonly Window _debugLogWindow;
         private readonly WelcomeViewModel _welcomeViewModel;
         private readonly AdminPageViewModel _adminPageViewModel;
         private readonly MainPageViewModel _mainPageViewModel;
@@ -46,7 +50,18 @@ namespace LM01_UI.ViewModels
             _logger = new Logger();
             _plcService = new PlcService();
             _plcClient = new PlcTcpClient(_logger);
-            _plcStatusService = new PlcStatusService(_plcClient, _plcService);
+            _plcStatusService = new PlcStatusService(_plcClient, _plcService, _logger);
+
+            _debugLogViewModel = new DebugLogViewModel(_logger);
+            _debugLogWindow = new Window
+            {
+                Title = "Debug Log",
+                Width = 600,
+                Height = 400,
+                Content = new DebugLogView { DataContext = _debugLogViewModel }
+            };
+            _debugLogWindow.Show();
+
 
             var plcTestViewModel = new PlcTestViewModel(_plcClient, _logger);
 
@@ -79,6 +94,7 @@ namespace LM01_UI.ViewModels
             _plcStatusService.Dispose();
             _plcClient.Dispose();
             _logger.Dispose();
+            _debugLogWindow.Close();
         }
         private void ExitApplication()
         {
@@ -118,6 +134,7 @@ namespace LM01_UI.ViewModels
         private async void OnStatusUpdated(object? sender, PlcStatusEventArgs e)
         {
             var status = e.Status;
+            _logger.Inform(1, $"MainWindowViewModel.OnStatusUpdated start: State={status.State}, LoadedRecipeId={status.LoadedRecipeId}, Step={status.Step}, ErrorCode={status.ErrorCode}");
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -130,6 +147,9 @@ namespace LM01_UI.ViewModels
                     _ => PlcStatusText
                 };
             });
+
+
+            _logger.Inform(1, $"MainWindowViewModel.OnStatusUpdated end: State={status.State}, LoadedRecipeId={status.LoadedRecipeId}, Step={status.Step}, ErrorCode={status.ErrorCode}");
         }
     }
 }
