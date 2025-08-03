@@ -55,10 +55,10 @@ namespace LM01_UI.Services
                     try
                     {
                         var command = _plcService.GetStatusCommand();
-                        _logger.Inform(0, $"STATUS → sent: {command}");
                         string response = await _tcpClient.SendReceiveAsync(
                             command,
                             TimeSpan.FromSeconds(0.5));
+                        _logger.Inform(0, $"STATUS → sent: {command}");
                         _logger.Inform(0, $"STATUS ← response: {response}");
 
                         var status = ParseStatus(response);
@@ -73,10 +73,12 @@ namespace LM01_UI.Services
                     }
                     catch (TimeoutException)
                     {
+                        _logger.Inform(0, "STATUS timeout");
                         // ignore timeouts, they will be retried on next loop
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
+                        _logger.Inform(0, $"STATUS exception: {ex.Message}");
                         // any other exception terminates polling
                         _tcpClient.Disconnect();
                         break;

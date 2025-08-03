@@ -168,9 +168,7 @@ namespace LM01_UI.ViewModels
             try
             {
                 string command = _plcService.BuildLoadCommand(SelectedRecipe);
-                string response = await _tcpClient.SendReceiveAsync(command, TimeSpan.FromSeconds(2));
-                await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
-                await ProcessPlcResponse(response);
+                await _tcpClient.SendAsync(command);
             }
             catch (Exception ex)
             {
@@ -183,9 +181,7 @@ namespace LM01_UI.ViewModels
             if (!IsRecipeLoaded) return;
             try
             {
-                string response = await _tcpClient.SendReceiveAsync(_plcService.GetUnloadCommand(), TimeSpan.FromSeconds(2));
-                await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
-                await ProcessPlcResponse(response);
+                await _tcpClient.SendAsync(_plcService.GetUnloadCommand());
                 SelectedRecipe = null;
             }
             catch (Exception ex)
@@ -206,9 +202,7 @@ namespace LM01_UI.ViewModels
         {
             try
             {
-                string response = await _tcpClient.SendReceiveAsync(_plcService.GetStartCommand(), TimeSpan.FromSeconds(2));
-                await Dispatcher.UIThread.InvokeAsync(() => LastStatusResponse = response);
-                await ProcessPlcResponse(response);
+                await _tcpClient.SendAsync(_plcService.GetStopCommand());
             }
             catch (Exception ex)
             {
@@ -263,45 +257,5 @@ namespace LM01_UI.ViewModels
 
         }
 
-        private async Task ProcessPlcResponse(string response)
-        {
-            if (string.IsNullOrEmpty(response))
-                return;
-
-            var digits = new string(response.Where(char.IsDigit).ToArray());
-            if (digits.Length >= 10)
-                digits = digits[^10..];
-
-            if (digits.Length < 10)
-                return;
-
-            string plcState = digits.Substring(0, 1);
-            int.TryParse(digits.Substring(1, 3), out int loadedId);
-            int.TryParse(digits.Substring(4, 2), out int step);
-            int.TryParse(digits.Substring(6, 4), out int err);
-
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                foreach (var recipeStep in SelectedRecipeSteps)
-                {
-                    recipeStep.IsActive = step > 0 && recipeStep.StepNumber == step;
-                }
-
-                CurrentStepNumber = step;
-                PlcErrorCode = err;
-
-                IsRecipeLoaded = plcState is "1" or "2" or "3";
-                IsRunning = plcState == "2";
-
-                LoadedRecipeId = IsRecipeLoaded ? loadedId : null;
-                PlcStatusText = plcState switch
-                {
-                    "1" => $"Receptura naložena (ID: {loadedId})",
-                    "2" => $"Izvajanje… (Receptura: {loadedId}, Korak: {step})",
-                    "3" => $"NAPAKA (Koda: {err})",
-                    _ => PlcStatusText
-                };
-            });
-        }
     }
 }

@@ -37,8 +37,8 @@ namespace LM01_UI.ViewModels
 
             try
             {
-                // Send the command and let the logger handle displaying any response or error.
-                await _plcClient.SendReceiveAsync(CommandToSend, TimeSpan.FromSeconds(2));
+                await _plcClient.SendAsync(CommandToSend);
+                _logger.Inform(1, "Command sent; no immediate response expected.");
             }
             catch (Exception ex)
             {
