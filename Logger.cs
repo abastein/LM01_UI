@@ -1,6 +1,7 @@
 ﻿using Avalonia.Threading;
 using System;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.IO;
 
 namespace LM01_UI // POPRAVEK: Pravilen imenski prostor
@@ -10,6 +11,13 @@ namespace LM01_UI // POPRAVEK: Pravilen imenski prostor
         private readonly StreamWriter? _logWriter;
 
         public ObservableCollection<string> Messages { get; } = new();
+
+        private readonly List<string> _pending = new();
+
+        public bool IsFrozen
+        {
+            get; private set;
+        }
 
         public Logger()
         {
@@ -41,6 +49,14 @@ namespace LM01_UI // POPRAVEK: Pravilen imenski prostor
                 // ignore logging failures
             }
 
+            if (IsFrozen)
+            {
+                _pending.Add(formattedMessage);
+                if (_pending.Count > 200)
+                    _pending.RemoveAt(0);
+                return;
+            }
+
             Dispatcher.UIThread.Post(() =>
             {
                 Messages.Insert(0, formattedMessage);
@@ -64,6 +80,34 @@ namespace LM01_UI // POPRAVEK: Pravilen imenski prostor
             {
                 // ignore logging failures
             }
+        }
+        public void ToggleFreeze()
+        {
+            IsFrozen = !IsFrozen;
+            if (!IsFrozen && _pending.Count > 0)
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    for (int i = _pending.Count - 1; i >= 0; i--)
+                    {
+                        Messages.Insert(0, _pending[i]);
+                    }
+
+                    while (Messages.Count > 200)
+                        Messages.RemoveAt(Messages.Count - 1);
+
+                    _pending.Clear();
+                });
+            }
+        }
+
+        public void Clear()
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                Messages.Clear();
+                _pending.Clear();
+            });
         }
     }
 }

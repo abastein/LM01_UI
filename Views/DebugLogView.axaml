@@ -3,5 +3,26 @@
              x:Class="LM01_UI.Views.DebugLogView"
              xmlns:vm="clr-namespace:LM01_UI.ViewModels"
              x:DataType="vm:DebugLogViewModel">
-	<ListBox ItemsSource="{Binding Messages}" />
+	<StackPanel>
+		<StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+			<Button Command="{Binding ToggleFreezeCommand}">
+				<Button.Content>
+					<TextBlock>
+						<TextBlock.Style>
+							<Style TargetType="TextBlock">
+								<Setter Property="Text" Value="Freeze" />
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding IsFrozen}" Value="True">
+										<Setter Property="Text" Value="Unfreeze" />
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</TextBlock.Style>
+					</TextBlock>
+				</Button.Content>
+			</Button>
+			<Button Content="Clear" Command="{Binding ClearLogCommand}" Margin="5,0,0,0"/>
+		</StackPanel>
+		<ListBox ItemsSource="{Binding Messages}" />
+	</StackPanel>
 </UserControl>
