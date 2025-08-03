@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 
 namespace LM01_UI.ViewModels
@@ -11,9 +12,9 @@ namespace LM01_UI.ViewModels
 
         public bool IsFrozen => _logger.IsFrozen;
 
-        public IRelayCommand ToggleFreezeCommand { get; }
+        public ICommand ToggleFreezeCommand { get; }
 
-        public IRelayCommand ClearLogCommand { get; }
+        public ICommand ClearLogCommand { get; }
 
         public DebugLogViewModel(Logger logger)
         {
