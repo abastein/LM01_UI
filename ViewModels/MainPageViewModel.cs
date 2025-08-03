@@ -134,7 +134,7 @@ namespace LM01_UI.ViewModels
             try
             {
                 var recipes = await _dbContext.Recipes
-                    .OrderBy(r => r.Name)
+                    .OrderBy(r => r.Id)
                     .ToListAsync();
                 Recipes = new ObservableCollection<Recipe>(recipes);
             }
