@@ -12,6 +12,8 @@ namespace LM01_UI.ViewModels
 
         public bool IsFrozen => _logger.IsFrozen;
 
+        public string FreezeButtonText => IsFrozen ? "Unfreeze" : "Freeze";
+
         public ICommand ToggleFreezeCommand { get; }
 
         public ICommand ClearLogCommand { get; }
@@ -23,6 +25,7 @@ namespace LM01_UI.ViewModels
             {
                 _logger.ToggleFreeze();
                 OnPropertyChanged(nameof(IsFrozen));
+                OnPropertyChanged(nameof(FreezeButtonText));
             });
 
             ClearLogCommand = new RelayCommand(() =>

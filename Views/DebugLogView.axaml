@@ -8,22 +8,8 @@
 				
 				<StackPanel Orientation="Horizontal" Margin="0,0,0,5">
 
-					<Button Command="{Binding ToggleFreezeCommand}">
-						<Button.Content>
-							<TextBlock>
-								<TextBlock.Styles>
-									<Style Selector="TextBlock">
-										<Setter Property="Text" Value="Freeze" />
-										<Style.Triggers>
-											<DataTrigger Binding="{Binding IsFrozen}" Value="True">
-												<Setter Property="Text" Value="Unfreeze" />
-											</DataTrigger>
-										</Style.Triggers>
-									</Style>
-								</TextBlock.Styles>
-							</TextBlock>
-						</Button.Content>
-					</Button>
+					<Button Command="{Binding ToggleFreezeCommand}"
+							Content="{Binding FreezeButtonText}" />
 					
 					<Button Content="Clear" Command="{Binding ClearLogCommand}" Margin="5,0,0,0"/>
 					
