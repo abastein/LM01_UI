@@ -87,11 +87,9 @@ namespace LM01_UI.ViewModels
             LoadRecipeCommand = new AsyncRelayCommand(LoadRecipeOnPlcAsync, () => CanLoadRecipe);
             ClearSelectionCommand = new AsyncRelayCommand(ClearSelectionAsync, () => CanClearRecipe);
             ToggleStartStopCommand = new AsyncRelayCommand(ToggleStartStopAsync, () => CanToggleRunning);
-            // ========================== Revision End ==========================
+     
 
             _tcpClient.ConnectionStatusChanged += isConnected =>
-
-            if (_tcpClient.IsConnected)
             {
                 IsPlcConnected = isConnected;
                 if (isConnected) _statusService.Start();
@@ -102,10 +100,6 @@ namespace LM01_UI.ViewModels
 
             _ = LoadRecipesAsync();
         }
-
-        // ========================= Revision Start =========================
-        // The partial methods now notify the commands to re-evaluate their
-        // CanExecute status, which will enable/disable the buttons in the UI.
 
         partial void OnSelectedRecipeChanged(Recipe? oldValue, Recipe? newValue)
         {
@@ -134,9 +128,6 @@ namespace LM01_UI.ViewModels
             StartStopButtonText = IsRunning ? "Stop" : "Start";
             StartStopButtonBrush = IsRunning ? Brushes.IndianRed : Brushes.MediumSeaGreen;
         }
-        // ========================== Revision End ==========================
-
-        // ... The rest of your file remains unchanged ...
 
         private async Task LoadRecipesAsync()
         {
