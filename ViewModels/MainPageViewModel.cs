@@ -60,9 +60,6 @@ namespace LM01_UI.ViewModels
         [ObservableProperty]
         private int? _loadedRecipeId;
 
-        /// <summary>
-        /// Controls button enabled state in the UI.
-        /// </summary>
         public bool CanLoadRecipe => SelectedRecipe != null && IsPlcConnected && !IsRunning;
         public bool CanClearRecipe => IsRecipeLoaded && !IsRunning;
         public bool CanToggleRunning => IsPlcConnected && (IsRecipeLoaded || IsRunning);

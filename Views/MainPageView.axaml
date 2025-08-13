@@ -5,19 +5,21 @@
              xmlns:local="clr-namespace:LM01_UI"
              x:DataType="vm:MainPageViewModel"
              Background="White"
-			 BorderBrush="DarkGreen"
-			 BorderThickness="2"
-			 CornerRadius="25,25,25,25"
-			 Margin="0,20,0,0">
+             BorderBrush="DarkGreen"
+             BorderThickness="2"
+             CornerRadius="25,25,25,25"
+             Margin="0,20,0,0">
 
 	<UserControl.Resources>
 		<local:NullToBoolConverter x:Key="NullToBoolConverter" />
 		<local:BoolToBrushConverter x:Key="ActiveStateBrushConverter"
-                                    TrueBrush="CornflowerBlue"
-                                    FalseBrush="Transparent"/>
+									TrueBrush="CornflowerBlue"
+									FalseBrush="Transparent"/>
 	</UserControl.Resources>
 
 	<UserControl.Styles>
+
+		<!-- Gumbi -->
 		<Style Selector="Button">
 			<Setter Property="Height" Value="100"/>
 			<Setter Property="FontSize" Value="36"/>
@@ -27,6 +29,7 @@
 			<Setter Property="VerticalAlignment" Value="Stretch"/>
 		</Style>
 
+		<!-- DataGrid osnovne nastavitve (tudi touch-friendly) -->
 		<Style Selector="DataGrid">
 			<Setter Property="IsReadOnly" Value="True"/>
 			<Setter Property="AutoGenerateColumns" Value="False"/>
@@ -35,53 +38,131 @@
 			<Setter Property="BorderBrush" Value="DarkGreen"/>
 			<Setter Property="BorderThickness" Value="2"/>
 			<Setter Property="CornerRadius" Value="3"/>
+
+			<!-- touch -->
+			<Setter Property="RowHeight" Value="48"/>
+			<Setter Property="MinColumnWidth" Value="80"/>
+			<Setter Property="HeadersVisibility" Value="All"/>
+			<Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
+			<Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
 		</Style>
 
-		<Style Selector="DataGridRow">
+		<!-- ********  CUSTOM TEMPLATES – brez selection overlay  ******** -->
+		<!-- Pazi: višja specifičnost -> 'DataGrid DataGridRow' in 'DataGrid DataGridCell' -->
+
+		<!-- DataGridRow: preprost template (brez overlay plasti) -->
+		<Style Selector="DataGrid DataGridRow">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Grid ColumnDefinitions="Auto,*">
+						<DataGridRowHeader Name="PART_RowHeaderPresenter" Grid.Column="0"/>
+						<Border Grid.Column="1" Background="{TemplateBinding Background}">
+							<DataGridCellsPresenter Name="PART_CellsPresenter"/>
+						</Border>
+					</Grid>
+				</ControlTemplate>
+			</Setter>
 			<Setter Property="Background" Value="White"/>
 		</Style>
-		<Style Selector="DataGridRow:nth-child(2n)">
+
+		<!-- Alternirajoče vrstice -->
+		<Style Selector="DataGrid DataGridRow:nth-child(2n)">
 			<Setter Property="Background" Value="#F5F5F5"/>
 		</Style>
 
-		<Style Selector="DataGridColumnHeader">
-			<Setter Property="FontSize" Value="24"/>
-			<Setter Property="Foreground" Value="DarkGreen"/>
-			<Setter Property="Background" Value="#EEE"/>
-			<Setter Property="Padding" Value="12,8"/>
-		</Style>
+		<!-- DataGridCell: pravilni PART + TemplateBindings -->
+		<Style Selector="DataGrid DataGridCell">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Border Background="{TemplateBinding Background}">
+						<ContentPresenter Name="PART_ContentPresenter"
+										  Content="{TemplateBinding Content}"
+										  ContentTemplate="{TemplateBinding ContentTemplate}"
+										  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+										  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+					</Border>
+				</ControlTemplate>
+			</Setter>
 
-		<Style Selector="DataGridCell">
-			<Setter Property="FontSize" Value="30"/>
+			<!-- posreduj samo TextElement.* (brez Foreground na celici) -->
+			<Setter Property="TextElement.FontSize" Value="30"/>
+			<Setter Property="TextElement.Foreground" Value="Black"/>
+
 			<Setter Property="Padding" Value="10,6"/>
 			<Setter Property="Background" Value="Transparent"/>
 			<Setter Property="BorderThickness" Value="0"/>
 		</Style>
 
-		<Style Selector="DataGridRow:pointerover">
-			<Setter Property="Background" Value="#D5F5E3"/>
+		<!-- Headerji stolpcev (večji za dotik) -->
+		<Style Selector="DataGrid DataGridColumnHeader">
+			<Setter Property="FontSize" Value="24"/>
+			<Setter Property="Foreground" Value="DarkGreen"/>
+			<Setter Property="Background" Value="#EEE"/>
+			<Setter Property="Padding" Value="12,8"/>
+			<Setter Property="MinHeight" Value="40"/>
 		</Style>
-		<Style Selector="DataGridRow:selected">
+
+		<!-- Brez hover efektov (touch) -->
+		<Style Selector="DataGrid DataGridRow:pointerover">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="DataGrid DataGridRow:pointerover Border.row-bg">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+
+		<!-- Izbrano (fokusirano) -->
+		<Style Selector="DataGrid DataGridRow:selected">
 			<Setter Property="Background" Value="#82E0AA"/>
 			<Setter Property="Foreground" Value="Black"/>
 		</Style>
+		<Style Selector="DataGrid DataGridCell:selected">
+			<Setter Property="Background" Value="#82E0AA"/>
+			<Setter Property="TextElement.Foreground" Value="Black"/>
+		</Style>
+
+		<!-- Izbrano (NEfokusirano – programska izbira) -->
+		<Style Selector="DataGrid DataGridRow:selected:unfocused">
+			<Setter Property="Background" Value="#82E0AA"/>
+			<Setter Property="Foreground" Value="Black"/>
+		</Style>
+		<Style Selector="DataGrid DataGridCell:selected:unfocused">
+			<Setter Property="Background" Value="#82E0AA"/>
+			<Setter Property="TextElement.Foreground" Value="Black"/>
+		</Style>
+
+		<!-- Override za TEMPLATE stolpce (desna mreža) -->
+		<Style Selector="DataGrid DataGridRow:selected Border.row-bg">
+			<Setter Property="Background" Value="#82E0AA"/>
+		</Style>
+		<Style Selector="DataGrid DataGridRow:selected TextBlock.row-text">
+			<Setter Property="Foreground" Value="Black"/>
+		</Style>
+		<Style Selector="DataGrid DataGridRow:selected:unfocused Border.row-bg">
+			<Setter Property="Background" Value="#82E0AA"/>
+		</Style>
+		<Style Selector="DataGrid DataGridRow:selected:unfocused TextBlock.row-text">
+			<Setter Property="Foreground" Value="Black"/>
+		</Style>
+
 	</UserControl.Styles>
 
 	<Grid RowDefinitions="Auto,*,Auto" Margin="10">
 		<TextBlock Grid.Row="0"
-                   Text="Izberi program"
-                   FontSize="30"
-                   FontWeight="Bold"
-                   Foreground="Black"
-                   Margin="10,0,0,20"/>
+				   Text="Izberi program"
+				   FontSize="30"
+				   FontWeight="Bold"
+				   Foreground="Black"
+				   Margin="10,5,0,20"/>
 
 		<Grid Grid.Row="1"
-              ColumnDefinitions="*,*"
-              ColumnSpacing="20">
+			  ColumnDefinitions="*,*"
+			  ColumnSpacing="20">
 
+			<!-- LEVA TABELA -->
 			<DataGrid Grid.Column="0"
-                      ItemsSource="{Binding Recipes}"
-                      SelectedItem="{Binding SelectedRecipe}">
+					  ItemsSource="{Binding Recipes}"
+					  SelectedItem="{Binding SelectedRecipe}"
+					  SelectedIndex="0">
 				<DataGrid.Columns>
 					<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="100"/>
 					<DataGridTextColumn Header="Ime Recepture" Binding="{Binding Name}" Width="*"/>
@@ -89,44 +170,64 @@
 				</DataGrid.Columns>
 			</DataGrid>
 
+			<!-- DESNA TABELA -->
 			<DataGrid Grid.Column="1"
-                      ItemsSource="{Binding SelectedRecipeSteps}"
-                      IsVisible="{Binding SelectedRecipe, Converter={StaticResource NullToBoolConverter}}"
-                      CanUserResizeColumns="False">
+					  ItemsSource="{Binding SelectedRecipeSteps}"
+					  IsVisible="{Binding SelectedRecipe, Converter={StaticResource NullToBoolConverter}}"
+					  CanUserResizeColumns="False">
 				<DataGrid.Columns>
 					<DataGridTemplateColumn Header="Št." Width="Auto">
 						<DataTemplate>
-							<Border Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch">
-								<TextBlock Text="{Binding StepNumber}" VerticalAlignment="Center" Margin="5,0"/>
+							<Border Classes="row-bg"
+									Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
+									HorizontalAlignment="Stretch"
+									VerticalAlignment="Stretch">
+								<TextBlock Classes="row-text"
+										   Text="{Binding StepNumber}"
+										   VerticalAlignment="Center"
+										   Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
+
 					<DataGridTemplateColumn Header="Funkcija" Width="*">
 						<DataTemplate>
-							<Border Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch">
-								<TextBlock Text="{Binding Function}" VerticalAlignment="Center" Margin="5,0"/>
+							<Border Classes="row-bg"
+									Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
+									HorizontalAlignment="Stretch"
+									VerticalAlignment="Stretch">
+								<TextBlock Classes="row-text"
+										   Text="{Binding Function}"
+										   VerticalAlignment="Center"
+										   Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
+
 					<DataGridTemplateColumn Header="Hitrost(RPM)" Width="Auto">
 						<DataTemplate>
-							<Border Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch">
-								<TextBlock Text="{Binding SpeedRPM}" VerticalAlignment="Center" Margin="5,0"/>
+							<Border Classes="row-bg"
+									Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
+									HorizontalAlignment="Stretch"
+									VerticalAlignment="Stretch">
+								<TextBlock Classes="row-text"
+										   Text="{Binding SpeedRPM}"
+										   VerticalAlignment="Center"
+										   Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
+
 					<DataGridTemplateColumn Header="Smer" Width="Auto">
 						<DataTemplate>
-							<Border Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch">
-								<TextBlock Text="{Binding Direction}" VerticalAlignment="Center" Margin="5,0"/>
+							<Border Classes="row-bg"
+									Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
+									HorizontalAlignment="Stretch"
+									VerticalAlignment="Stretch">
+								<TextBlock Classes="row-text"
+										   Text="{Binding Direction}"
+										   VerticalAlignment="Center"
+										   Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
@@ -136,22 +237,21 @@
 
 		<Grid Grid.Row="2" RowDefinitions="Auto,Auto" Margin="0,10,0,0" RowSpacing="10">
 			<Grid Grid.Row="0" ColumnDefinitions="*,*" ColumnSpacing="20">
-
 				<Button Grid.Column="0"
-                        Content="Naloži"
-                        Background="#007BFF"
-                        Command="{Binding LoadRecipeCommand}"/>
+						Content="Naloži"
+						Background="#007BFF"
+						Command="{Binding LoadRecipeCommand}"/>
 				<Button Grid.Column="1"
-				Content="Počisti"
-				Background="#FD7E14"
-				Command="{Binding ClearSelectionCommand}"/>
+						Content="Počisti"
+						Background="#FD7E14"
+						Command="{Binding ClearSelectionCommand}"/>
 			</Grid>
 
 			<Button Grid.Row="1"
-                    Name="StartStopButton"
-                    Background="{Binding StartStopButtonBrush}"
-                    Content="{Binding StartStopButtonText}"
-                    Command="{Binding ToggleStartStopCommand}"/>
+					Name="StartStopButton"
+					Background="{Binding StartStopButtonBrush}"
+					Content="{Binding StartStopButtonText}"
+					Command="{Binding ToggleStartStopCommand}"/>
 		</Grid>
 
 	</Grid>

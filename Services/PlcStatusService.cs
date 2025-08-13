@@ -57,7 +57,7 @@ namespace LM01_UI.Services
                         var command = _plcService.GetStatusCommand();
                         string response = await _tcpClient.SendReceiveAsync(
                             command,
-                            TimeSpan.FromSeconds(0.5));
+                            TimeSpan.FromSeconds(0.25));
                         _logger.Inform(0, $"STATUS → sent: {command}");
                         _logger.Inform(0, $"STATUS ← response: {response}");
 
@@ -84,7 +84,7 @@ namespace LM01_UI.Services
                         break;
                     }
 
-                    await Task.Delay(250, token);
+                    await Task.Delay(1, token);
                 }
             }
             catch (OperationCanceledException)
