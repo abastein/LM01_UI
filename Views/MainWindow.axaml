@@ -127,7 +127,7 @@
 							BorderBrush="DarkGray"
 							BorderThickness="3"
 							CornerRadius="10,50,10,10"
-							Margin="10"/>
+							Margin="20,10,10,20"/>
 
 			<Button Content="Uredi programe"
 							Command="{Binding NavigateAdminCommand}"
@@ -140,7 +140,7 @@
 							BorderBrush="DarkGray"
 							BorderThickness="3"
 							CornerRadius="10,50,10,10"
-							Margin="10"/>
+							Margin="20,10,10,20"/>
 
 			<Button Content="Ročni način"
 							Command=""
@@ -153,7 +153,7 @@
 							BorderBrush="DarkGray"
 							BorderThickness="3"
 							CornerRadius="10,50,10,10"
-							Margin="10"/>
+							Margin="20,10,10,20"/>
 					
 			<Button Content="Pranje"
 							Command="{Binding NavigatePranjeCommand}"
@@ -165,8 +165,8 @@
 							Foreground="Black"
 							BorderBrush="DarkGray"
 							BorderThickness="3"
-							CornerRadius="10,50,10,10"
-							Margin="10"/>
+							CornerRadius="10,50,10,20"
+							Margin="20"/>
 
 				</StackPanel>
 
@@ -181,14 +181,11 @@
 								BorderBrush="DarkGray"
 								BorderThickness="3"
 								CornerRadius="10,50,10,10"
-								Margin="10"
+								Margin="20,10,10,30"
 								Grid.Row="1"
 								VerticalAlignment="Bottom"/>
 
-			</Grid>
-
-				
-			</Grid>
-
+			</Grid>				
+		</Grid>
 	</Grid>
 </Window>

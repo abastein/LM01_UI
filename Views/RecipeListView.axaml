@@ -2,63 +2,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="LM01_UI.Views.RecipeListView"
              xmlns:vm="clr-namespace:LM01_UI.ViewModels"
+			 xmlns:local="clr-namespace:LM01_UI"
              x:DataType="vm:RecipeListViewModel"
-             Background="White">
+             Background="White"
+             BorderBrush="DarkGreen"
+             BorderThickness="2"
+             CornerRadius="25,25,25,25"
+             Margin="0,20,0,0">
 
-	<!-- Shared DataGrid styling -->
 	<UserControl.Styles>
-		<!-- Base DataGrid styling -->
-		<Style Selector="DataGrid">
-			<Setter Property="IsReadOnly" Value="True"/>
-			<Setter Property="AutoGenerateColumns" Value="False"/>
-			<Setter Property="Background" Value="White"/>
-			<Setter Property="BorderBrush" Value="DarkGreen"/>
-			<Setter Property="BorderThickness" Value="2"/>
-			<Setter Property="CornerRadius" Value="2"/>
-		</Style>
-
-		<!-- Row backgrounds (striping) -->
-		<Style Selector="DataGridRow">
-			<Setter Property="Background" Value="White"/>
-		</Style>
-		<Style Selector="DataGridRow:nth-child(2n)">
-			<Setter Property="Background" Value="#F5F5F5"/>
-		</Style>
-
-		<!-- Column headers -->
-		<Style Selector="DataGridColumnHeader">
-			<Setter Property="FontSize" Value="38"/>
-			<Setter Property="Foreground" Value="DarkGreen"/>
-			<Setter Property="Background" Value="#EEE"/>
-			<Setter Property="Padding" Value="12,8"/>
-		</Style>
-
-		<!-- Cells -->
-		<Style Selector="DataGridCell">
-			<Setter Property="FontSize" Value="34"/>
-			<Setter Property="Padding" Value="10,6"/>
-			<Setter Property="Background" Value="Transparent"/>
-			<Setter Property="BorderThickness" Value="0"/>
-		</Style>
-
-		<!-- Hover & selection states -->
-		<Style Selector="DataGridRow:pointerover">
-			<Setter Property="Background" Value="#D5F5E3"/>
-		</Style>
-		<Style Selector="DataGridRow:selected">
-			<Setter Property="Background" Value="#82E0AA"/>
-			<Setter Property="Foreground" Value="Black"/>
-		</Style>
+		<StyleInclude Source="avares://LM01_UI/Styles/SharedStyles.axaml"/>
 	</UserControl.Styles>
 
-	<Grid RowDefinitions="Auto,*,Auto" RowSpacing="10" Margin="10">
-		<!-- Title -->
+	<Grid RowDefinitions="Auto,*,Auto" Margin="10">
 		<TextBlock Grid.Row="0"
-                   Text="Seznam programov"
-                   FontSize="30"
-                   FontWeight="Bold"
-                   Foreground="Black"
-                   Margin="0,0,0,10"/>
+				   Text="Urejanje programov"
+				   FontSize="30"
+				   FontWeight="Bold"
+				   Foreground="Black"
+				   Margin="10,5,0,20"/>
 
 		<!-- DataGrid -->
 		<DataGrid Grid.Row="1"
