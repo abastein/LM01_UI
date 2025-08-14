@@ -107,61 +107,85 @@
 					BorderThickness="3"
 					/>
 
-			<StackPanel Grid.Column="0" Grid.Row="1" Margin="0,30,0,0">
+			<Grid Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Margin="0,30,0,0">
 
-				<Button Content="Programi"
-						Command="{Binding NavigateProgramiCommand}"
-						Width="255"
-						Height="100"
-						FontSize="25"
-						FontWeight="Bold"
-						Background="White"
-						Foreground="Black"
-						BorderBrush="DarkGray"
-						BorderThickness="3"
-						CornerRadius="10,50,10,10"
-						Margin="10"/>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
 
-				<Button Content="Uredi programe"
-						Command="{Binding NavigateAdminCommand}"
-						Width="255"
-						Height="100"
-						FontSize="25"
-						FontWeight="Bold"
-						Background="White"
-						Foreground="Black"
-						BorderBrush="DarkGray"
-						BorderThickness="3"
-						CornerRadius="10,50,10,10"
-						Margin="10"/>
+				<StackPanel Grid.Row="0">
 
-				<Button Content="Ročni način"
-						Command=""
-						Width="255"
-						Height="100"
-						FontSize="25"
-						FontWeight="Bold"
-						Background="White"
-						Foreground="Black"
-						BorderBrush="DarkGray"
-						BorderThickness="3"
-						CornerRadius="10,50,10,10"
-						Margin="10"/>
+			<Button Content="Programi"
+							Command="{Binding NavigateProgramiCommand}"
+							Width="255"
+							Height="100"
+							FontSize="25"
+							FontWeight="Bold"
+							Background="White"
+							Foreground="Black"
+							BorderBrush="DarkGray"
+							BorderThickness="3"
+							CornerRadius="10,50,10,10"
+							Margin="10"/>
+
+			<Button Content="Uredi programe"
+							Command="{Binding NavigateAdminCommand}"
+							Width="255"
+							Height="100"
+							FontSize="25"
+							FontWeight="Bold"
+							Background="White"
+							Foreground="Black"
+							BorderBrush="DarkGray"
+							BorderThickness="3"
+							CornerRadius="10,50,10,10"
+							Margin="10"/>
+
+			<Button Content="Ročni način"
+							Command=""
+							Width="255"
+							Height="100"
+							FontSize="25"
+							FontWeight="Bold"
+							Background="White"
+							Foreground="Black"
+							BorderBrush="DarkGray"
+							BorderThickness="3"
+							CornerRadius="10,50,10,10"
+							Margin="10"/>
+					
+			<Button Content="Pranje"
+							Command="{Binding NavigatePranjeCommand}"
+							Width="255"
+							Height="100"
+							FontSize="25"
+							FontWeight="Bold"
+							Background="White"
+							Foreground="Black"
+							BorderBrush="DarkGray"
+							BorderThickness="3"
+							CornerRadius="10,50,10,10"
+							Margin="10"/>
+
+				</StackPanel>
 
 				<Button Content="Izhod"
-						Command="{Binding ExitApplicationCommand}"
-						Width="255"
-						Height="100"
-						FontSize="25"
-						FontWeight="Bold"
-						Background="White"
-						Foreground="Black"
-						BorderBrush="DarkGray"
-						BorderThickness="3"
-						CornerRadius="10,50,10,10"
-						Margin="10"/>
+								Command="{Binding ExitApplicationCommand}"
+								Width="255"
+								Height="100"
+								FontSize="25"
+								FontWeight="Bold"
+								Background="Salmon"
+								Foreground="Black"
+								BorderBrush="DarkGray"
+								BorderThickness="3"
+								CornerRadius="10,50,10,10"
+								Margin="10"
+								Grid.Row="1"
+								VerticalAlignment="Bottom"/>
 
-			</StackPanel>
+			</Grid>
 
 				
 			</Grid>

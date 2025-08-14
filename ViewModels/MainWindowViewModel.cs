@@ -44,6 +44,7 @@ namespace LM01_UI.ViewModels
         public IRelayCommand NavigateProgramiCommand { get; }
         public IRelayCommand NavigateAdminCommand { get; }
         public IRelayCommand NavigateManualCommand { get; }
+        public IRelayCommand NavigatePranjeCommand { get; }
 
         public MainWindowViewModel(ApplicationDbContext dbContext)
         {
@@ -84,6 +85,7 @@ namespace LM01_UI.ViewModels
             NavigateProgramiCommand = new RelayCommand(() => Navigate("Run"));
             NavigateAdminCommand = new RelayCommand(() => Navigate("Admin"));
             NavigateManualCommand = new RelayCommand(() => Navigate("Manual"));
+            NavigatePranjeCommand = new RelayCommand(() => Navigate("Pranje"));
         }
 
         public void Dispose()
@@ -121,6 +123,9 @@ namespace LM01_UI.ViewModels
                     break;
                 case "Manual":
                     // Placeholder for future manual mode view
+                    break;
+                case "Pranje":
+                    // Placeholder for future pranje view
                     break;
             }
         }
