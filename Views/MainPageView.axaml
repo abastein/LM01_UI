@@ -47,36 +47,28 @@
 
 			<!-- DESNA TABELA -->
 			<DataGrid Grid.Column="1"
-					  ItemsSource="{Binding SelectedRecipeSteps}"
-					  IsVisible="{Binding SelectedRecipe, Converter={StaticResource NullToBoolConverter}}"
-					  CanUserResizeColumns="False">
+							  ItemsSource="{Binding SelectedRecipeSteps}"
+							  IsVisible="{Binding SelectedRecipe, Converter={StaticResource NullToBoolConverter}}"
+							  CanUserResizeColumns="False">
+				<DataGrid.Styles>
+					<Style Selector="DataGridRow:selected Border.row-bg">
+						<Setter Property="Background" Value="#007435"/>
+					</Style>
+					<Style Selector="DataGridRow:selected Border.row-bg TextBlock.row-text">
+						<Setter Property="Foreground" Value="White"/>
+					</Style>
+				</DataGrid.Styles>
 				<DataGrid.Columns>
 					<DataGridTemplateColumn Header="Št." Width="Auto">
 						<DataTemplate>
 							<Border Classes="row-bg"
-											Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
-											HorizontalAlignment="Stretch"
-											VerticalAlignment="Stretch">
-								<Border.Styles>
-									<Style Selector="Border">
-										<Style.Triggers>
-											<DataTrigger Binding="{Binding $parent[DataGridRow].IsSelected}" Value="True">
-												<Setter Property="Background" Value="#007435"/>
-											</DataTrigger>
-										</Style.Triggers>
-									</Style>
-									<Style Selector="TextBlock">
-										<Style.Triggers>
-											<DataTrigger Binding="{Binding $parent[DataGridRow].IsSelected}" Value="True">
-												<Setter Property="Foreground" Value="White"/>
-											</DataTrigger>
-										</Style.Triggers>
-									</Style>
-								</Border.Styles>
+															Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
+															HorizontalAlignment="Stretch"
+															VerticalAlignment="Stretch">
 								<TextBlock Classes="row-text"
-												   Text="{Binding StepNumber}"
-												   VerticalAlignment="Center"
-												   Margin="5,0"/>
+																   Text="{Binding StepNumber}"
+																   VerticalAlignment="Center"
+																   Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
@@ -84,29 +76,13 @@
 					<DataGridTemplateColumn Header="Funkcija" Width="*">
 						<DataTemplate>
 							<Border Classes="row-bg"
-											Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
-											HorizontalAlignment="Stretch"
-											VerticalAlignment="Stretch">
-								<Border.Styles>
-									<Style Selector="Border">
-										<Style.Triggers>
-											<DataTrigger Binding="{Binding $parent[DataGridRow].IsSelected}" Value="True">
-												<Setter Property="Background" Value="#007435"/>
-											</DataTrigger>
-										</Style.Triggers>
-									</Style>
-									<Style Selector="TextBlock">
-										<Style.Triggers>
-											<DataTrigger Binding="{Binding $parent[DataGridRow].IsSelected}" Value="True">
-												<Setter Property="Foreground" Value="White"/>
-											</DataTrigger>
-										</Style.Triggers>
-									</Style>
-								</Border.Styles>
+															Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
+															HorizontalAlignment="Stretch"
+															VerticalAlignment="Stretch">
 								<TextBlock Classes="row-text"
-												   Text="{Binding Function}"
-												   VerticalAlignment="Center"
-												   Margin="5,0"/>
+																   Text="{Binding Function}"
+																   VerticalAlignment="Center"
+																   Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
@@ -114,29 +90,13 @@
 					<DataGridTemplateColumn Header="Hitrost(RPM)" Width="Auto">
 						<DataTemplate>
 							<Border Classes="row-bg"
-											Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
-											HorizontalAlignment="Stretch"
-											VerticalAlignment="Stretch">
-								<Border.Styles>
-									<Style Selector="Border">
-										<Style.Triggers>
-											<DataTrigger Binding="{Binding $parent[DataGridRow].IsSelected}" Value="True">
-												<Setter Property="Background" Value="#007435"/>
-											</DataTrigger>
-										</Style.Triggers>
-									</Style>
-									<Style Selector="TextBlock">
-										<Style.Triggers>
-											<DataTrigger Binding="{Binding $parent[DataGridRow].IsSelected}" Value="True">
-												<Setter Property="Foreground" Value="White"/>
-											</DataTrigger>
-										</Style.Triggers>
-									</Style>
-								</Border.Styles>
+															Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
+															HorizontalAlignment="Stretch"
+															VerticalAlignment="Stretch">
 								<TextBlock Classes="row-text"
-												   Text="{Binding SpeedRPM}"
-												   VerticalAlignment="Center"
-												   Margin="5,0"/>
+																   Text="{Binding SpeedRPM}"
+																   VerticalAlignment="Center"
+																   Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
@@ -144,29 +104,13 @@
 					<DataGridTemplateColumn Header="Smer" Width="Auto">
 						<DataTemplate>
 							<Border Classes="row-bg"
-											Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
-											HorizontalAlignment="Stretch"
-											VerticalAlignment="Stretch">
-								<Border.Styles>
-									<Style Selector="Border">
-										<Style.Triggers>
-											<DataTrigger Binding="{Binding $parent[DataGridRow].IsSelected}" Value="True">
-												<Setter Property="Background" Value="#007435"/>
-											</DataTrigger>
-										</Style.Triggers>
-									</Style>
-									<Style Selector="TextBlock">
-										<Style.Triggers>
-											<DataTrigger Binding="{Binding $parent[DataGridRow].IsSelected}" Value="True">
-												<Setter Property="Foreground" Value="White"/>
-											</DataTrigger>
-										</Style.Triggers>
-									</Style>
-								</Border.Styles>
+															Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
+															HorizontalAlignment="Stretch"
+															VerticalAlignment="Stretch">
 								<TextBlock Classes="row-text"
-												   Text="{Binding Direction}"
-												   VerticalAlignment="Center"
-												   Margin="5,0"/>
+																   Text="{Binding Direction}"
+																   VerticalAlignment="Center"
+																   Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
