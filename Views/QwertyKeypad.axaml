@@ -15,49 +15,49 @@
 		</Style>
 	</UserControl.Styles>
 
-	<Border Background="#FF4E5E74" BorderBrush="Gray" BorderThickness="1" CornerRadius="8" Padding="10">
+	<Border Background="WhiteSmoke" BorderBrush="Black" BorderThickness="1" CornerRadius="8" Padding="10">
 		<StackPanel Spacing="5">
 			<StackPanel Orientation="Horizontal" Spacing="5">
-				<Button Classes="key" Content="Q" Tag="Q" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="W" Tag="W" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="E" Tag="E" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="R" Tag="R" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="T" Tag="T" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="Z" Tag="Z" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="U" Tag="U" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="I" Tag="I" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="O" Tag="O" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="P" Tag="P" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="Š" Tag="Š" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="Đ" Tag="Đ" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="Q" Tag="Q" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="W" Tag="W" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="E" Tag="E" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="R" Tag="R" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="T" Tag="T" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="Z" Tag="Z" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="U" Tag="U" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="I" Tag="I" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="O" Tag="O" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="P" Tag="P" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="Š" Tag="Š" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="Đ" Tag="Đ" Click="KeypadButton_Click"/>
 			</StackPanel>
 			<StackPanel Orientation="Horizontal" Spacing="5" Margin="20,0,0,0">
-				<Button Classes="key" Content="A" Tag="A" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="S" Tag="S" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="D" Tag="D" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="F" Tag="F" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="G" Tag="G" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="H" Tag="H" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="J" Tag="J" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="K" Tag="K" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="L" Tag="L" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="Č" Tag="Č" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="Ž" Tag="Ž" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="A" Tag="A" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="S" Tag="S" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="D" Tag="D" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="F" Tag="F" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="G" Tag="G" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="H" Tag="H" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="J" Tag="J" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="K" Tag="K" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="L" Tag="L" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="Č" Tag="Č" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="Ž" Tag="Ž" Click="KeypadButton_Click"/>
 			</StackPanel>
 			<StackPanel Orientation="Horizontal" Spacing="5" Margin="40,0,0,0">
-				<Button Classes="key" Content="Y" Tag="Y" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="X" Tag="X" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="C" Tag="C" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="V" Tag="V" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="B" Tag="B" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="N" Tag="N" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="M" Tag="M" Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="," Tag="," Click="KeypadButton_Click"/>
-				<Button Classes="key" Content="." Tag="." Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="Y" Tag="Y" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="X" Tag="X" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="C" Tag="C" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="V" Tag="V" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="B" Tag="B" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="N" Tag="N" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="M" Tag="M" Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="," Tag="," Click="KeypadButton_Click"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="." Tag="." Click="KeypadButton_Click"/>
 			</StackPanel>
 			<StackPanel Orientation="Horizontal" Spacing="5">
-				<Button Classes="key" Content="Presledek" Tag=" " Click="KeypadButton_Click" Width="500" HorizontalAlignment="Center"/>
-				<Button Classes="key" Content="⌫" Tag="BACKSPACE" Click="KeypadButton_Click" Width="150" HorizontalAlignment="Right"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="" Tag=" " Click="KeypadButton_Click" Width="500" HorizontalAlignment="Center"/>
+				<Button BorderBrush="DarkGreen" BorderThickness="3" Classes="key" Content="⌫" Tag="BACKSPACE" Click="KeypadButton_Click" Width="150" HorizontalAlignment="Right"/>
 			</StackPanel>
 		</StackPanel>
 	</Border>

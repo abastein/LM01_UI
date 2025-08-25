@@ -28,25 +28,25 @@
 		<!-- ********  KLJUČNO: preglasi selection overlay (Fluent + Simple)  ******** -->
 
 		<!-- FluentTheme – izbrano (focused) in ne-fokusirano -->
-		<SolidColorBrush x:Key="SystemControlHighlightListLowBrush" Color="#82E0AA"/>
-		<SolidColorBrush x:Key="SystemControlHighlightListAltLowBrush" Color="#82E0AA"/>
+		<SolidColorBrush x:Key="SystemControlHighlightListLowBrush" Color="#007435"/>
+		<SolidColorBrush x:Key="SystemControlHighlightListAltLowBrush" Color="#007435"/>
 
 		<!-- SimpleTheme/Skupni ključi -->
-		<SolidColorBrush x:Key="ThemeSelectionBrush" Color="#82E0AA"/>
-		<SolidColorBrush x:Key="ThemeUnfocusedSelectionBrush" Color="#82E0AA"/>
-		<SolidColorBrush x:Key="ThemeSelectionForegroundBrush" Color="Black"/>
-		<SolidColorBrush x:Key="ThemeUnfocusedSelectionForegroundBrush" Color="Black"/>
+		<SolidColorBrush x:Key="ThemeSelectionBrush" Color="#007435"/>
+		<SolidColorBrush x:Key="ThemeUnfocusedSelectionBrush" Color="#007435"/>
+		<SolidColorBrush x:Key="ThemeSelectionForegroundBrush" Color="White"/>
+		<SolidColorBrush x:Key="ThemeUnfocusedSelectionForegroundBrush" Color="White"/>
 
-		<!-- DataGrid-specifični ključi, ki jih uporabljajo predloge v 11.3.x -->
-		<SolidColorBrush x:Key="DataGridRowSelectedBackground" Color="#82E0AA"/>
-		<SolidColorBrush x:Key="DataGridRowSelectedInactiveBackground" Color="#82E0AA"/>
-		<SolidColorBrush x:Key="DataGridCellSelectedBackground" Color="#82E0AA"/>
-		<SolidColorBrush x:Key="DataGridCellSelectedInactiveBackground" Color="#82E0AA"/>
+		<!-- DataGrid-specifični ključi (Avalonia 11.3.x) -->
+		<SolidColorBrush x:Key="DataGridRowSelectedBackground" Color="#007435"/>
+		<SolidColorBrush x:Key="DataGridRowSelectedInactiveBackground" Color="#007435"/>
+		<SolidColorBrush x:Key="DataGridCellSelectedBackground" Color="#007435"/>
+		<SolidColorBrush x:Key="DataGridCellSelectedInactiveBackground" Color="#007435"/>
 
-		<SolidColorBrush x:Key="DataGridRowSelectedForeground" Color="Black"/>
-		<SolidColorBrush x:Key="DataGridRowSelectedInactiveForeground" Color="Black"/>
-		<SolidColorBrush x:Key="DataGridCellSelectedForeground" Color="Black"/>
-		<SolidColorBrush x:Key="DataGridCellSelectedInactiveForeground" Color="Black"/>
+		<SolidColorBrush x:Key="DataGridRowSelectedForeground" Color="White"/>
+		<SolidColorBrush x:Key="DataGridRowSelectedInactiveForeground" Color="White"/>
+		<SolidColorBrush x:Key="DataGridCellSelectedForeground" Color="White"/>
+		<SolidColorBrush x:Key="DataGridCellSelectedInactiveForeground" Color="White"/>
 	</Application.Resources>
 
 	<Application.DataTemplates>

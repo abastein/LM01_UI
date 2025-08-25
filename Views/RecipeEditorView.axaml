@@ -6,10 +6,10 @@
              x:DataType="vm:RecipeEditorViewModel"
              x:CompileBindings="True">
 
-	<Border BorderBrush="White" BorderThickness="1" CornerRadius="5" Padding="20" Background="WhiteSmoke" MinWidth="1000">
+	<Border BorderBrush="Black" BorderThickness="3" BackgroundSizing="OuterBorderEdge" BoxShadow="0 4 16 0 #80000000"  CornerRadius="5" Padding="20" Background="#007435" MinWidth="1000">
 		<Grid RowDefinitions="Auto, Auto, Auto, *, Auto" ColumnDefinitions="Auto, Auto">
 
-			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Urejanje Recepture" FontSize="30" FontWeight="Bold" Foreground="#FFDCA400" Margin="0,0,0,20"/>
+			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Urejanje Recepture" FontSize="30" FontWeight="Bold" Foreground="WhiteSmoke" Margin="0,0,0,20"/>
 
 			<StackPanel Grid.Row="1" Grid.Column="0" Spacing="10" Margin="0,0,40,0">
 				<TextBlock Text="Ime recepture:" Foreground="White"/>
@@ -21,15 +21,15 @@
 			<views:QwertyKeypad x:Name="Keypad" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top"/>
 
 			<StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="10" Margin="0,20,0,10">
-				<TextBlock Text="Koraki Recepture:" FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+				<TextBlock Text="Koraki Recepture:" FontSize="24" FontWeight="Bold" Foreground="WhiteSmoke" VerticalAlignment="Center"/>
 				<Button Content="Dodaj Korak" Command="{Binding AddStepCommand}"/>
 				<Button Content="Uredi Korak" Command="{Binding EditStepCommand}"/>
 				<Button Content="Izbriši Korak" Command="{Binding DeleteStepCommand}"/>
 			</StackPanel>
 
-			<DataGrid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Steps}" SelectedItem="{Binding SelectedStep}" IsReadOnly="True" AutoGenerateColumns="False">
+			<DataGrid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Steps}" SelectedItem="{Binding SelectedStep}" IsReadOnly="True" AutoGenerateColumns="False" BorderBrush="White" BorderThickness="3" CornerRadius="5" Background="WhiteSmoke">
 				<DataGrid.Columns>
-					<DataGridTextColumn Header="Št." Binding="{Binding StepNumber}" Width="50"/>
+					<DataGridTextColumn Header="Št." Binding="{Binding StepNumber}" Width="60"/>
 					<DataGridTextColumn Header="Funkcija" Binding="{Binding Function}" Width="Auto"/>
 					<DataGridTextColumn Header="Hitrost(RPM)" Binding="{Binding SpeedRPM}"/>
 					<DataGridTextColumn Header="Smer" Binding="{Binding Direction}"/>
@@ -40,8 +40,8 @@
 			</DataGrid>
 
 			<StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
-				<Button Content="Shrani" Command="{Binding SaveRecipeCommand}"/>
-				<Button Content="Prekliči" Command="{Binding CancelCommand}"/>
+				<Button Width="150" FontSize="24" FontWeight="Bold" Content="Shrani" Command="{Binding SaveRecipeCommand}"/>
+				<Button Width="150" FontSize="24" FontWeight="Bold" Content="Prekliči" Command="{Binding CancelCommand}"/>
 			</StackPanel>
 
 		</Grid>

@@ -24,17 +24,18 @@
 
 		<!-- DataGrid -->
 		<DataGrid Grid.Row="1"
-                  ItemsSource="{Binding Recipes}"
-                  SelectedItem="{Binding SelectedRecipe}">
+				  ItemsSource="{Binding Recipes}"
+				  SelectedItem="{Binding SelectedRecipe}"
+				  SelectionMode="Single">
 			<DataGrid.Columns>
-				<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+				<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
 				<DataGridTextColumn Header="Ime" Binding="{Binding Name}" Width="*"/>
 				<DataGridTextColumn Header="Opis" Binding="{Binding Description}" Width="2*"/>
 			</DataGrid.Columns>
 		</DataGrid>
 
 		<!-- Actions -->
-		<StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+		<StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="20">
 			<Button Content="Dodaj Novo" Command="{Binding AddNewRecipeCommand}"/>
 			<Button Content="Uredi Izbrano" Command="{Binding EditRecipeCommand}"/>
 			<Button Content="Izbriši Izbrano" Command="{Binding DeleteRecipeCommand}"/>
