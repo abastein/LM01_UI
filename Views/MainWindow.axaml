@@ -154,7 +154,7 @@
 							Margin="20,10,10,20"/>
 
 			<Button Content="Ročni način"
-							Command=""
+							Command="{Binding NavigateManualCommand}"
 							Width="255"
 							Height="100"
 							FontSize="25"

@@ -51,6 +51,23 @@ namespace LM01_UI.Services
 
         public string GetUnloadCommand() => BuildPaddedCommand("00100300000");
 
+        private string BuildManualLoadCommand(int rpm, DirectionType direction)
+        {
+            // Convert RPM to pulses per second for the PLC
+            var speedPps = (int)Math.Round(rpm * 200.0 / 60.0);
+
+            // Convert direction enum to the PLC format (1+ for CW, 2- for CCW)
+            var directionCode = direction == DirectionType.CW ? "1+" : "2-";
+
+            // Payload consists of speed in pulses per second followed by direction code
+            var payload = string.Format("{0:0000}{1}", speedPps, directionCode);
+
+            return BuildPaddedCommand("001003", payload);
+        }
+
+        public string GetManualLoadCommand(int rpm, DirectionType direction) =>
+            BuildManualLoadCommand(rpm, direction);
+
         public string BuildLoadCommand(Recipe recipe)
         {
             var parameterBuilder = new StringBuilder();

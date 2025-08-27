@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LM01_UI.Views.ManualModeView"
+             xmlns:vm="clr-namespace:LM01_UI.ViewModels"
+             x:DataType="vm:ManualModeViewModel"
+             Background="#FF202530">
+	<Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="10" Margin="20">
+		<StackPanel Orientation="Horizontal" Grid.Row="0" Spacing="5" HorizontalAlignment="Left">
+			<Button Content="-" Command="{Binding DecreaseRpmCommand}" Width="40"/>
+			<TextBox Width="100" Text="{Binding Rpm, Mode=TwoWay}" HorizontalContentAlignment="Center"/>
+			<Button Content="+" Command="{Binding IncreaseRpmCommand}" Width="40"/>
+		</StackPanel>
+
+		<ToggleSwitch Grid.Row="1"
+                      OnContent="CW"
+                      OffContent="CCW"
+                      IsChecked="{Binding Direction, Converter={StaticResource DirectionToBoolConverter}}"/>
+
+		<Button Grid.Row="2"
+                Content="{Binding LoadUnloadText}"
+                Command="{Binding ToggleLoadUnloadCommand}"
+                Width="120"/>
+
+		<Button Grid.Row="3"
+                Content="{Binding StartStopText}"
+                Command="{Binding ToggleStartStopCommand}"
+                Width="120"/>
+	</Grid>
+</UserControl>

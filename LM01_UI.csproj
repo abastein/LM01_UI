@@ -120,9 +120,11 @@
     <Compile Update="ViewModels\MainPageViewModel.cs" />
     <Compile Update="ViewModels\PlcTestViewModel.cs" />
     <Compile Update="ViewModels\ParameterEditorViewModel.cs" />
-    <Compile Update="ViewModels\RecipeListViewModel.cs" /> 
+	<Compile Update="ViewModels\RecipeListViewModel.cs" />
 	<Compile Update="ViewModels\UITestViewModel.cs" />
 	<Compile Update="ViewModels\DebugLogViewModel.cs" />
+	<Compile Update="ViewModels\ManualModeViewModel.cs" />
+	<Compile Update="ViewModels\\ManualModeViewModel.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -25,6 +25,7 @@ namespace LM01_UI.ViewModels
         private readonly WelcomeViewModel _welcomeViewModel;
         private readonly AdminPageViewModel _adminPageViewModel;
         private readonly MainPageViewModel _mainPageViewModel;
+        private readonly ManualModeViewModel _manualModeViewModel;
 
         [ObservableProperty]
         private string _plcStatusText = "PLC ni povezan";
@@ -70,6 +71,7 @@ namespace LM01_UI.ViewModels
             _welcomeViewModel = new WelcomeViewModel(_plcClient, _logger, Navigate);
             _mainPageViewModel = new MainPageViewModel(_dbContext, _plcClient, _plcService, _plcStatusService, _logger);
             _adminPageViewModel = new AdminPageViewModel(_plcClient, _logger, _dbContext, Navigate, plcTestViewModel);
+            _manualModeViewModel = new ManualModeViewModel(_plcClient, _plcService, _logger);
 
             _plcStatusService.StatusUpdated += OnStatusUpdated;
             _plcClient.ConnectionStatusChanged += OnPlcConnectionStatusChanged;
@@ -93,6 +95,7 @@ namespace LM01_UI.ViewModels
             _plcStatusService.StatusUpdated -= OnStatusUpdated;
             _plcClient.ConnectionStatusChanged -= OnPlcConnectionStatusChanged;
             _welcomeViewModel.Dispose();
+            _manualModeViewModel.Dispose();
 
             _plcStatusService.Dispose();
             _plcClient.Dispose();
@@ -122,7 +125,7 @@ namespace LM01_UI.ViewModels
                     CurrentPageViewModel = _welcomeViewModel;
                     break;
                 case "Manual":
-                    // Placeholder for future manual mode view
+                    CurrentPageViewModel = _manualModeViewModel;
                     break;
                 case "Pranje":
                     // Placeholder for future pranje view

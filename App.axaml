@@ -24,6 +24,7 @@
 		<converters:DegreesToPulsesConverter x:Key="DegreesToPulsesConverter"/>
 		<converters:RpmToPulsesPerSecondConverter x:Key="RpmToPulsesPerSecondConverter"/>
 		<converters:DirectionToSymbolConverter x:Key="DirectionToSymbolConverter"/>
+		<converters:DirectionToBoolConverter x:Key="DirectionToBoolConverter"/>
 
 		<!-- ********  KLJUČNO: preglasi selection overlay (Fluent + Simple)  ******** -->
 
@@ -58,6 +59,9 @@
 		</DataTemplate>
 		<DataTemplate DataType="{x:Type vm:AdminPageViewModel}">
 			<views:AdminPageView/>
+		</DataTemplate>
+		<DataTemplate DataType="{x:Type vm:ManualModeViewModel}">
+			<views:ManualModeView/>
 		</DataTemplate>
 		<DataTemplate DataType="{x:Type vm:PlcTestViewModel}">
 			<views:PlcTestView/>
