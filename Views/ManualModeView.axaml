@@ -3,27 +3,55 @@
              x:Class="LM01_UI.Views.ManualModeView"
              xmlns:vm="clr-namespace:LM01_UI.ViewModels"
              x:DataType="vm:ManualModeViewModel"
-             Background="#FF202530">
-	<Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="10" Margin="20">
-		<StackPanel Orientation="Horizontal" Grid.Row="0" Spacing="5" HorizontalAlignment="Left">
-			<Button Content="-" Command="{Binding DecreaseRpmCommand}" Width="40"/>
-			<TextBox Width="100" Text="{Binding Rpm, Mode=TwoWay}" HorizontalContentAlignment="Center"/>
-			<Button Content="+" Command="{Binding IncreaseRpmCommand}" Width="40"/>
+	         Background="White"
+	         BorderBrush="DarkGreen"
+	         BorderThickness="2"
+	         CornerRadius="25,25,25,25"
+	         Margin="0,20,0,0">
+
+	<UserControl.Styles>
+		<StyleInclude Source="avares://LM01_UI/Styles/SharedStyles.axaml"/>
+	</UserControl.Styles>
+
+	<Grid RowDefinitions="Auto,Auto,Auto,Auto"
+          RowSpacing="20"
+          Margin="20"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center">
+
+		<StackPanel Orientation="Horizontal"
+                    Grid.Row="0"
+                    Spacing="20"
+                    HorizontalAlignment="Center">
+			<Button Content="-"
+                    Command="{Binding DecreaseRpmCommand}"
+                    Width="100"/>
+			<TextBox Width="200"
+                     Text="{Binding Rpm, Mode=TwoWay}"
+                     HorizontalContentAlignment="Center"
+                     FontSize="36"/>
+			<Button Content="+"
+                    Command="{Binding IncreaseRpmCommand}"
+                    Width="100"/>
 		</StackPanel>
 
 		<ToggleSwitch Grid.Row="1"
                       OnContent="CW"
                       OffContent="CCW"
-                      IsChecked="{Binding Direction, Converter={StaticResource DirectionToBoolConverter}}"/>
+                      IsChecked="{Binding Direction, Converter={StaticResource DirectionToBoolConverter}}"
+                      FontSize="36"
+                      HorizontalAlignment="Center"/>
 
 		<Button Grid.Row="2"
                 Content="{Binding LoadUnloadText}"
                 Command="{Binding ToggleLoadUnloadCommand}"
-                Width="120"/>
+                Width="200"
+                HorizontalAlignment="Center"/>
 
 		<Button Grid.Row="3"
                 Content="{Binding StartStopText}"
                 Command="{Binding ToggleStartStopCommand}"
-                Width="120"/>
+                Width="200"
+                HorizontalAlignment="Center"/>
 	</Grid>
 </UserControl>

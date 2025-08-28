@@ -95,7 +95,6 @@ namespace LM01_UI.ViewModels
             _plcStatusService.StatusUpdated -= OnStatusUpdated;
             _plcClient.ConnectionStatusChanged -= OnPlcConnectionStatusChanged;
             _welcomeViewModel.Dispose();
-            _manualModeViewModel.Dispose();
 
             _plcStatusService.Dispose();
             _plcClient.Dispose();

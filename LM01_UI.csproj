@@ -100,6 +100,11 @@
 		  <DependentUpon>Views\DebugLogView.axaml</DependentUpon>
 	  </Compile>
 
+	  <AvaloniaXaml Update="Views\ManualModeView.axaml" />
+	  <Compile Update="Views\ManualModeView.axaml.cs">
+		  <DependentUpon>Views\ManualModeView.axaml</DependentUpon>
+	  </Compile>
+
     <Compile Update="BoolToBrushConverter.cs" />
     <Compile Update="Logger.cs" />
     <Compile Update="PlcTcpClient.cs" />
