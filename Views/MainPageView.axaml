@@ -11,7 +11,9 @@
              Margin="0,20,0,0">
 
 	<UserControl.Resources>
-		<local:NullToBoolConverter x:Key="NullToBoolConverter" />
+		<local:BoolToBrushConverter x:Key="ActiveRowBrushConverter"
+									TrueBrush="CornflowerBlue"
+									FalseBrush="Transparent"/>
 	</UserControl.Resources>
 
 	<UserControl.Styles>
@@ -51,9 +53,8 @@
 							IsHitTestVisible="{Binding IsSelectionEnabled}">
 				<DataGrid.Styles>
 					<Style Selector="Border.row-bg">
-						<DataTrigger Binding="{Binding IsActive}" Value="True">
-							<Setter Property="Background" Value="CornflowerBlue"/>
-						</DataTrigger>
+						<Setter Property="Background"
+								Value="{Binding IsActive, Converter={StaticResource ActiveRowBrushConverter}}"/>
 					</Style>
 				</DataGrid.Styles>
 				<DataGrid.Columns>
