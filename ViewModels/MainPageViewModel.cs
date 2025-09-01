@@ -60,7 +60,7 @@ namespace LM01_UI.ViewModels
         [ObservableProperty]
         private int? _loadedRecipeId;
 
-        public bool CanLoadRecipe => SelectedRecipe != null && IsPlcConnected && !IsRunning;
+        public bool CanLoadRecipe => SelectedRecipe != null && IsPlcConnected && !IsRunning && !IsRecipeLoaded;
         public bool CanClearRecipe => IsRecipeLoaded && !IsRunning;
         public bool CanToggleRunning => IsPlcConnected && (IsRecipeLoaded || IsRunning);
 
@@ -112,6 +112,7 @@ namespace LM01_UI.ViewModels
 
         partial void OnIsRecipeLoadedChanged(bool oldValue, bool newValue)
         {
+            LoadRecipeCommand.NotifyCanExecuteChanged();
             ClearSelectionCommand.NotifyCanExecuteChanged();
             ToggleStartStopCommand.NotifyCanExecuteChanged();
         }
