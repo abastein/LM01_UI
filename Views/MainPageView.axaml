@@ -3,6 +3,7 @@
              x:Class="LM01_UI.Views.MainPageView"
              xmlns:vm="clr-namespace:LM01_UI.ViewModels"
              xmlns:local="clr-namespace:LM01_UI"
+			 xmlns:m="clr-namespace:LM01_UI.Models"
              x:DataType="vm:MainPageViewModel"
              Background="White"
              BorderBrush="DarkGreen"
@@ -52,9 +53,9 @@
 							CanUserResizeColumns="False"
 							IsHitTestVisible="{Binding IsSelectionEnabled}">
 				<DataGrid.Styles>
-					<Style Selector="Border.row-bg">
+					<Style Selector="Border.row-bg" x:DataType="m:RecipeStep">
 						<Setter Property="Background"
-								Value="{Binding IsActive, Converter={StaticResource ActiveRowBrushConverter}}"/>
+										Value="{Binding IsActive, Converter={StaticResource ActiveRowBrushConverter}}"/>
 					</Style>
 				</DataGrid.Styles>
 				<DataGrid.Columns>
