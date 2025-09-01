@@ -51,15 +51,11 @@
 							IsHitTestVisible="{Binding IsSelectionEnabled}">
 				<DataGrid.Styles>
 					<Style Selector="Border.row-bg">
-						<DataTrigger Binding="{Binding IsActive}" Value="True">
-							<Setter Property="Background" Value="CornflowerBlue"/>
-						</DataTrigger>
-					</Style>
-					<Style Selector="DataGridRow:selected Border.row-bg">
-						<Setter Property="Background" Value="#007435"/>
-					</Style>
-					<Style Selector="DataGridRow:selected Border.row-bg TextBlock.row-text">
-						<Setter Property="Foreground" Value="White"/>
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding IsActive}" Value="True">
+								<Setter Property="Background" Value="CornflowerBlue"/>
+							</DataTrigger>
+						</Style.Triggers>
 					</Style>
 				</DataGrid.Styles>
 				<DataGrid.Columns>
