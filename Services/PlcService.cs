@@ -8,8 +8,8 @@ namespace LM01_UI.Services
 {
     public class PlcService
     {
-        //private const int CommandLength = 256;
-        //private const char PaddingChar = '\0';
+        private const int CommandLength = 256;
+        private const char PaddingChar = '0';
 
         // "Spomin" za zadnje veljavne parametre recepture
         private string _parameterPayload = string.Empty;
@@ -30,15 +30,15 @@ namespace LM01_UI.Services
             //{
             //    fullCommand = fullCommand.Substring(0, CommandLength);
             //}
-            //return fullCommand.PadRight(CommandLength, PaddingChar);
+            fullCommand = fullCommand.PadRight(CommandLength, PaddingChar);
             //return fullCommand;
            // return commandCode + "$R$L";
             return fullCommand + Terminator;
         }
 
         // Ukazi so sedaj metode, ker je njihova vsebina odvisna od stanja
-        public string GetStartCommand() => BuildPaddedCommand("001001");
-        public string GetStatusCommand() => BuildPaddedCommand("001000");
+        public string GetStartCommand() => "001001" + Terminator;
+        public string GetStatusCommand() => "001000" + Terminator;
         //public string GetStatusCommand() => BuildPaddedCommand("001000");
 
         public string GetStopCommand()
@@ -46,10 +46,10 @@ namespace LM01_UI.Services
             // STOP ukaz vedno pošlje prazen payload in ponastavi shranjenega
             _parameterPayload = string.Empty;
             //string emptyPayload = new string(PaddingChar, CommandLength - 6);
-            return BuildPaddedCommand("001002");
+            return "001002" + Terminator;
         }
 
-        public string GetUnloadCommand() => BuildPaddedCommand("00100300000");
+        public string GetUnloadCommand() => BuildPaddedCommand("0010030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
 
         private string BuildManualLoadCommand(int rpm, DirectionType direction)
         {

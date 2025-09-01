@@ -38,6 +38,7 @@ namespace LM01_UI.ViewModels
         public IRelayCommand DecreaseRpmCommand { get; }
         public IAsyncRelayCommand ToggleLoadUnloadCommand { get; }
         public IAsyncRelayCommand ToggleStartStopCommand { get; }
+        public IAsyncRelayCommand RunCommand { get; }
 
         public ManualModeViewModel(PlcTcpClient tcpClient, PlcService plcService, Logger logger)
         {
@@ -50,6 +51,24 @@ namespace LM01_UI.ViewModels
 
             ToggleLoadUnloadCommand = new AsyncRelayCommand(ToggleLoadUnloadAsync);
             ToggleStartStopCommand = new AsyncRelayCommand(ToggleStartStopAsync);
+            RunCommand = new AsyncRelayCommand(RunAsync);
+        }
+
+        private async Task RunAsync()
+        {
+            try
+            {
+                await _tcpClient.SendAsync(_plcService.GetManualLoadCommand(Rpm, Direction));
+                await _tcpClient.SendAsync(_plcService.GetStartCommand());
+                IsLoaded = true;
+                IsRunning = true;
+                LoadUnloadText = "Unload";
+                StartStopText = "Stop";
+            }
+            catch (Exception ex)
+            {
+                _logger.Inform(2, $"Error running spindle: {ex.Message}");
+            }
         }
 
         private async Task ToggleLoadUnloadAsync()
