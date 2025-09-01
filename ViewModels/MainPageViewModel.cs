@@ -244,7 +244,16 @@ namespace LM01_UI.ViewModels
 
                 if (status.State is "1" or "2" && recipe != null && SelectedRecipe?.Id != recipe.Id)
                 {
-                    SelectedRecipe = recipe;
+                    var existing = Recipes.FirstOrDefault(r => r.Id == recipe.Id);
+                    if (existing is null)
+                    {
+                        Recipes.Add(recipe);
+                        SelectedRecipe = recipe;
+                    }
+                    else
+                    {
+                        SelectedRecipe = existing;
+                    }
                 }
 
                 foreach (var recipeStep in SelectedRecipeSteps)

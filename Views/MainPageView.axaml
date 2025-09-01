@@ -12,9 +12,6 @@
 
 	<UserControl.Resources>
 		<local:NullToBoolConverter x:Key="NullToBoolConverter" />
-		<local:BoolToBrushConverter x:Key="ActiveStateBrushConverter"
-									TrueBrush="CornflowerBlue"
-									FalseBrush="Transparent"/>
 	</UserControl.Resources>
 
 	<UserControl.Styles>
@@ -48,11 +45,18 @@
 
 			<!-- DESNA TABELA -->
 			<DataGrid Grid.Column="1"
-					ItemsSource="{Binding SelectedRecipeSteps}"
-					IsVisible="{Binding SelectedRecipe, Converter={StaticResource NullToBoolConverter}}"
-					CanUserResizeColumns="False"
-					IsHitTestVisible="{Binding IsSelectionEnabled}">
+							ItemsSource="{Binding SelectedRecipeSteps}"
+							IsVisible="{Binding SelectedRecipe, Converter={StaticResource NullToBoolConverter}}"
+							CanUserResizeColumns="False"
+							IsHitTestVisible="{Binding IsSelectionEnabled}">
 				<DataGrid.Styles>
+					<Style Selector="Border.row-bg">
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding IsActive}" Value="True">
+								<Setter Property="Background" Value="CornflowerBlue"/>
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
 					<Style Selector="DataGridRow:selected Border.row-bg">
 						<Setter Property="Background" Value="#007435"/>
 					</Style>
@@ -64,13 +68,12 @@
 					<DataGridTemplateColumn Header="Št." Width="Auto">
 						<DataTemplate>
 							<Border Classes="row-bg"
-															Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
-															HorizontalAlignment="Stretch"
-															VerticalAlignment="Stretch">
+									HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch">
 								<TextBlock Classes="row-text"
-																   Text="{Binding StepNumber}"
-																   VerticalAlignment="Center"
-																   Margin="5,0"/>
+									Text="{Binding StepNumber}"
+									VerticalAlignment="Center"
+									Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
@@ -78,13 +81,13 @@
 					<DataGridTemplateColumn Header="Funkcija" Width="*">
 						<DataTemplate>
 							<Border Classes="row-bg"
-															Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
-															HorizontalAlignment="Stretch"
-															VerticalAlignment="Stretch">
+									Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
+									HorizontalAlignment="Stretch"
+									VerticalAlignment="Stretch">
 								<TextBlock Classes="row-text"
-																   Text="{Binding Function}"
-																   VerticalAlignment="Center"
-																   Margin="5,0"/>
+									Text="{Binding Function}"
+									VerticalAlignment="Center"
+									Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
@@ -92,9 +95,8 @@
 					<DataGridTemplateColumn Header="Hitrost(RPM)" Width="Auto">
 						<DataTemplate>
 							<Border Classes="row-bg"
-															Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
-															HorizontalAlignment="Stretch"
-															VerticalAlignment="Stretch">
+									HorizontalAlignment="Stretch"
+									VerticalAlignment="Stretch">
 								<TextBlock Classes="row-text"
 																   Text="{Binding SpeedRPM}"
 																   VerticalAlignment="Center"
@@ -106,9 +108,8 @@
 					<DataGridTemplateColumn Header="Smer" Width="Auto">
 						<DataTemplate>
 							<Border Classes="row-bg"
-															Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
-															HorizontalAlignment="Stretch"
-															VerticalAlignment="Stretch">
+									HorizontalAlignment="Stretch"
+									VerticalAlignment="Stretch">
 								<TextBlock Classes="row-text"
 																   Text="{Binding Direction}"
 																   VerticalAlignment="Center"
