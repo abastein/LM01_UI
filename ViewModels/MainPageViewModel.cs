@@ -63,6 +63,7 @@ namespace LM01_UI.ViewModels
         public bool CanLoadRecipe => SelectedRecipe != null && IsPlcConnected && !IsRunning && !IsRecipeLoaded;
         public bool CanClearRecipe => IsRecipeLoaded && !IsRunning;
         public bool CanToggleRunning => IsPlcConnected && (IsRecipeLoaded || IsRunning);
+        public bool IsSelectionEnabled => !IsRecipeLoaded;
 
         public IAsyncRelayCommand LoadRecipeCommand { get; }
         public IAsyncRelayCommand ToggleStartStopCommand { get; }
@@ -115,6 +116,7 @@ namespace LM01_UI.ViewModels
             LoadRecipeCommand.NotifyCanExecuteChanged();
             ClearSelectionCommand.NotifyCanExecuteChanged();
             ToggleStartStopCommand.NotifyCanExecuteChanged();
+            OnPropertyChanged(nameof(IsSelectionEnabled));
         }
 
         partial void OnIsRunningChanged(bool oldValue, bool newValue)
