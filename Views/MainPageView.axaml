@@ -81,7 +81,6 @@
 					<DataGridTemplateColumn Header="Funkcija" Width="*">
 						<DataTemplate>
 							<Border Classes="row-bg"
-									Background="{Binding IsActive, Converter={StaticResource ActiveStateBrushConverter}}"
 									HorizontalAlignment="Stretch"
 									VerticalAlignment="Stretch">
 								<TextBlock Classes="row-text"
@@ -98,9 +97,9 @@
 									HorizontalAlignment="Stretch"
 									VerticalAlignment="Stretch">
 								<TextBlock Classes="row-text"
-																   Text="{Binding SpeedRPM}"
-																   VerticalAlignment="Center"
-																   Margin="5,0"/>
+									Text="{Binding SpeedRPM}"
+									VerticalAlignment="Center"
+									Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
@@ -111,12 +110,13 @@
 									HorizontalAlignment="Stretch"
 									VerticalAlignment="Stretch">
 								<TextBlock Classes="row-text"
-																   Text="{Binding Direction}"
-																   VerticalAlignment="Center"
-																   Margin="5,0"/>
+									Text="{Binding Direction}"
+									VerticalAlignment="Center"
+									Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
+					
 				</DataGrid.Columns>
 			</DataGrid>
 		</Grid>
