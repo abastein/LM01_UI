@@ -35,13 +35,13 @@
 
 			<!-- LEVA TABELA -->
 			<DataGrid Grid.Column="0"
-							ItemsSource="{Binding Recipes}"
-							SelectedItem="{Binding SelectedRecipe}"
-							IsHitTestVisible="{Binding IsSelectionEnabled}">
+					ItemsSource="{Binding Recipes}"
+					SelectedItem="{Binding ActiveRecipe, Mode=TwoWay}"
+					IsHitTestVisible="{Binding IsSelectionEnabled}">
 				<DataGrid.Columns>
-					<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="100"/>
-					<DataGridTextColumn Header="Ime Recepture" Binding="{Binding Name}" Width="*"/>
-					<DataGridTextColumn Header="Opis" Binding="{Binding Description}" Width="1.5*"/>
+						<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="100"/>
+						<DataGridTextColumn Header="Ime Recepture" Binding="{Binding Name}" Width="*"/>
+						<DataGridTextColumn Header="Opis" Binding="{Binding Description}" Width="1.5*"/>
 				</DataGrid.Columns>
 			</DataGrid>
 
