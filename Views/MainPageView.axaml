@@ -13,8 +13,8 @@
 
 	<UserControl.Resources>
                 <local:BoolToBrushConverter x:Key="ActiveRowBrushConverter"
-                                                                        TrueBrush="#007435"
-                                                                        FalseBrush="Transparent"/>
+                TrueBrush="#007435"
+                FalseBrush="Transparent"/>
 	</UserControl.Resources>
 
 	<UserControl.Styles>
