@@ -12,9 +12,9 @@
              Margin="0,20,0,0">
 
 	<UserControl.Resources>
-		<local:BoolToBrushConverter x:Key="ActiveRowBrushConverter"
-									TrueBrush="CornflowerBlue"
-									FalseBrush="Transparent"/>
+                <local:BoolToBrushConverter x:Key="ActiveRowBrushConverter"
+                                                                        TrueBrush="#007435"
+                                                                        FalseBrush="Transparent"/>
 	</UserControl.Resources>
 
 	<UserControl.Styles>

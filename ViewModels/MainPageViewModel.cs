@@ -34,6 +34,9 @@ namespace LM01_UI.ViewModels
         private ObservableCollection<RecipeStep> _selectedRecipeSteps = new();
 
         [ObservableProperty]
+        private RecipeStep? _selectedStep;
+
+        [ObservableProperty]
         private string _plcStatusText = "Povezava ni vzpostavljena";
 
         [ObservableProperty]
