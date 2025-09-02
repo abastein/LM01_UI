@@ -35,10 +35,9 @@
 
 			<!-- LEVA TABELA -->
 			<DataGrid Grid.Column="0"
-					ItemsSource="{Binding Recipes}"
-					SelectedItem="{Binding SelectedRecipe}"
-					SelectedIndex="0"
-					IsHitTestVisible="{Binding IsSelectionEnabled}">
+							ItemsSource="{Binding Recipes}"
+							SelectedItem="{Binding SelectedRecipe}"
+							IsHitTestVisible="{Binding IsSelectionEnabled}">
 				<DataGrid.Columns>
 					<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="100"/>
 					<DataGridTextColumn Header="Ime Recepture" Binding="{Binding Name}" Width="*"/>
@@ -48,10 +47,10 @@
 
 			<!-- DESNA TABELA -->
 			<DataGrid Grid.Column="1"
-							ItemsSource="{Binding SelectedRecipeSteps}"
-							IsVisible="{Binding SelectedRecipe, Converter={StaticResource NullToBoolConverter}}"
-							CanUserResizeColumns="False"
-							IsHitTestVisible="{Binding IsSelectionEnabled}">
+					ItemsSource="{Binding SelectedRecipeSteps}"
+					IsVisible="{Binding ActiveRecipe, Converter={StaticResource NullToBoolConverter}}"
+					CanUserResizeColumns="False"
+					IsHitTestVisible="{Binding IsSelectionEnabled}">
 				<DataGrid.Styles>
 					<Style Selector="Border.row-bg" x:DataType="m:RecipeStep">
 						<Setter Property="Background"
