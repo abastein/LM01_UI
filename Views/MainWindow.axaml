@@ -78,17 +78,35 @@
 							VerticalAlignment="Center"/>
 										
 				</StackPanel>
-				<StackPanel Grid.Column="2" Grid.Row="1"
-							Orientation="Horizontal"
-							Spacing="15"
+			
+					<Grid Grid.Column="2" Grid.Row="1"
 							Margin="40"
 							HorizontalAlignment="Left">
-				<Image  Source="avares://LM01_UI/Assets/Images/Logo3B.png"
-							Width="340"
-							Stretch="Uniform"
-							VerticalAlignment="Center"/>
-				
-				</StackPanel>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
+
+						<Image  Source="avares://LM01_UI/Assets/Images/Logo3B.png"
+								Grid.Row="0"
+								Width="340"
+								Stretch="Uniform"
+								VerticalAlignment="Center"/>
+
+						<TextBlock Grid.Row="1"
+								Text="Additional Control 1"
+								FontSize="20"
+								Foreground="Black"
+								VerticalAlignment="Center"/>
+
+						<TextBlock Grid.Row="2"
+								Text="Additional Control 2"
+								FontSize="20"
+								Foreground="Black"
+								VerticalAlignment="Center"/>
+
+					</Grid>
 			
 				<ContentControl Content="{Binding CurrentPageViewModel}"
 								Grid.Column="1"
