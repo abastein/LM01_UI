@@ -5,12 +5,12 @@
              xmlns:enums="clr-namespace:LM01_UI.Enums"
              xmlns:views="clr-namespace:LM01_UI.Views"
              x:DataType="vm:StepEditorViewModel"
-             Background="WhiteSmoke">
+             Background="#007435">
 
 	<Grid ColumnDefinitions="Auto, Auto" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
 
 		<StackPanel Grid.Column="0" Margin="0,0,40,0" Spacing="10" VerticalAlignment="Center">
-			<TextBlock Text="Urejanje Koraka Recepture" FontSize="24" FontWeight="Bold" Foreground="#FFDCA400" Margin="0,0,0,10"/>
+			<TextBlock Text="Urejanje Koraka" FontSize="24" FontWeight="Bold" Foreground="WhiteSmoke" Margin="0,0,0,10"/>
 
 			<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
 				<TextBlock Grid.Row="0" Grid.Column="0" Text="Št. Koraka:" Foreground="White" VerticalAlignment="Center"/>

@@ -1,4 +1,6 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LM01_UI.Data.Persistence;
@@ -93,21 +95,17 @@ namespace LM01_UI.ViewModels
             var editorViewModel = new StepEditorViewModel(newStepObject, closeCallback);
             editorWindow.Content = new StepEditorView { DataContext = editorViewModel };
 
-            // POPRAVEK: Dodano preverjanje, če glavno okno obstaja
-            var mainWindow = (App.Current as App)?.GetMainWindow();
-            if (mainWindow != null)
-            {
-                await editorWindow.ShowDialog(mainWindow);
-            }
-            else
-            {
-                editorWindow.Show();
-            }
+            var parent = (Avalonia.Application.Current?.ApplicationLifetime
+                as IClassicDesktopStyleApplicationLifetime)?
+                .Windows.FirstOrDefault(w => w.DataContext == this);
+            await editorWindow.ShowDialog(parent);
 
             if (newStepResult != null)
             {
                 Steps.Add(newStepResult);
                 RenumberSteps();
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                    Steps = new ObservableCollection<RecipeStep>(Steps.OrderBy(s => s.StepNumber)));
             }
         }
 
@@ -128,22 +126,18 @@ namespace LM01_UI.ViewModels
             var editorViewModel = new StepEditorViewModel(stepToEdit, closeCallback);
             editorWindow.Content = new StepEditorView { DataContext = editorViewModel };
 
-            // POPRAVEK: Dodano preverjanje, če glavno okno obstaja
-            var mainWindow = (App.Current as App)?.GetMainWindow();
-            if (mainWindow != null)
-            {
-                await editorWindow.ShowDialog(mainWindow);
-            }
-            else
-            {
-                editorWindow.Show();
-            }
+            var parent = (Avalonia.Application.Current?.ApplicationLifetime
+                as IClassicDesktopStyleApplicationLifetime)?
+                .Windows.FirstOrDefault(w => w.DataContext == this);
+            await editorWindow.ShowDialog(parent);
 
             if (editedStepResult != null)
             {
                 var index = Steps.IndexOf(stepToEdit);
                 if (index != -1) { Steps[index] = editedStepResult; }
                 RenumberSteps();
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                    Steps = new ObservableCollection<RecipeStep>(Steps.OrderBy(s => s.StepNumber)));
             }
         }
 
