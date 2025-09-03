@@ -48,7 +48,9 @@ namespace LM01_UI.ViewModels
         {
             try
             {
-                var recipesFromDb = await _dbContext.Recipes.OrderBy(r => r.Name).ToListAsync();
+                var recipesFromDb = await _dbContext.Recipes
+                .OrderBy(r => r.Id)
+                .ToListAsync();
                 Recipes = new ObservableCollection<Recipe>(recipesFromDb);
             }
             catch (Exception ex) { _logger.Inform(2, $"Napaka pri nalaganju receptur: {ex.Message}"); }
