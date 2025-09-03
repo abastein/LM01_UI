@@ -115,6 +115,7 @@ namespace LM01_UI.ViewModels
             switch (destination)
             {
                 case "Run":
+                    _ = _mainPageViewModel.ReloadRecipesAsync();
                     CurrentPageViewModel = _mainPageViewModel;
                     break;
                 case "Admin":

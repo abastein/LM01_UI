@@ -75,23 +75,28 @@ namespace LM01_UI.ViewModels
 
         private async Task OpenRecipeEditor(Recipe recipe)
         {
-            var editorWindow = new Window { Title = "Urejevalnik Recepture", WindowStartupLocation = WindowStartupLocation.CenterScreen, SizeToContent = SizeToContent.WidthAndHeight };
-            var editorViewModel = new RecipeEditorViewModel(recipe, _dbContext, _logger, () => editorWindow.Close());
-            editorWindow.Content = new RecipeEditorView { DataContext = editorViewModel };
+            var editorWindow = new Window
+            {
+                Title = "Urejevalnik Recepture",
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                SizeToContent = SizeToContent.WidthAndHeight
+            };
 
-            // POPRAVEK: Dodano preverjanje, če glavno okno obstaja
+            var editorViewModel = new RecipeEditorViewModel(
+                recipe, _dbContext, _logger, () => editorWindow.Close());
+
+            editorWindow.DataContext = editorViewModel;      // <-- new
+            editorWindow.Content = new RecipeEditorView(); // DataContext already set on window
+
             var mainWindow = (App.Current as App)?.GetMainWindow();
             if (mainWindow != null)
-            {
                 await editorWindow.ShowDialog(mainWindow);
-            }
             else
-            {
-                editorWindow.Show(); // Odpremo kot navadno okno, če lastnika ni mogoče najti
-            }
+                editorWindow.Show();
 
             await LoadRecipesAsync();
         }
+
 
         private async Task DeleteSelectedRecipeAsync()
         {

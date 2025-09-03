@@ -164,6 +164,11 @@ namespace LM01_UI.ViewModels
             }
         }
 
+        public Task ReloadRecipesAsync()
+        {
+            return LoadRecipesAsync();
+        }
+
         private async Task LoadStepsForActiveRecipeAsync()
         {
             SelectedRecipeSteps.Clear();
