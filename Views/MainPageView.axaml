@@ -35,14 +35,53 @@
 
 			<!-- LEVA TABELA -->
 			<DataGrid Grid.Column="0"
-					ItemsSource="{Binding Recipes}"
-					SelectedItem="{Binding SelectedRecipe, Mode=TwoWay}"
-					SelectionMode="Single"
-					IsEnabled="{Binding IsSelectionEnabled}">
+							ItemsSource="{Binding Recipes}"
+							SelectedItem="{Binding SelectedRecipe, Mode=TwoWay}"
+							SelectionMode="Single"
+							IsHitTestVisible="{Binding IsSelectionEnabled}">
+				<DataGrid.Styles>
+					<Style Selector="Border.row-bg" x:DataType="m:Recipe">
+						<Setter Property="Background"
+										Value="{Binding IsActive, Converter={StaticResource ActiveRowBrushConverter}}"/>
+					</Style>
+				</DataGrid.Styles>
 				<DataGrid.Columns>
-					<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="100"/>
-					<DataGridTextColumn Header="Ime Recepture" Binding="{Binding Name}" Width="*"/>
-						<DataGridTextColumn Header="Opis" Binding="{Binding Description}" Width="1.5*"/>
+					<DataGridTemplateColumn Header="ID" Width="100">
+						<DataTemplate>
+							<Border Classes="row-bg"
+											HorizontalAlignment="Stretch"
+											VerticalAlignment="Stretch">
+								<TextBlock Classes="row-text"
+												Text="{Binding Id}"
+												VerticalAlignment="Center"
+												Margin="5,0"/>
+							</Border>
+						</DataTemplate>
+					</DataGridTemplateColumn>
+					<DataGridTemplateColumn Header="Ime Recepture" Width="*">
+						<DataTemplate>
+							<Border Classes="row-bg"
+											HorizontalAlignment="Stretch"
+											VerticalAlignment="Stretch">
+								<TextBlock Classes="row-text"
+												Text="{Binding Name}"
+												VerticalAlignment="Center"
+												Margin="5,0"/>
+							</Border>
+						</DataTemplate>
+					</DataGridTemplateColumn>
+					<DataGridTemplateColumn Header="Opis" Width="1.5*">
+						<DataTemplate>
+							<Border Classes="row-bg"
+											HorizontalAlignment="Stretch"
+											VerticalAlignment="Stretch">
+								<TextBlock Classes="row-text"
+												Text="{Binding Description}"
+												VerticalAlignment="Center"
+												Margin="5,0"/>
+							</Border>
+						</DataTemplate>
+					</DataGridTemplateColumn>
 				</DataGrid.Columns>
 			</DataGrid>
 
