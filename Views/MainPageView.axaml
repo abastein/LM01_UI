@@ -35,23 +35,24 @@
 
 			<!-- LEVA TABELA -->
 			<DataGrid Grid.Column="0"
-							ItemsSource="{Binding Recipes}"
-							SelectedItem="{Binding SelectedRecipe, Mode=TwoWay}"
-							SelectionMode="Single"
-							IsEnabled="{Binding IsSelectionEnabled}">
+					ItemsSource="{Binding Recipes}"
+					SelectedItem="{Binding SelectedRecipe, Mode=TwoWay}"
+					SelectionMode="Single"
+					SelectionUnit="FullRow"
+					IsEnabled="{Binding IsSelectionEnabled}">
 				<DataGrid.Columns>
-						<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="100"/>
-						<DataGridTextColumn Header="Ime Recepture" Binding="{Binding Name}" Width="*"/>
+					<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="100"/>
+					<DataGridTextColumn Header="Ime Recepture" Binding="{Binding Name}" Width="*"/>
 						<DataGridTextColumn Header="Opis" Binding="{Binding Description}" Width="1.5*"/>
 				</DataGrid.Columns>
 			</DataGrid>
 
 			<!-- DESNA TABELA -->
 			<DataGrid Grid.Column="1"
-							ItemsSource="{Binding SelectedRecipeSteps}"
-							IsVisible="{Binding SelectedRecipe, Converter={StaticResource NullToBoolConverter}}"
-							CanUserResizeColumns="False"
-							IsEnabled="{Binding IsSelectionEnabled}">
+					ItemsSource="{Binding SelectedRecipeSteps}"
+					IsVisible="{Binding SelectedRecipe, Converter={StaticResource NullToBoolConverter}}"
+					CanUserResizeColumns="False"
+					IsHitTestVisible="False">
 				<DataGrid.Styles>
 					<Style Selector="Border.row-bg" x:DataType="m:RecipeStep">
 						<Setter Property="Background"
@@ -144,10 +145,9 @@
 		<Grid Grid.Row="2" RowDefinitions="Auto,Auto" Margin="0,10,0,0" RowSpacing="10">
 			<Grid Grid.Row="0" ColumnDefinitions="*,*" ColumnSpacing="20">
 				<Button Grid.Column="0"
-								Content="Naloži"
-								Background="#007BFF"
-								Command="{Binding LoadRecipeCommand}"
-								IsEnabled="{Binding IsSelectionEnabled}"/>
+						Content="Naloži"
+						Background="#007BFF"
+						Command="{Binding LoadRecipeCommand}"/>
 				<Button Grid.Column="1"
 						Content="Počisti"
 						Background="#FD7E14"

@@ -124,12 +124,13 @@ namespace LM01_UI.ViewModels
             ToggleStartStopCommand.NotifyCanExecuteChanged();
         }
 
-        partial void OnIsRecipeLoadedChanged(bool oldValue, bool newValue)
+        private void UpdateUiState()
         {
+            IsRecipeLoaded = LoadedRecipeId.HasValue;
+            OnPropertyChanged(nameof(IsSelectionEnabled));
             LoadRecipeCommand.NotifyCanExecuteChanged();
             ClearSelectionCommand.NotifyCanExecuteChanged();
             ToggleStartStopCommand.NotifyCanExecuteChanged();
-            OnPropertyChanged(nameof(IsSelectionEnabled));
         }
 
         partial void OnIsRunningChanged(bool oldValue, bool newValue)
@@ -188,6 +189,8 @@ namespace LM01_UI.ViewModels
             {
                 string command = _plcService.BuildLoadCommand(SelectedRecipe);
                 await _tcpClient.SendAsync(command);
+                LoadedRecipeId = SelectedRecipe.Id;
+                UpdateUiState();
             }
             catch (Exception ex)
             {
@@ -201,7 +204,9 @@ namespace LM01_UI.ViewModels
             try
             {
                 await _tcpClient.SendAsync(_plcService.GetUnloadCommand());
-                  // SelectedRecipe = null;
+                LoadedRecipeId = null;
+                UpdateUiState();
+                // SelectedRecipe = null;
             }
             catch (Exception ex)
             {
@@ -263,23 +268,15 @@ namespace LM01_UI.ViewModels
 
                 if (status.State is "1" or "2" or "3")
                 {
-                    if (recipe != null)
+                    var existing = Recipes.FirstOrDefault(r => r.Id == status.LoadedRecipeId);
+                    if (existing is null && recipe is not null)
                     {
-                        var existing = Recipes.FirstOrDefault(r => r.Id == recipe.Id);
-                        if (existing is null)
-                        {
-                            Recipes.Add(recipe);
-                            SelectedRecipe = recipe;
-                        }
-                        else
-                        {
-                            SelectedRecipe = existing;
-                        }
+                        Recipes.Add(recipe);
+                        existing = recipe;
                     }
-                    else
-                    {
-                        SelectedRecipe = null;
-                    }
+
+                    SelectedRecipe = existing;
+                    OnPropertyChanged(nameof(SelectedRecipe));
                 }
 
                 foreach (var recipeStep in SelectedRecipeSteps)
@@ -290,8 +287,9 @@ namespace LM01_UI.ViewModels
                 CurrentStepNumber = status.Step;
                 PlcErrorCode = status.ErrorCode;
 
-                IsRecipeLoaded = status.State is "1" or "2" or "3";
+                LoadedRecipeId = status.State is "1" or "2" or "3" ? status.LoadedRecipeId : (int?)null;
                 IsRunning = status.State == "2";
+                UpdateUiState();
 
                 LoadedRecipeId = IsRecipeLoaded ? status.LoadedRecipeId : (int?)null;
                 PlcStatusText = status.State switch
