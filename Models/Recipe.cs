@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LM01_UI.Models
 {
@@ -20,6 +21,7 @@ namespace LM01_UI.Models
         // Navigacijska lastnost: Receptura ima lahko veliko korakov
         public ICollection<RecipeStep> Steps { get; set; } = new List<RecipeStep>();
 
+        [NotMapped]
         [ObservableProperty]
         private bool _isActive;
     }
