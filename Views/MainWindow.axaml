@@ -55,12 +55,17 @@
 					<RowDefinition Height="Auto"/>
 				</Grid.RowDefinitions>
 
-				<TextBlock Grid.Row="0"
-								Text="MARMORIRANJE STL 600"
-								FontSize="40"
-								FontWeight="Bold"
-								Foreground="Black"
-								VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="0"
+                           Text="MARMORIRANJE STL 600"
+                           FontSize="50"
+                           FontWeight="SemiBold"
+						  
+                           Foreground="Lightgray"
+                           VerticalAlignment="Center">
+                    <TextBlock.Effect>
+                        <DropShadowEffect Color="Black" BlurRadius="8" Opacity="0.7"/>
+                    </TextBlock.Effect>
+                </TextBlock>
 
 				<StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="15">
 					<TextBlock Text="PLC Status:"
