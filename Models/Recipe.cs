@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace LM01_UI.Models
 {
-    public class Recipe
+    public partial class Recipe : ObservableObject
     {
         public int Id { get; set; } // Program ID (npr. 001)
 
@@ -18,5 +19,8 @@ namespace LM01_UI.Models
 
         // Navigacijska lastnost: Receptura ima lahko veliko korakov
         public ICollection<RecipeStep> Steps { get; set; } = new List<RecipeStep>();
+
+        [ObservableProperty]
+        private bool _isActive;
     }
 }
