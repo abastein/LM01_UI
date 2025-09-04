@@ -95,10 +95,11 @@ namespace LM01_UI.ViewModels
             var editorViewModel = new StepEditorViewModel(newStepObject, closeCallback);
             editorWindow.Content = new StepEditorView { DataContext = editorViewModel };
 
-            var parent = (Avalonia.Application.Current?.ApplicationLifetime
-                as IClassicDesktopStyleApplicationLifetime)?
-                .Windows.FirstOrDefault(w => w.DataContext == this);
-            await editorWindow.ShowDialog(parent);
+            var lifetime = Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
+            var parent = lifetime?.Windows.FirstOrDefault(w => w.DataContext == this) ?? lifetime?.MainWindow;
+
+            if (parent is not null)
+                await editorWindow.ShowDialog(parent);
 
             if (newStepResult != null)
             {

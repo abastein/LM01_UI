@@ -38,7 +38,6 @@
 							ItemsSource="{Binding Recipes}"
 							SelectedItem="{Binding SelectedRecipe, Mode=TwoWay}"
 							SelectionMode="Single"
-							SelectionUnit="FullRow"
 							IsEnabled="{Binding IsSelectionEnabled}">
 				<DataGrid.Columns>
 						<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="100"/>
