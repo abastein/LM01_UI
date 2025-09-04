@@ -60,8 +60,8 @@ namespace LM01_UI.ViewModels
         [ObservableProperty]
         private int _plcErrorCode;
 
-        [ObservableProperty]
-        private Recipe? _plcLoadedRecipe;
+        //[ObservableProperty]
+        //private Recipe? _plcLoadedRecipe;
 
         [ObservableProperty]
         private int? _loadedRecipeId;
@@ -71,11 +71,11 @@ namespace LM01_UI.ViewModels
         public bool CanToggleRunning => IsPlcConnected && (IsRecipeLoaded || IsRunning);
         public bool IsSelectionEnabled => !IsRecipeLoaded;
 
-        public Recipe? ActiveRecipe
-        {
-            get => PlcLoadedRecipe ?? SelectedRecipe;
-            set => SelectedRecipe = value;
-        }
+        //public Recipe? ActiveRecipe
+        //{
+        //    get => PlcLoadedRecipe ?? SelectedRecipe;
+        //    set => SelectedRecipe = value;
+        //}
 
 
         public IAsyncRelayCommand LoadRecipeCommand { get; }
@@ -115,14 +115,7 @@ namespace LM01_UI.ViewModels
         partial void OnSelectedRecipeChanged(Recipe? oldValue, Recipe? newValue)
         {
             LoadRecipeCommand.NotifyCanExecuteChanged();
-            _ = LoadStepsForActiveRecipeAsync();
-            OnPropertyChanged(nameof(ActiveRecipe));
-        }
-
-        partial void OnPlcLoadedRecipeChanged(Recipe? oldValue, Recipe? newValue)
-        {
-            _ = LoadStepsForActiveRecipeAsync();
-            OnPropertyChanged(nameof(ActiveRecipe));
+            _ = LoadStepsForSelectedRecipeAsync();
         }
 
         partial void OnIsPlcConnectedChanged(bool oldValue, bool newValue)
@@ -169,15 +162,15 @@ namespace LM01_UI.ViewModels
             return LoadRecipesAsync();
         }
 
-        private async Task LoadStepsForActiveRecipeAsync()
+        private async Task LoadStepsForSelectedRecipeAsync()
         {
             SelectedRecipeSteps.Clear();
-            var active = ActiveRecipe;
-            if (active != null)
+            var recipe = SelectedRecipe;
+            if (recipe != null)
             {
                 var recipeWithSteps = await _dbContext.Recipes
                     .Include(r => r.Steps)
-                     .FirstOrDefaultAsync(r => r.Id == active.Id);
+                    .FirstOrDefaultAsync(r => r.Id == recipe.Id);
                 if (recipeWithSteps != null)
                 {
                     foreach (var step in recipeWithSteps.Steps.OrderBy(s => s.StepNumber))
@@ -276,21 +269,17 @@ namespace LM01_UI.ViewModels
                         if (existing is null)
                         {
                             Recipes.Add(recipe);
-                            PlcLoadedRecipe = recipe;
+                            SelectedRecipe = recipe;
                         }
                         else
                         {
-                            PlcLoadedRecipe = existing;
+                            SelectedRecipe = existing;
                         }
                     }
                     else
                     {
-                        PlcLoadedRecipe = null;
+                        SelectedRecipe = null;
                     }
-                }
-                else
-                {
-                    PlcLoadedRecipe = null;
                 }
 
                 foreach (var recipeStep in SelectedRecipeSteps)
