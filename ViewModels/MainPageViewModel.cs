@@ -116,6 +116,11 @@ namespace LM01_UI.ViewModels
         {
             LoadRecipeCommand.NotifyCanExecuteChanged();
             _ = LoadStepsForSelectedRecipeAsync();
+
+            foreach (var recipe in Recipes)
+            {
+                recipe.IsActive = recipe == SelectedRecipe;
+            }
         }
 
         partial void OnIsPlcConnectedChanged(bool oldValue, bool newValue)
@@ -151,6 +156,10 @@ namespace LM01_UI.ViewModels
                     .OrderBy(r => r.Id)
                     .ToListAsync();
                 Recipes = new ObservableCollection<Recipe>(recipes);
+                foreach (var recipe in Recipes)
+                {
+                    recipe.IsActive = false;
+                }
             }
             catch (Exception ex)
             {
@@ -276,7 +285,16 @@ namespace LM01_UI.ViewModels
                     }
 
                     SelectedRecipe = existing;
-                    OnPropertyChanged(nameof(SelectedRecipe));
+                }
+                else
+                {
+                    SelectedRecipe = null;
+                }
+
+                OnPropertyChanged(nameof(SelectedRecipe));
+                foreach (var r in Recipes)
+                {
+                    r.IsActive = r == SelectedRecipe;
                 }
 
                 foreach (var recipeStep in SelectedRecipeSteps)
