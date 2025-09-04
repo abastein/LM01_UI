@@ -100,16 +100,42 @@
 					<DataGridTemplateColumn Header="Smer" Width="Auto">
 						<DataTemplate>
 							<Border Classes="row-bg"
-									HorizontalAlignment="Stretch"
-									VerticalAlignment="Stretch">
+											HorizontalAlignment="Stretch"
+											VerticalAlignment="Stretch">
 								<TextBlock Classes="row-text"
-									Text="{Binding Direction}"
-									VerticalAlignment="Center"
-									Margin="5,0"/>
+										Text="{Binding Direction}"
+										VerticalAlignment="Center"
+										Margin="5,0"/>
 							</Border>
 						</DataTemplate>
 					</DataGridTemplateColumn>
-					
+
+					<DataGridTemplateColumn Header="Cilj" Width="Auto">
+						<DataTemplate>
+							<Border Classes="row-bg"
+											HorizontalAlignment="Stretch"
+											VerticalAlignment="Stretch">
+								<TextBlock Classes="row-text"
+										Text="{Binding TargetXDeg}"
+										VerticalAlignment="Center"
+										Margin="5,0"/>
+							</Border>
+						</DataTemplate>
+					</DataGridTemplateColumn>
+
+					<DataGridTemplateColumn Header="Pavza" Width="Auto">
+						<DataTemplate>
+							<Border Classes="row-bg"
+											HorizontalAlignment="Stretch"
+											VerticalAlignment="Stretch">
+								<TextBlock Classes="row-text"
+										Text="{Binding PauseMs}"
+										VerticalAlignment="Center"
+										Margin="5,0"/>
+							</Border>
+						</DataTemplate>
+					</DataGridTemplateColumn>
+
 				</DataGrid.Columns>
 			</DataGrid>
 		</Grid>
