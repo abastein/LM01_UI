@@ -20,6 +20,7 @@ namespace LM01_UI.ViewModels
         private readonly PlcService _plcService;
         private readonly PlcStatusService _statusService;
         private readonly Logger _logger;
+        private bool _acceptPlcUpdates;
 
         [ObservableProperty]
         private string _lastStatusResponse = string.Empty;
@@ -198,6 +199,7 @@ namespace LM01_UI.ViewModels
             {
                 string command = _plcService.BuildLoadCommand(SelectedRecipe);
                 await _tcpClient.SendAsync(command);
+                _acceptPlcUpdates = true;
                 LoadedRecipeId = SelectedRecipe.Id;
                 UpdateUiState();
             }
@@ -213,9 +215,9 @@ namespace LM01_UI.ViewModels
             try
             {
                 await _tcpClient.SendAsync(_plcService.GetUnloadCommand());
+                _acceptPlcUpdates = false;
                 LoadedRecipeId = null;
                 UpdateUiState();
-                // SelectedRecipe = null;
             }
             catch (Exception ex)
             {
@@ -275,29 +277,36 @@ namespace LM01_UI.ViewModels
             {
                 LastStatusResponse = status.Raw;
 
-                if (status.State is "1" or "2" or "3")
+                if (_acceptPlcUpdates)
                 {
-                    var existing = Recipes.FirstOrDefault(r => r.Id == status.LoadedRecipeId);
-                    if (existing is null && recipe is not null)
+                    if (status.State is "1" or "2" or "3")
                     {
-                        Recipes.Add(recipe);
-                        existing = recipe;
+                        var existing = Recipes.FirstOrDefault(r => r.Id == status.LoadedRecipeId);
+                        if (existing is null && recipe is not null)
+                        {
+                            Recipes.Add(recipe);
+                            existing = recipe;
+                        }
+
+                        SelectedRecipe = existing;
+                    }
+                    else
+                    {
+                        SelectedRecipe = null;
                     }
 
-                    SelectedRecipe = existing;
-                }
-                else
-                {
-                    SelectedRecipe = null;
+                    OnPropertyChanged(nameof(SelectedRecipe));
+                    foreach (var r in Recipes)
+                    {
+                        r.IsActive = r == SelectedRecipe;
+                    }
+
+                    LoadedRecipeId = status.State is "1" or "2" or "3" ? status.LoadedRecipeId : (int?)null;
+                    IsRunning = status.State == "2";
+                    UpdateUiState();
                 }
 
-                OnPropertyChanged(nameof(SelectedRecipe));
-                foreach (var r in Recipes)
-                {
-                    r.IsActive = r == SelectedRecipe;
-                }
-
-                foreach (var recipeStep in SelectedRecipeSteps)
+                    foreach (var recipeStep in SelectedRecipeSteps)
                 {
                     recipeStep.IsActive = status.Step > 0 && recipeStep.StepNumber == status.Step;
                 }
@@ -305,11 +314,6 @@ namespace LM01_UI.ViewModels
                 CurrentStepNumber = status.Step;
                 PlcErrorCode = status.ErrorCode;
 
-                LoadedRecipeId = status.State is "1" or "2" or "3" ? status.LoadedRecipeId : (int?)null;
-                IsRunning = status.State == "2";
-                UpdateUiState();
-
-                LoadedRecipeId = IsRecipeLoaded ? status.LoadedRecipeId : (int?)null;
                 PlcStatusText = status.State switch
                 {
                     "1" => $"Receptura naložena (ID: {status.LoadedRecipeId})",
