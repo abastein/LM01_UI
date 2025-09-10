@@ -39,7 +39,7 @@ namespace LM01_UI
             if (value == null) return 0;
             if (double.TryParse(value.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out var rpm))
             {
-                var pps = rpm * PulsesPerRevolution / 60.0;
+                var pps = (rpm * PulsesPerRevolution / 60.0) ;
                 return System.Convert.ChangeType(Math.Round(pps), targetType, culture);
             }
             return 0;
