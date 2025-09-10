@@ -55,17 +55,6 @@ namespace LM01_UI.ViewModels
             _plcClient = new PlcTcpClient(_logger);
             _plcStatusService = new PlcStatusService(_plcClient, _plcService, _logger);
 
-            //_debugLogViewModel = new DebugLogViewModel(_logger);
-            //_debugLogWindow = new Window
-            //{
-            //    Title = "Debug Log",
-            //    Width = 600,
-            //    Height = 400,
-            //    Content = new DebugLogView { DataContext = _debugLogViewModel }
-            //};
-            //_debugLogWindow.Show();
-
-
             var plcTestViewModel = new PlcTestViewModel(_plcClient, _logger);
 
             _welcomeViewModel = new WelcomeViewModel(_plcClient, _logger, Navigate);

@@ -20,11 +20,11 @@
           VerticalAlignment="Center">
 
 		<TextBlock Grid.Row="0"
-				   Text="Ročni način"
-				   FontSize="30"
-				   FontWeight="Bold"
-				   Foreground="Black"
-				   Margin="10,5,0,20"/>
+						   Text=""
+						   FontSize="30"
+						   FontWeight="Bold"
+						   Foreground="Black"
+						   Margin="10,5,0,20"/>
 
 		<StackPanel Orientation="Horizontal"
 				Grid.Row="1"
