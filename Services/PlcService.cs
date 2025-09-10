@@ -51,13 +51,18 @@ namespace LM01_UI.Services
 
         public string GetUnloadCommand() => BuildPaddedCommand("0010030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
 
-        private string BuildManualLoadCommand(int rpm, DirectionType direction)
+        private string BuildManualLoadCommand(int rpm, DirectionType direction, double target, bool isDegrees = true)
         {
             // Convert RPM to pulses per second for the PLC
             var speedPps = (int)Math.Round(rpm * 200.0 / 60.0);
 
             // Convert direction enum to the PLC format (1+ for CW, 2- for CCW)
             var directionCode = direction == DirectionType.CW ? "1+" : "2-";
+
+            // Convert target distance to pulses (default assumes degrees)
+            var targetPulses = isDegrees
+                ? (int)Math.Round(target / 1.8)
+                : (int)Math.Round(target);
 
             // Build payload according to PLC protocol
             // Recipe ID placeholder + step count + step number + function rotate code
@@ -68,7 +73,7 @@ namespace LM01_UI.Services
             builder.Append("01"); // Function code for rotate
             builder.Append(string.Format("{0:0000}", speedPps)); // Speed in pulses-per-second
             builder.Append(directionCode); // Direction code
-            builder.Append("000"); // Target pulses for continuous rotation
+            builder.Append(string.Format("{0:000}", targetPulses)); // Target pulses
             builder.Append("0000"); // Pause
 
             // Pad payload to required length and build final command
@@ -77,8 +82,8 @@ namespace LM01_UI.Services
             return BuildPaddedCommand("001003", payload);
         }
 
-        public string GetManualLoadCommand(int rpm, DirectionType direction) =>
-            BuildManualLoadCommand(rpm, direction);
+        public string GetManualLoadCommand(int rpm, DirectionType direction, double target = 360, bool isDegrees = true) =>
+            BuildManualLoadCommand(rpm, direction, target, isDegrees);
 
         public string BuildLoadCommand(Recipe recipe)
         {

@@ -4,6 +4,7 @@ using LM01_UI.Enums;
 //using LM01_UI.Models;
 using LM01_UI.Services;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LM01_UI.ViewModels
@@ -13,10 +14,12 @@ namespace LM01_UI.ViewModels
         private readonly PlcTcpClient _tcpClient;
         private readonly PlcService _plcService;
         private readonly Logger _logger;
-        private const int CommandDelayMs = 500;
 
         [ObservableProperty]
         private int _rpm;
+
+        [ObservableProperty]
+        private int _jogDistance = 360;
 
         [ObservableProperty]
         private DirectionType _direction = DirectionType.CW;
@@ -52,9 +55,13 @@ namespace LM01_UI.ViewModels
             {
                 if (!IsLoaded || !IsRunning)
                 {
-                    await _tcpClient.SendAsync(_plcService.GetManualLoadCommand(Rpm, Direction));
+                    await _tcpClient.SendAsync(_plcService.GetManualLoadCommand(Rpm, Direction, JogDistance)); ;
+                    var loaded = await WaitForStateAsync("1", TimeSpan.FromSeconds(5));
+                    if (!loaded)
+                    {
+                        _logger.Inform(2, "PLC did not confirm load state in time");
+                    }
                     await _tcpClient.SendAsync(_plcService.GetStartCommand());
-                    await Task.Delay(CommandDelayMs);
                     IsLoaded = true;
                     IsRunning = true;
                     StartStopText = "Stop";
@@ -62,8 +69,12 @@ namespace LM01_UI.ViewModels
                 else
                 {
                     await _tcpClient.SendAsync(_plcService.GetStopCommand());
+                    var stopped = await WaitForStateAsync("1", TimeSpan.FromSeconds(5));
+                    if (!stopped)
+                    {
+                        _logger.Inform(2, "PLC did not confirm stop state in time");
+                    }
                     await _tcpClient.SendAsync(_plcService.GetUnloadCommand());
-                    await Task.Delay(CommandDelayMs);
                     IsLoaded = false;
                     IsRunning = false;
                     StartStopText = "Start";
@@ -74,6 +85,29 @@ namespace LM01_UI.ViewModels
             {
                 _logger.Inform(2, $"Error toggling run: {ex.Message}");
             }
+        }
+        private async Task<bool> WaitForStateAsync(string expectedState, TimeSpan timeout)
+        {
+            var command = _plcService.GetStatusCommand();
+            var deadline = DateTime.UtcNow + timeout;
+            while (DateTime.UtcNow < deadline)
+            {
+                try
+                {
+                    var response = await _tcpClient.SendReceiveAsync(command, TimeSpan.FromSeconds(0.25));
+                    var digits = new string(response.Where(char.IsDigit).ToArray());
+                    if (digits.Length > 0 && digits[0].ToString() == expectedState)
+                    {
+                        return true;
+                    }
+                }
+                catch (TimeoutException)
+                {
+                    // retry until timeout
+                }
+                await Task.Delay(100);
+            }
+            return false;
         }
     }
 }
