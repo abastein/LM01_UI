@@ -13,6 +13,7 @@ namespace LM01_UI.ViewModels
         private readonly PlcTcpClient _tcpClient;
         private readonly PlcService _plcService;
         private readonly Logger _logger;
+        private const int CommandDelayMs = 500;
 
         [ObservableProperty]
         private int _rpm;
@@ -53,6 +54,7 @@ namespace LM01_UI.ViewModels
                 {
                     await _tcpClient.SendAsync(_plcService.GetManualLoadCommand(Rpm, Direction));
                     await _tcpClient.SendAsync(_plcService.GetStartCommand());
+                    await Task.Delay(CommandDelayMs);
                     IsLoaded = true;
                     IsRunning = true;
                     StartStopText = "Stop";
@@ -61,6 +63,7 @@ namespace LM01_UI.ViewModels
                 {
                     await _tcpClient.SendAsync(_plcService.GetStopCommand());
                     await _tcpClient.SendAsync(_plcService.GetUnloadCommand());
+                    await Task.Delay(CommandDelayMs);
                     IsLoaded = false;
                     IsRunning = false;
                     StartStopText = "Start";
