@@ -49,19 +49,29 @@
 					Command="{Binding IncreaseRpmBy10Command}"
 					Width="100"/>
 		</StackPanel>
+			
+            <StackPanel Orientation="Horizontal" Grid.Row="0" Spacing="20" HorizontalAlignment="Center">
+				<TextBlock
+					Text="Smer vrtenja"
+					FontSize="24"
+					FontWeight="Bold"
+					Foreground="Black"
+					VerticalAlignment="Center"/>
+				<ToggleSwitch
+					OnContent="CW"
+					OffContent="CCW"
+					IsChecked="{Binding Direction, Converter={StaticResource DirectionToBoolConverter}}"
+					FontSize="36"
+					HorizontalAlignment="Center"
+					VerticalAlignment="Center"/>
+		</StackPanel>
 
-			<ToggleSwitch Grid.Row="1"
-			  OnContent="CW"
-			  OffContent="CCW"
-			  IsChecked="{Binding Direction, Converter={StaticResource DirectionToBoolConverter}}"
-			  FontSize="36"
-			  HorizontalAlignment="Center"/>
-
-			<Button Grid.Row="2"
+		<Button Grid.Row="2"
 		Content="{Binding StartStopText}"
 		Command="{Binding ToggleRunCommand}"
 		Background="{Binding StartStopBrush}"
-		Width="200"
+		Width="780"
+		Height="200"
 		HorizontalAlignment="Center"/>
 		</Grid>
 	</Grid>
