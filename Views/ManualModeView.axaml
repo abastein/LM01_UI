@@ -13,18 +13,20 @@
 		<StyleInclude Source="avares://LM01_UI/Styles/SharedStyles.axaml"/>
 	</UserControl.Styles>
 
-	<Grid RowDefinitions="Auto,Auto,Auto,Auto"
-          RowSpacing="20"
-          Margin="20"
-          HorizontalAlignment="Center"
-          VerticalAlignment="Center">
-
+	<Grid RowDefinitions="Auto,*" Margin="20">
 		<TextBlock Grid.Row="0"
-						   Text=""
-						   FontSize="30"
-						   FontWeight="Bold"
-						   Foreground="Black"
-						   Margin="10,5,0,20"/>
+				   Text="Ročni način"
+				   FontSize="30"
+				   FontWeight="Bold"
+				   Foreground="Black"
+				   Margin="10,5,0,20"
+				   HorizontalAlignment="Left"/>
+
+		<Grid Grid.Row="1"
+			  RowDefinitions="Auto,Auto,Auto"
+			  RowSpacing="20"
+			  HorizontalAlignment="Center"
+			  VerticalAlignment="Center">
 
 		<StackPanel Orientation="Horizontal"
 				Grid.Row="1"
@@ -48,19 +50,20 @@
 					Width="100"/>
 		</StackPanel>
 
-		<ToggleSwitch Grid.Row="2"
-                      OnContent="CW"
-                      OffContent="CCW"
-                      IsChecked="{Binding Direction, Converter={StaticResource DirectionToBoolConverter}}"
-                      FontSize="36"
-                      HorizontalAlignment="Center"/>
+			<ToggleSwitch Grid.Row="1"
+			  OnContent="CW"
+			  OffContent="CCW"
+			  IsChecked="{Binding Direction, Converter={StaticResource DirectionToBoolConverter}}"
+			  FontSize="36"
+			  HorizontalAlignment="Center"/>
 
-		<Button Grid.Row="3"
-				Content="{Binding StartStopText}"
-				Command="{Binding ToggleRunCommand}"
-				Background="{Binding StartStopBrush}"
-				Width="200"
-				HorizontalAlignment="Center"/>
-
+			<Button Grid.Row="2"
+		Content="{Binding StartStopText}"
+		Command="{Binding ToggleRunCommand}"
+		Background="{Binding StartStopBrush}"
+		Width="200"
+		HorizontalAlignment="Center"/>
+		</Grid>
 	</Grid>
+
 </UserControl>
