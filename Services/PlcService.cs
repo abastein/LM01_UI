@@ -20,7 +20,7 @@ namespace LM01_UI.Services
         private const string Terminator = "$R$L";
 
         // Recipe ID identifying manual mode in the PLC
-        private const string ManualRecipeId = "007";
+        private const string ManualRecipeId = "999";
 
 
         // Metoda za sestavljanje sporočila, ki upošteva trenutni payload
@@ -77,7 +77,7 @@ namespace LM01_UI.Services
             builder.Append("01"); // Function code for rotate
             builder.Append(string.Format("{0:0000}", speedPps)); // Speed in pulses-per-second
             builder.Append(directionCode); // Direction code
-            builder.Append(string.Format("{0:000}", targetPulses)); // Target pulses
+            builder.Append("0000"); // Target pulses
             builder.Append("0000"); // Pause
 
             // Pad payload to required length and build final command

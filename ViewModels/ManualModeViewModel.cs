@@ -6,6 +6,7 @@ using LM01_UI.Services;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Media;
 
 namespace LM01_UI.ViewModels
 {
@@ -33,8 +34,13 @@ namespace LM01_UI.ViewModels
         [ObservableProperty]
         private string _startStopText = "Start";
 
+        [ObservableProperty]
+        private IBrush _startStopBrush = Brushes.MediumSeaGreen;
+
         public IRelayCommand IncreaseRpmCommand { get; }
         public IRelayCommand DecreaseRpmCommand { get; }
+        public IRelayCommand IncreaseRpmBy10Command { get; }
+        public IRelayCommand DecreaseRpmBy10Command { get; }
         public IAsyncRelayCommand ToggleRunCommand { get; }
 
         public ManualModeViewModel(PlcTcpClient tcpClient, PlcService plcService, Logger logger)
@@ -43,8 +49,10 @@ namespace LM01_UI.ViewModels
             _plcService = plcService;
             _logger = logger;
 
-            IncreaseRpmCommand = new RelayCommand(() => Rpm++);
+            IncreaseRpmCommand = new RelayCommand(() => { if (Rpm < 400) Rpm++; });
             DecreaseRpmCommand = new RelayCommand(() => { if (Rpm > 0) Rpm--; });
+            IncreaseRpmBy10Command = new RelayCommand(() => { if (Rpm < 400) Rpm = Math.Min(400, Rpm + 10); });
+            DecreaseRpmBy10Command = new RelayCommand(() => { if (Rpm > 0) Rpm = Math.Max(0, Rpm - 10); });
 
             ToggleRunCommand = new AsyncRelayCommand(ToggleRunAsync);
         }
@@ -65,6 +73,7 @@ namespace LM01_UI.ViewModels
                     IsLoaded = true;
                     IsRunning = true;
                     StartStopText = "Stop";
+                    StartStopBrush = Brushes.IndianRed;
                 }
                 else
                 {
@@ -78,6 +87,7 @@ namespace LM01_UI.ViewModels
                     IsLoaded = false;
                     IsRunning = false;
                     StartStopText = "Start";
+                    StartStopBrush = Brushes.MediumSeaGreen;
                 }
 
             }
@@ -108,6 +118,19 @@ namespace LM01_UI.ViewModels
                 await Task.Delay(100);
             }
             return false;
+        }
+        partial void OnRpmChanged(int value)
+        {
+            if (value > 400)
+            {
+                _rpm = 400;
+                OnPropertyChanged(nameof(Rpm));
+            }
+            else if (value < 0)
+            {
+                _rpm = 0;
+                OnPropertyChanged(nameof(Rpm));
+            }
         }
     }
 }

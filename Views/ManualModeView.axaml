@@ -3,11 +3,11 @@
              x:Class="LM01_UI.Views.ManualModeView"
              xmlns:vm="clr-namespace:LM01_UI.ViewModels"
              x:DataType="vm:ManualModeViewModel"
-	         Background="White"
-	         BorderBrush="DarkGreen"
-	         BorderThickness="2"
-	         CornerRadius="25,25,25,25"
-	         Margin="0,20,0,0">
+             Background="White"
+             BorderBrush="DarkGreen"
+             BorderThickness="2"
+             CornerRadius="25,25,25,25"
+             Margin="0,20,0,0">
 
 	<UserControl.Styles>
 		<StyleInclude Source="avares://LM01_UI/Styles/SharedStyles.axaml"/>
@@ -19,33 +19,33 @@
           HorizontalAlignment="Center"
           VerticalAlignment="Center">
 
-		<StackPanel Orientation="Horizontal"
-                    Grid.Row="0"
-                    Spacing="20"
-                    HorizontalAlignment="Center">
-			<TextBlock Text=""
-		   VerticalAlignment="Center"
-		   FontSize="36"/>
-			<TextBox Width="300"
-					 Text="0"
-					 HorizontalContentAlignment="Center"
-					 FontSize="50"/>
-		</StackPanel>
+		<TextBlock Grid.Row="0"
+				   Text="Ročni način"
+				   FontSize="30"
+				   FontWeight="Bold"
+				   Foreground="Black"
+				   Margin="10,5,0,20"/>
 
 		<StackPanel Orientation="Horizontal"
-			Grid.Row="1"
-			Spacing="20"
-			HorizontalAlignment="Center">
-			<Button Content="-"
-                    Command="{Binding DecreaseRpmCommand}"
-                    Width="100"/>
+				Grid.Row="1"
+				Spacing="20"
+				HorizontalAlignment="Center">
+			<Button Content="-10"
+					Command="{Binding DecreaseRpmBy10Command}"
+					Width="100"/>
+			<Button Content="-1"
+					Command="{Binding DecreaseRpmCommand}"
+					Width="100"/>
 			<TextBox Width="300"
-                     Text="{Binding Rpm, Mode=TwoWay}"
-                     HorizontalContentAlignment="Center"
-                     FontSize="50"/>
-			<Button Content="+"
-                    Command="{Binding IncreaseRpmCommand}"
-                    Width="100"/>
+					 Text="{Binding Rpm, Mode=TwoWay}"
+					 HorizontalContentAlignment="Center"
+					 FontSize="50"/>
+			<Button Content="+1"
+					Command="{Binding IncreaseRpmCommand}"
+					Width="100"/>
+			<Button Content="+10"
+					Command="{Binding IncreaseRpmBy10Command}"
+					Width="100"/>
 		</StackPanel>
 
 		<ToggleSwitch Grid.Row="2"
@@ -56,10 +56,11 @@
                       HorizontalAlignment="Center"/>
 
 		<Button Grid.Row="3"
-                Content="{Binding StartStopText}"
-			    Command="{Binding ToggleRunCommand}"
-                Width="200"
-                HorizontalAlignment="Center"/>
+				Content="{Binding StartStopText}"
+				Command="{Binding ToggleRunCommand}"
+				Background="{Binding StartStopBrush}"
+				Width="200"
+				HorizontalAlignment="Center"/>
 
 	</Grid>
 </UserControl>
