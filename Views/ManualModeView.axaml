@@ -23,11 +23,11 @@
                     Grid.Row="0"
                     Spacing="20"
                     HorizontalAlignment="Center">
-			<TextBlock Text="Jog \u00B0"
+			<TextBlock Text=""
 		   VerticalAlignment="Center"
 		   FontSize="36"/>
 			<TextBox Width="300"
-					 Text="{Binding JogDistance, Mode=TwoWay}"
+					 Text="0"
 					 HorizontalContentAlignment="Center"
 					 FontSize="50"/>
 		</StackPanel>

@@ -19,6 +19,10 @@ namespace LM01_UI.Services
         /// </summary>
         private const string Terminator = "$R$L";
 
+        // Recipe ID identifying manual mode in the PLC
+        private const string ManualRecipeId = "007";
+
+
         // Metoda za sestavljanje sporočila, ki upošteva trenutni payload
         private string BuildPaddedCommand(string commandCode, string? payload = null)
         {
@@ -67,7 +71,7 @@ namespace LM01_UI.Services
             // Build payload according to PLC protocol
             // Recipe ID placeholder + step count + step number + function rotate code
             var builder = new StringBuilder();
-            builder.Append("000"); // Recipe ID placeholder
+            builder.Append(ManualRecipeId); // Recipe ID for manual mode
             builder.Append("01"); // Step count
             builder.Append("01"); // Step number
             builder.Append("01"); // Function code for rotate
@@ -77,7 +81,7 @@ namespace LM01_UI.Services
             builder.Append("0000"); // Pause
 
             // Pad payload to required length and build final command
-            var payload = builder.ToString().PadRight(CommandLength, PaddingChar);
+            var payload = builder.ToString().PadRight(CommandLength -6, PaddingChar);
 
             return BuildPaddedCommand("001003", payload);
         }
