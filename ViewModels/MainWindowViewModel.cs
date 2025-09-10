@@ -147,7 +147,11 @@ namespace LM01_UI.ViewModels
 
                 if (!_startupStatusHandled && (status.State == "1" || status.State == "2"))
                 {
-                    Navigate("Run");
+                    if (CurrentPageViewModel == _welcomeViewModel && CurrentPageViewModel != _manualModeViewModel)
+                    {
+                        Navigate("Run");
+                    }
+
                     _startupStatusHandled = true;
                 }
             });
