@@ -26,10 +26,10 @@
 			<Button Content="-"
                     Command="{Binding DecreaseRpmCommand}"
                     Width="100"/>
-			<TextBox Width="200"
+			<TextBox Width="300"
                      Text="{Binding Rpm, Mode=TwoWay}"
                      HorizontalContentAlignment="Center"
-                     FontSize="36"/>
+                     FontSize="50"/>
 			<Button Content="+"
                     Command="{Binding IncreaseRpmCommand}"
                     Width="100"/>
@@ -54,6 +54,5 @@
                 Width="200"
                 HorizontalAlignment="Center"/>
 
-	    <Button Grid.Row="4" Content="Test Run" Command="{Binding RunCommand}" Width="300"/>
 	</Grid>
 </UserControl>
