@@ -28,7 +28,7 @@ namespace LM01_UI.ViewModels
         private readonly ManualModeViewModel _manualModeViewModel;
 
         [ObservableProperty]
-        private string _plcStatusText = "PLC ni povezan";
+        private string _plcStatusText = "Pripravljen ...";
 
         [ObservableProperty]
         private bool _isPlcConnected;

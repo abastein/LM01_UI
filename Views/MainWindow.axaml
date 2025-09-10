@@ -56,7 +56,7 @@
 				</Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0"
-                           Text="MARMORIRANJE STL 600"
+                           Text="MARMORIRANJE"
                            FontSize="50"
                            FontWeight="SemiBold"
 						  
@@ -103,15 +103,17 @@
 								VerticalAlignment="Center"/>
 
 						<TextBlock Grid.Row="1"
-								Text="STL600"
-								FontSize="30"
-								Foreground="Black"
+								Text="Model:STL600"
+								FontSize="18"
+								Foreground="Navy"
+								HorizontalAlignment="Center"
 								VerticalAlignment="Center"/>
 
 						<TextBlock Grid.Row="2"
-								Text="ver: 1.2C Sep 2025"
-								FontSize="20"
+								Text="V1.1044 Sep 2025"
+								FontSize="16"
 								Foreground="Black"
+								HorizontalAlignment="Center"
 								VerticalAlignment="Center"/>
 
 					</Grid>

@@ -59,8 +59,20 @@ namespace LM01_UI.Services
             // Convert direction enum to the PLC format (1+ for CW, 2- for CCW)
             var directionCode = direction == DirectionType.CW ? "1+" : "2-";
 
-            // Payload consists of speed in pulses per second followed by direction code
-            var payload = string.Format("{0:0000}{1}", speedPps, directionCode);
+            // Build payload according to PLC protocol
+            // Recipe ID placeholder + step count + step number + function rotate code
+            var builder = new StringBuilder();
+            builder.Append("000"); // Recipe ID placeholder
+            builder.Append("01"); // Step count
+            builder.Append("01"); // Step number
+            builder.Append("01"); // Function code for rotate
+            builder.Append(string.Format("{0:0000}", speedPps)); // Speed in pulses-per-second
+            builder.Append(directionCode); // Direction code
+            builder.Append("000"); // Target pulses for continuous rotation
+            builder.Append("0000"); // Pause
+
+            // Pad payload to required length and build final command
+            var payload = builder.ToString().PadRight(CommandLength, PaddingChar);
 
             return BuildPaddedCommand("001003", payload);
         }
