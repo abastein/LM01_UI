@@ -103,13 +103,13 @@
 								VerticalAlignment="Center"/>
 
 						<TextBlock Grid.Row="1"
-								Text="Additional Control 1"
-								FontSize="20"
+								Text="STL600"
+								FontSize="30"
 								Foreground="Black"
 								VerticalAlignment="Center"/>
 
 						<TextBlock Grid.Row="2"
-								Text="Additional Control 2"
+								Text="ver: 1.2C Sep 2025"
 								FontSize="20"
 								Foreground="Black"
 								VerticalAlignment="Center"/>

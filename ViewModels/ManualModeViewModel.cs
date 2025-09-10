@@ -1,11 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using HarfBuzzSharp;
 using LM01_UI.Enums;
-using LM01_UI.Models;
+//using LM01_UI.Models;
 using LM01_UI.Services;
 using System;
-using System.Runtime.Intrinsics.Arm;
 using System.Threading.Tasks;
 
 namespace LM01_UI.ViewModels
@@ -29,16 +27,11 @@ namespace LM01_UI.ViewModels
         private bool _isRunning;
 
         [ObservableProperty]
-        private string _loadUnloadText = "Load";
-
-        [ObservableProperty]
         private string _startStopText = "Start";
 
         public IRelayCommand IncreaseRpmCommand { get; }
         public IRelayCommand DecreaseRpmCommand { get; }
-        public IAsyncRelayCommand ToggleLoadUnloadCommand { get; }
-        public IAsyncRelayCommand ToggleStartStopCommand { get; }
-        public IAsyncRelayCommand RunCommand { get; }
+        public IAsyncRelayCommand ToggleRunCommand { get; }
 
         public ManualModeViewModel(PlcTcpClient tcpClient, PlcService plcService, Logger logger)
         {
@@ -49,81 +42,34 @@ namespace LM01_UI.ViewModels
             IncreaseRpmCommand = new RelayCommand(() => Rpm++);
             DecreaseRpmCommand = new RelayCommand(() => { if (Rpm > 0) Rpm--; });
 
-            ToggleLoadUnloadCommand = new AsyncRelayCommand(ToggleLoadUnloadAsync);
-            ToggleStartStopCommand = new AsyncRelayCommand(ToggleStartStopAsync);
-            RunCommand = new AsyncRelayCommand(RunAsync);
+            ToggleRunCommand = new AsyncRelayCommand(ToggleRunAsync);
         }
 
-        private async Task RunAsync()
+        private async Task ToggleRunAsync()
         {
             try
             {
-                await _tcpClient.SendAsync(_plcService.GetManualLoadCommand(Rpm, Direction));
-                await _tcpClient.SendAsync(_plcService.GetStartCommand());
-                IsLoaded = true;
-                IsRunning = true;
-                LoadUnloadText = "Unload";
-                StartStopText = "Stop";
-            }
-            catch (Exception ex)
-            {
-                _logger.Inform(2, $"Error running spindle: {ex.Message}");
-            }
-        }
-
-        private async Task ToggleLoadUnloadAsync()
-        {
-            try
-            {
-                if (IsLoaded)
+                if (!IsLoaded || !IsRunning)
                 {
-                    await _tcpClient.SendAsync(_plcService.GetUnloadCommand());
-                    IsLoaded = false;
+                    await _tcpClient.SendAsync(_plcService.GetManualLoadCommand(Rpm, Direction));
+                    await _tcpClient.SendAsync(_plcService.GetStartCommand());
+                    IsLoaded = true;
+                    IsRunning = true;
+                    StartStopText = "Stop";
                 }
                 else
-                {
-                    var step = new RecipeStep
-                    {
-                        StepNumber = 1,
-                        Function = FunctionType.Rotate,
-                        SpeedRPM = Rpm,
-                        Direction = Direction,
-                        TargetXDeg = 0,
-                        Repeats = 1,
-                        PauseMs = 0
-                    };
-                    var recipe = new Recipe { Id = 0 };
-                    recipe.Steps.Add(step);
-                    await _tcpClient.SendAsync(_plcService.BuildLoadCommand(recipe));
-                    IsLoaded = true;
-                }
-                LoadUnloadText = IsLoaded ? "Unload" : "Load";
-            }
-            catch (Exception ex)
-            {
-                _logger.Inform(2, $"Error toggling load: {ex.Message}");
-            }
-        }
-
-        private async Task ToggleStartStopAsync()
-        {
-            try
-            {
-                if (IsRunning)
                 {
                     await _tcpClient.SendAsync(_plcService.GetStopCommand());
+                    await _tcpClient.SendAsync(_plcService.GetUnloadCommand());
+                    IsLoaded = false;
                     IsRunning = false;
+                    StartStopText = "Start";
                 }
-                else
-                {
-                    await _tcpClient.SendAsync(_plcService.GetStartCommand());
-                    IsRunning = true;
-                }
-                StartStopText = IsRunning ? "Stop" : "Start";
+
             }
             catch (Exception ex)
             {
-                _logger.Inform(2, $"Error toggling start: {ex.Message}");
+                _logger.Inform(2, $"Error toggling run: {ex.Message}");
             }
         }
     }

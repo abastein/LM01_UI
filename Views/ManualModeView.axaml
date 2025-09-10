@@ -13,7 +13,7 @@
 		<StyleInclude Source="avares://LM01_UI/Styles/SharedStyles.axaml"/>
 	</UserControl.Styles>
 
-	<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+	<Grid RowDefinitions="Auto,Auto,Auto"
           RowSpacing="20"
           Margin="20"
           HorizontalAlignment="Center"
@@ -43,14 +43,8 @@
                       HorizontalAlignment="Center"/>
 
 		<Button Grid.Row="2"
-                Content="{Binding LoadUnloadText}"
-                Command="{Binding ToggleLoadUnloadCommand}"
-                Width="200"
-                HorizontalAlignment="Center"/>
-
-		<Button Grid.Row="3"
                 Content="{Binding StartStopText}"
-                Command="{Binding ToggleStartStopCommand}"
+			    Command="{Binding ToggleRunCommand}"
                 Width="200"
                 HorizontalAlignment="Center"/>
 
