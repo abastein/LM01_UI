@@ -124,7 +124,7 @@
 						</DataTemplate>
 					</DataGridTemplateColumn>
 
-					<DataGridTemplateColumn Header="Hitrost(RPM)" Width="Auto">
+					<DataGridTemplateColumn Header="Hitrost" Width="*">
 						<DataTemplate>
 							<Border Classes="row-bg"
 									HorizontalAlignment="Stretch"
