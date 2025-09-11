@@ -24,26 +24,15 @@
 
 		<!-- DataGrid -->
 		<DataGrid Grid.Row="1"
-				ItemsSource="{Binding Recipes}"
-				SelectedItem="{Binding SelectedRecipe}"
-				SelectionMode="Single"
-				SelectionUnit="FullRow"
-				IsReadOnly="True">
+						ItemsSource="{Binding Recipes}"
+						SelectedItem="{Binding SelectedRecipe}"
+						SelectionMode="Single"
+						IsReadOnly="True">
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
 				<DataGridTextColumn Header="Ime" Binding="{Binding Name}" Width="*"/>
 				<DataGridTextColumn Header="Opis" Binding="{Binding Description}" Width="2*"/>
 			</DataGrid.Columns>
-			<DataGrid.Styles>
-				<Style Selector="DataGridRow:selected">
-					<Setter Property="Background" Value="#007435"/>
-					<Setter Property="Foreground" Value="White"/>
-				</Style>
-				<Style Selector="DataGridCell:selected">
-					<Setter Property="Background" Value="#007435"/>
-					<Setter Property="TextElement.Foreground" Value="White"/>
-				</Style>
-			</DataGrid.Styles>
 		</DataGrid>
 
 		<!-- Actions -->
