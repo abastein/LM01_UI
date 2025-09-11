@@ -28,6 +28,15 @@ namespace LM01_UI.ViewModels
         [NotifyCanExecuteChangedFor(nameof(DeleteRecipeCommand))]
         private Recipe? _selectedRecipe;
 
+        partial void OnSelectedRecipeChanged(Recipe? oldValue, Recipe? newValue)
+        {
+            foreach (var recipe in Recipes)
+            {
+                recipe.IsActive = recipe == newValue;
+            }
+        }
+
+
         public RecipeListViewModel(ApplicationDbContext dbContext, Logger logger, Action<Recipe> onEditRecipe, Action onAddNewRecipe)
         {
             _dbContext = dbContext;

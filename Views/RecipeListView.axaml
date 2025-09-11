@@ -3,6 +3,7 @@
              x:Class="LM01_UI.Views.RecipeListView"
              xmlns:vm="clr-namespace:LM01_UI.ViewModels"
 			 xmlns:local="clr-namespace:LM01_UI"
+             xmlns:m="clr-namespace:LM01_UI.Models"
              x:DataType="vm:RecipeListViewModel"
              Background="White"
              BorderBrush="DarkGreen"
@@ -13,6 +14,12 @@
 	<UserControl.Styles>
 		<StyleInclude Source="avares://LM01_UI/Styles/SharedStyles.axaml"/>
 	</UserControl.Styles>
+
+	<UserControl.Resources>
+		<local:BoolToBrushConverter x:Key="ActiveRowBrushConverter"
+									TrueBrush="#007435"
+									FalseBrush="Transparent"/>
+	</UserControl.Resources>
 
 	<Grid RowDefinitions="Auto,*,Auto" Margin="10">
 		<TextBlock Grid.Row="0"
@@ -28,10 +35,49 @@
 						SelectedItem="{Binding SelectedRecipe}"
 						SelectionMode="Single"
 						IsReadOnly="True">
+			<DataGrid.Styles>
+				<Style Selector="Border.row-bg" x:DataType="m:Recipe">
+					<Setter Property="Background"
+							Value="{Binding IsActive, Converter={StaticResource ActiveRowBrushConverter}}"/>
+				</Style>
+			</DataGrid.Styles>
 			<DataGrid.Columns>
-				<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
-				<DataGridTextColumn Header="Ime" Binding="{Binding Name}" Width="*"/>
-				<DataGridTextColumn Header="Opis" Binding="{Binding Description}" Width="2*"/>
+				<DataGridTemplateColumn Header="ID" Width="60">
+					<DataTemplate>
+						<Border Classes="row-bg"
+								HorizontalAlignment="Stretch"
+								VerticalAlignment="Stretch">
+							<TextBlock Classes="row-text"
+									   Text="{Binding Id}"
+									   VerticalAlignment="Center"
+									   Margin="5,0"/>
+						</Border>
+					</DataTemplate>
+				</DataGridTemplateColumn>
+				<DataGridTemplateColumn Header="Ime" Width="*">
+					<DataTemplate>
+						<Border Classes="row-bg"
+								HorizontalAlignment="Stretch"
+								VerticalAlignment="Stretch">
+							<TextBlock Classes="row-text"
+									   Text="{Binding Name}"
+									   VerticalAlignment="Center"
+									   Margin="5,0"/>
+						</Border>
+					</DataTemplate>
+				</DataGridTemplateColumn>
+				<DataGridTemplateColumn Header="Opis" Width="2*">
+					<DataTemplate>
+						<Border Classes="row-bg"
+								HorizontalAlignment="Stretch"
+								VerticalAlignment="Stretch">
+							<TextBlock Classes="row-text"
+									   Text="{Binding Description}"
+									   VerticalAlignment="Center"
+									   Margin="5,0"/>
+						</Border>
+					</DataTemplate>
+				</DataGridTemplateColumn>
 			</DataGrid.Columns>
 		</DataGrid>
 
