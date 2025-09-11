@@ -250,12 +250,47 @@ namespace LM01_UI.ViewModels
             try
             {
                 await _tcpClient.SendAsync(_plcService.GetStopCommand());
+                var stopped = await WaitForStateAsync("1", TimeSpan.FromSeconds(5));
+                if (stopped)
+                {
+                    IsRunning = false;
+                    UpdateUiState();
+                }
+                else
+                {
+                    _logger.Inform(2, "PLC did not confirm stop state in time");
+                }
             }
             catch (Exception ex)
             {
                 _logger.Inform(2, $"Napaka pri pošiljanju STOP: {ex.Message}");
             }
         }
+
+        private async Task<bool> WaitForStateAsync(string expectedState, TimeSpan timeout)
+        {
+            var command = _plcService.GetStatusCommand();
+            var deadline = DateTime.UtcNow + timeout;
+            while (DateTime.UtcNow < deadline)
+            {
+                try
+                {
+                    var response = await _tcpClient.SendReceiveAsync(command, TimeSpan.FromSeconds(0.25));
+                    var digits = new string(response.Where(char.IsDigit).ToArray());
+                    if (digits.Length > 0 && digits[0].ToString() == expectedState)
+                    {
+                        return true;
+                    }
+                }
+                catch (TimeoutException)
+                {
+                    // retry until timeout
+                }
+                await Task.Delay(100);
+            }
+            return false;
+        }
+
 
         private async void OnStatusUpdated(object? sender, PlcStatusEventArgs e)
         {
