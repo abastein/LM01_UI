@@ -26,6 +26,7 @@ namespace LM01_UI.ViewModels
         private readonly AdminPageViewModel _adminPageViewModel;
         private readonly MainPageViewModel _mainPageViewModel;
         private readonly ManualModeViewModel _manualModeViewModel;
+        private readonly PranjeViewModel _pranjeViewModel;
 
         [ObservableProperty]
         private string _plcStatusText = "Pripravljen ...";
@@ -61,6 +62,7 @@ namespace LM01_UI.ViewModels
             _mainPageViewModel = new MainPageViewModel(_dbContext, _plcClient, _plcService, _plcStatusService, _logger);
             _adminPageViewModel = new AdminPageViewModel(_plcClient, _logger, _dbContext, Navigate, plcTestViewModel);
             _manualModeViewModel = new ManualModeViewModel(_plcClient, _plcService, _logger);
+            _pranjeViewModel = new PranjeViewModel();
 
             _plcStatusService.StatusUpdated += OnStatusUpdated;
             _plcClient.ConnectionStatusChanged += OnPlcConnectionStatusChanged;
@@ -118,6 +120,7 @@ namespace LM01_UI.ViewModels
                     break;
                 case "Pranje":
                     // Placeholder for future pranje view
+                    CurrentPageViewModel = _pranjeViewModel;
                     break;
             }
         }

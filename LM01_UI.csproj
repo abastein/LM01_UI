@@ -105,6 +105,11 @@
 		  <DependentUpon>Views\ManualModeView.axaml</DependentUpon>
 	  </Compile>
 
+	  <AvaloniaXaml Update="Views\PranjeView.axaml" />
+	  <Compile Update="Views\PranjeView.axaml.cs">
+		  <DependentUpon>Views\PranjeView.axaml</DependentUpon>
+	  </Compile>
+
     <Compile Update="BoolToBrushConverter.cs" />
     <Compile Update="Logger.cs" />
     <Compile Update="PlcTcpClient.cs" />
@@ -130,6 +135,7 @@
 	<Compile Update="ViewModels\DebugLogViewModel.cs" />
 	<Compile Update="ViewModels\ManualModeViewModel.cs" />
 	<Compile Update="ViewModels\\ManualModeViewModel.cs" />
+	<Compile Update="ViewModels\PranjeViewModel.cs" />
   </ItemGroup>
 
   <ItemGroup>

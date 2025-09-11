@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LM01_UI.Views.PranjeView"
+             xmlns:vm="clr-namespace:LM01_UI.ViewModels"
+             x:DataType="vm:PranjeViewModel"
+             Background="White"
+             BorderBrush="DarkGreen"
+             BorderThickness="2"
+             CornerRadius="25,25,25,25"
+             Margin="0,20,0,0">
+	<UserControl.Styles>
+		<StyleInclude Source="avares://LM01_UI/Styles/SharedStyles.axaml"/>
+	</UserControl.Styles>
+	<Grid RowDefinitions="Auto,*" Margin="20">
+		<TextBlock Grid.Row="0"
+                   Text="Izberi pranje"
+                   FontSize="30"
+                   FontWeight="Bold"
+                   Foreground="Black"
+                   Margin="10,5,0,20"
+                   HorizontalAlignment="Left"/>
+		<StackPanel Grid.Row="1" Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+			<Button Content="Normalno pranje" Command="{Binding NormalnoPranjeCommand}" Width="600" Height="150"/>
+			<Button Content="Intenzivno pranje" Command="{Binding IntenzivnoPranjeCommand}" Width="600" Height="150"/>
+		</StackPanel>
+	</Grid>
+</UserControl>
