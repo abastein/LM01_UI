@@ -36,6 +36,7 @@ namespace LM01_UI.ViewModels
 
         [ObservableProperty]
         private IBrush _startStopBrush = Brushes.MediumSeaGreen;
+        public bool ControlsEnabled => !IsRunning;
 
         public IRelayCommand IncreaseRpmCommand { get; }
         public IRelayCommand DecreaseRpmCommand { get; }
@@ -131,6 +132,11 @@ namespace LM01_UI.ViewModels
                 _rpm = 0;
                 OnPropertyChanged(nameof(Rpm));
             }
+        }
+
+        partial void OnIsRunningChanged(bool value)
+        {
+            OnPropertyChanged(nameof(ControlsEnabled));
         }
     }
 }

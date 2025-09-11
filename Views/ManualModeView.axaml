@@ -28,10 +28,11 @@
 			  HorizontalAlignment="Center"
 			  VerticalAlignment="Center">
 
-		<StackPanel Orientation="Horizontal"
-				Grid.Row="1"
-				Spacing="20"
-				HorizontalAlignment="Center">
+			<StackPanel Orientation="Horizontal"
+							Grid.Row="1"
+							Spacing="20"
+							HorizontalAlignment="Center"
+							IsEnabled="{Binding ControlsEnabled}">
 			<Button Content="-10"
 					Command="{Binding DecreaseRpmBy10Command}"
 					Width="100"/>
@@ -49,8 +50,8 @@
 					Command="{Binding IncreaseRpmBy10Command}"
 					Width="100"/>
 		</StackPanel>
-			
-            <StackPanel Orientation="Horizontal" Grid.Row="0" Spacing="20" HorizontalAlignment="Center">
+
+			<StackPanel Orientation="Horizontal" Grid.Row="0" Spacing="20" HorizontalAlignment="Center" IsEnabled="{Binding ControlsEnabled}">
 				<TextBlock
 					Text="Smer vrtenja"
 					FontSize="24"
