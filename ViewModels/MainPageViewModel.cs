@@ -333,9 +333,6 @@ namespace LM01_UI.ViewModels
                         {
                             SelectedRecipe = null;
 
-                            //LoadedRecipeId = status.State is "1" or "2" or "3" ? status.LoadedRecipeId : (int?)null;
-                            //IsRunning = status.State == "2";
-                            //UpdateUiState();
                         }
 
                     OnPropertyChanged(nameof(SelectedRecipe));
