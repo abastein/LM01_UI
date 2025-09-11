@@ -327,27 +327,32 @@ namespace LM01_UI.ViewModels
                                 Recipes.Add(recipe);
                                 existing = recipe;
                             }
+                            SelectedRecipe = existing;
+                        }
+                        else
+                        {
+                            SelectedRecipe = null;
 
-                            LoadedRecipeId = status.State is "1" or "2" or "3" ? status.LoadedRecipeId : (int?)null;
-                            IsRunning = status.State == "2";
-                            UpdateUiState();
+                            //LoadedRecipeId = status.State is "1" or "2" or "3" ? status.LoadedRecipeId : (int?)null;
+                            //IsRunning = status.State == "2";
+                            //UpdateUiState();
                         }
 
-                            OnPropertyChanged(nameof(SelectedRecipe));
+                    OnPropertyChanged(nameof(SelectedRecipe));
                     foreach (var r in Recipes)
+                        {
+                            r.IsActive = r == SelectedRecipe;
+                        }
+
+                        LoadedRecipeId = status.State is "1" or "2" or "3" ? status.LoadedRecipeId : (int?)null;
+                        IsRunning = status.State == "2";
+                        UpdateUiState();
+                    }
+
+                    foreach (var recipeStep in SelectedRecipeSteps)
                         {
                             recipeStep.IsActive = status.Step > 0 && recipeStep.StepNumber == status.Step;
                         }
-
-                    LoadedRecipeId = status.State is "1" or "2" or "3" ? status.LoadedRecipeId : (int?)null;
-                    IsRunning = status.State == "2";
-                    UpdateUiState();
-                }
-
-                    foreach (var recipeStep in SelectedRecipeSteps)
-                {
-                    recipeStep.IsActive = status.Step > 0 && recipeStep.StepNumber == status.Step;
-                }
 
                 CurrentStepNumber = status.Step;
                 PlcErrorCode = status.ErrorCode;
