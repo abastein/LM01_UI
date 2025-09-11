@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LM01_UI.ViewModels
@@ -20,6 +21,7 @@ namespace LM01_UI.ViewModels
         private readonly PlcService _plcService;
         private readonly PlcStatusService _statusService;
         private readonly Logger _logger;
+        private readonly SemaphoreSlim _statusUpdateSemaphore = new(1, 1);
         private bool _acceptPlcUpdates;
 
         [ObservableProperty]
@@ -108,7 +110,7 @@ namespace LM01_UI.ViewModels
                 else _statusService.Stop();
             };
 
-            _statusService.StatusUpdated += OnStatusUpdated;
+            _statusService.StatusUpdated += async (sender, e) => await OnStatusUpdated(sender, e);
 
             _ = LoadRecipesAsync();
         }
@@ -292,49 +294,50 @@ namespace LM01_UI.ViewModels
         }
 
 
-        private async void OnStatusUpdated(object? sender, PlcStatusEventArgs e)
+        private async Task OnStatusUpdated(object? sender, PlcStatusEventArgs e)
         {
-            var status = e.Status;
-            _logger.Inform(1, $"MainPageViewModel.OnStatusUpdated start: State={status.State}, LoadedRecipeId={status.LoadedRecipeId}, Step={status.Step}, ErrorCode={status.ErrorCode}");
-
-            Recipe? recipe = null;
+            await _statusUpdateSemaphore.WaitAsync();
             try
             {
-                recipe = await _dbContext.Recipes
-                    .Include(r => r.Steps)
-                    .FirstOrDefaultAsync(r => r.Id == status.LoadedRecipeId);
-            }
-            catch (Exception ex)
-            {
-                _logger.Inform(2, $"Napaka pri pridobivanju recepture: {ex.Message}");
-            }
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                LastStatusResponse = status.Raw;
+                var status = e.Status;
+                _logger.Inform(1, $"MainPageViewModel.OnStatusUpdated start: State={status.State}, LoadedRecipeId={status.LoadedRecipeId}, Step={status.Step}, ErrorCode={status.ErrorCode}");
 
-                if (_acceptPlcUpdates)
+                Recipe? recipe = null;
+                try
                 {
-                    if (status.State is "1" or "2" or "3")
+                    recipe = await _dbContext.Recipes
+                        .Include(r => r.Steps)
+                        .FirstOrDefaultAsync(r => r.Id == status.LoadedRecipeId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Inform(2, $"Napaka pri pridobivanju recepture: {ex.Message}");
+                }
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    LastStatusResponse = status.Raw;
+
+                    if (_acceptPlcUpdates)
                     {
-                        var existing = Recipes.FirstOrDefault(r => r.Id == status.LoadedRecipeId);
-                        if (existing is null && recipe is not null)
+                        if (status.State is "1" or "2" or "3")
                         {
-                            Recipes.Add(recipe);
-                            existing = recipe;
+                            var existing = Recipes.FirstOrDefault(r => r.Id == status.LoadedRecipeId);
+                            if (existing is null && recipe is not null)
+                            {
+                                Recipes.Add(recipe);
+                                existing = recipe;
+                            }
+
+                            LoadedRecipeId = status.State is "1" or "2" or "3" ? status.LoadedRecipeId : (int?)null;
+                            IsRunning = status.State == "2";
+                            UpdateUiState();
                         }
 
-                        SelectedRecipe = existing;
-                    }
-                    else
-                    {
-                        SelectedRecipe = null;
-                    }
-
-                    OnPropertyChanged(nameof(SelectedRecipe));
+                            OnPropertyChanged(nameof(SelectedRecipe));
                     foreach (var r in Recipes)
-                    {
-                        r.IsActive = r == SelectedRecipe;
-                    }
+                        {
+                            recipeStep.IsActive = status.Step > 0 && recipeStep.StepNumber == status.Step;
+                        }
 
                     LoadedRecipeId = status.State is "1" or "2" or "3" ? status.LoadedRecipeId : (int?)null;
                     IsRunning = status.State == "2";
@@ -349,16 +352,22 @@ namespace LM01_UI.ViewModels
                 CurrentStepNumber = status.Step;
                 PlcErrorCode = status.ErrorCode;
 
-                PlcStatusText = status.State switch
-                {
-                    "1" => $"Receptura naložena (ID: {status.LoadedRecipeId})",
-                    "2" => $"Izvajanje… (Receptura: {status.LoadedRecipeId}, Korak: {status.Step})",
-                    "3" => $"NAPAKA (Koda: {status.ErrorCode})",
-                    _ => PlcStatusText
-                };
-            });
+                    PlcStatusText = status.State switch
+                    {
+                        "1" => $"Receptura naložena (ID: {status.LoadedRecipeId})",
+                        "2" => $"Izvajanje… (Receptura: {status.LoadedRecipeId}, Korak: {status.Step})",
+                        "3" => $"NAPAKA (Koda: {status.ErrorCode})",
+                        _ => PlcStatusText
+                    };
+                });
 
-            _logger.Inform(1, $"MainPageViewModel.OnStatusUpdated end: State={status.State}, LoadedRecipeId={status.LoadedRecipeId}, Step={status.Step}, ErrorCode={status.ErrorCode}");
+                _logger.Inform(1, $"MainPageViewModel.OnStatusUpdated end: State={status.State}, LoadedRecipeId={status.LoadedRecipeId}, Step={status.Step}, ErrorCode={status.ErrorCode}");
+
+            }
+            finally
+            {
+                _statusUpdateSemaphore.Release();
+            }
 
         }
 
