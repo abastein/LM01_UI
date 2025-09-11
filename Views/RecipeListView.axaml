@@ -24,9 +24,11 @@
 
 		<!-- DataGrid -->
 		<DataGrid Grid.Row="1"
-						  ItemsSource="{Binding Recipes}"
-						  SelectedItem="{Binding SelectedRecipe}"
-						  SelectionMode="Single">
+				ItemsSource="{Binding Recipes}"
+				SelectedItem="{Binding SelectedRecipe}"
+				SelectionMode="Single"
+				SelectionUnit="FullRow"
+				IsReadOnly="True">
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
 				<DataGridTextColumn Header="Ime" Binding="{Binding Name}" Width="*"/>
