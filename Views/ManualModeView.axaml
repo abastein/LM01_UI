@@ -63,6 +63,7 @@
 					OffContent="CCW"
 					IsChecked="{Binding Direction, Converter={StaticResource DirectionToBoolConverter}}"
 					FontSize="36"
+					IsEnabled="False"
 					HorizontalAlignment="Center"
 					VerticalAlignment="Center"/>
 		</StackPanel>

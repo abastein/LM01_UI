@@ -15,7 +15,7 @@ namespace LM01_UI.ViewModels
     {
 
         private const int NormalRecipeId = 998;
-        private const int IntensiveRecipeId = 999;
+        private const int IntensiveRecipeId = 997;
 
         private readonly ApplicationDbContext _dbContext;
         private readonly PlcTcpClient _plcClient;
