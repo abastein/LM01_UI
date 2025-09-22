@@ -13,7 +13,6 @@ namespace LM01_UI.ViewModels
 {
     public partial class PranjeViewModel : ViewModelBase, IDisposable
     {
-        public PranjeViewModel()
 
         private const int NormalRecipeId = 998;
         private const int IntensiveRecipeId = 999;
