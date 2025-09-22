@@ -62,7 +62,7 @@ namespace LM01_UI.ViewModels
             _mainPageViewModel = new MainPageViewModel(_dbContext, _plcClient, _plcService, _plcStatusService, _logger);
             _adminPageViewModel = new AdminPageViewModel(_plcClient, _logger, _dbContext, Navigate, plcTestViewModel);
             _manualModeViewModel = new ManualModeViewModel(_plcClient, _plcService, _logger);
-            _pranjeViewModel = new PranjeViewModel();
+            _pranjeViewModel = new PranjeViewModel(_dbContext, _plcClient, _plcService, _plcStatusService, _logger);
 
             _plcStatusService.StatusUpdated += OnStatusUpdated;
             _plcClient.ConnectionStatusChanged += OnPlcConnectionStatusChanged;
@@ -86,6 +86,7 @@ namespace LM01_UI.ViewModels
             _plcStatusService.StatusUpdated -= OnStatusUpdated;
             _plcClient.ConnectionStatusChanged -= OnPlcConnectionStatusChanged;
             _welcomeViewModel.Dispose();
+            _pranjeViewModel.Dispose();
 
             _plcStatusService.Dispose();
             _plcClient.Dispose();

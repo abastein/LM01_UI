@@ -20,8 +20,18 @@
                    Margin="10,5,0,20"
                    HorizontalAlignment="Left"/>
 		<StackPanel Grid.Row="1" Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center">
-			<Button Content="Normalno pranje" Command="{Binding NormalnoPranjeCommand}" Width="600" Height="150"/>
-			<Button Content="Intenzivno pranje" Command="{Binding IntenzivnoPranjeCommand}" Width="600" Height="150"/>
+			<Button Content="{Binding NormalnoButtonText}"
+					Background="{Binding NormalnoButtonBrush}"
+					IsEnabled="{Binding IsNormalnoButtonEnabled}"
+					Command="{Binding NormalnoPranjeCommand}"
+					Width="600"
+					Height="150"/>
+			<Button Content="{Binding IntenzivnoButtonText}"
+					Background="{Binding IntenzivnoButtonBrush}"
+					IsEnabled="{Binding IsIntenzivnoButtonEnabled}"
+					Command="{Binding IntenzivnoPranjeCommand}"
+					Width="600"
+					Height="150"/>
 		</StackPanel>
 	</Grid>
 </UserControl>
