@@ -23,6 +23,7 @@ namespace LM01_UI.ViewModels
         private readonly Logger _logger;
         private readonly SemaphoreSlim _statusUpdateSemaphore = new(1, 1);
         private bool _acceptPlcUpdates;
+        private bool _initialStatusProcessed;
 
         [ObservableProperty]
         private string _lastStatusResponse = string.Empty;
@@ -301,6 +302,29 @@ namespace LM01_UI.ViewModels
             {
                 var status = e.Status;
                 _logger.Inform(1, $"MainPageViewModel.OnStatusUpdated start: State={status.State}, LoadedRecipeId={status.LoadedRecipeId}, Step={status.Step}, ErrorCode={status.ErrorCode}");
+
+                if (!_initialStatusProcessed)
+                {
+                    _initialStatusProcessed = true;
+                    if (status.LoadedRecipeId == 999)
+                    {
+                        try
+                        {
+                            await _tcpClient.SendAsync(_plcService.GetUnloadCommand());
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Inform(2, $"Napaka pri pošiljanju UNLOAD: {ex.Message}");
+                        }
+                        await Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            LoadedRecipeId = null;
+                            UpdateUiState();
+                        });
+                        return;
+                    }
+                }
+
 
                 Recipe? recipe = null;
                 try

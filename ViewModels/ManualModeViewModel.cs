@@ -64,7 +64,7 @@ namespace LM01_UI.ViewModels
             {
                 if (!IsLoaded || !IsRunning)
                 {
-                    await _tcpClient.SendAsync(_plcService.GetManualLoadCommand(Rpm, Direction, JogDistance)); ;
+                    await _tcpClient.SendAsync(_plcService.GetManualLoadCommand(Rpm, Direction, JogDistance)); 
                     var loaded = await WaitForStateAsync("1", TimeSpan.FromSeconds(5));
                     if (!loaded)
                     {
