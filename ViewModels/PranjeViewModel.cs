@@ -193,7 +193,7 @@ namespace LM01_UI.ViewModels
             }
 
             var status = e.Status;
-            if (status.LoadedRecipeId != ActiveProgramId || status.State is "0" or "3")
+            if (status.LoadedRecipeId != ActiveProgramId || status.State == "0" || status.State == "3")
             {
                 ResetUiState();
             }
