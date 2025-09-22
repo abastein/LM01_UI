@@ -26,7 +26,10 @@ namespace LM01_UI.ViewModels
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(EditRecipeCommand))]
         [NotifyCanExecuteChangedFor(nameof(DeleteRecipeCommand))]
+        [NotifyPropertyChangedFor(nameof(CanDeleteSelectedRecipe))]
         private Recipe? _selectedRecipe;
+        public bool CanDeleteSelectedRecipe => SelectedRecipe is { SystemKey: null };
+
 
         partial void OnSelectedRecipeChanged(Recipe? oldValue, Recipe? newValue)
         {
@@ -44,7 +47,7 @@ namespace LM01_UI.ViewModels
 
             AddNewRecipeCommand = new AsyncRelayCommand(AddNewRecipeAsync);
             EditRecipeCommand = new AsyncRelayCommand(EditSelectedRecipeAsync, () => SelectedRecipe != null);
-            DeleteRecipeCommand = new AsyncRelayCommand(DeleteSelectedRecipeAsync, () => SelectedRecipe != null);
+            DeleteRecipeCommand = new AsyncRelayCommand(DeleteSelectedRecipeAsync, () => SelectedRecipe is { SystemKey: null });
 
             _ = LoadRecipesAsync();
         }
@@ -62,7 +65,10 @@ namespace LM01_UI.ViewModels
                 .ToListAsync();
                 Recipes = new ObservableCollection<Recipe>(recipesFromDb);
             }
-            catch (Exception ex) { _logger.Inform(2, $"Napaka pri nalaganju receptur: {ex.Message}"); }
+            catch (Exception ex)
+            {
+                _logger.Inform(2, $"Napaka pri nalaganju receptur: {ex.Message}");
+            }
         }
 
         private async Task AddNewRecipeAsync()
@@ -111,7 +117,10 @@ namespace LM01_UI.ViewModels
 
         private async Task DeleteSelectedRecipeAsync()
         {
-            if (SelectedRecipe == null) return;
+            if (SelectedRecipe is not { SystemKey: null })
+            {
+                return;
+            }
             var box = MessageBoxManager.GetMessageBoxStandard("Potrdi brisanje", $"Ali ste prepričani, da želite izbrisati recepturo '{SelectedRecipe.Name}'?", ButtonEnum.YesNo, Icon.Warning);
             var result = await box.ShowAsync();
 

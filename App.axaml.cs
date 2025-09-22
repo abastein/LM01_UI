@@ -34,7 +34,7 @@ namespace LM01_UI
                 .UseSqlite(connectionString);
 
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
-            dbContext.Database.Migrate();
+            dbContext.EnsureSystemRecipesAsync().GetAwaiter().GetResult();
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {

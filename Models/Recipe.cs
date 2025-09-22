@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using CommunityToolkit.Mvvm.ComponentModel;
+using LM01_UI.Enums;
 
 namespace LM01_UI.Models
 {
@@ -15,6 +13,9 @@ namespace LM01_UI.Models
         public string Name { get; set; } = string.Empty; // Ime recepture (npr. "Planica")
         public string? Description { get; set; } // Opcijski opis
 
+        public RecipeSystemKey? SystemKey { get; set; }
+
+
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public DateTime LastModifiedDate { get; set; } = DateTime.UtcNow;
 
@@ -24,5 +25,8 @@ namespace LM01_UI.Models
         [NotMapped]
         [ObservableProperty]
         private bool _isActive;
+
+        [NotMapped]
+        public bool IsSystem => SystemKey.HasValue;
     }
 }
