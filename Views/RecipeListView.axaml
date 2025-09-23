@@ -85,7 +85,9 @@
 		<StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="20">
 			<Button Content="Dodaj Novo" Command="{Binding AddNewRecipeCommand}"/>
 			<Button Content="Uredi Izbrano" Command="{Binding EditRecipeCommand}"/>
-			<Button Content="Izbriši Izbrano" Command="{Binding DeleteRecipeCommand}"/>
+			<Button Content="Izbriši Izbrano"
+					Command="{Binding DeleteRecipeCommand}"
+					IsEnabled="{Binding CanDeleteSelectedRecipe}"/>
 		</StackPanel>
 	</Grid>
 </UserControl>

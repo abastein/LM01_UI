@@ -155,7 +155,15 @@ namespace LM01_UI.ViewModels
         private void LoadStepProperties()
         {
             SelectedFunction = FunctionTypes.FirstOrDefault(f => f.Function == _step.Function);
-            Direction = _step.Direction;
+
+            var direction = _step.Direction;
+            if (direction.Equals(default(DirectionType)))
+            {
+                direction = DirectionType.CW;
+            }
+
+            Direction = direction;
+            _step.Direction = direction;
             SpeedRpmString = _step.SpeedRPM.ToString();
             TargetXDegString = _step.TargetXDeg.ToString();
             RepeatsString = _step.Repeats.ToString();

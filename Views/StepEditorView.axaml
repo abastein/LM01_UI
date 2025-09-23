@@ -35,7 +35,7 @@
 					</ComboBox.ItemTemplate>
 				</ComboBox>
 
-				<ComboBox x:Name="DirectionComboBox" Grid.Row="2" Grid.Column="1" ItemsSource="{Binding DirectionTypes}" SelectedItem="{Binding Direction}" Width="150" HorizontalAlignment="Left" IsEnabled="{Binding IsDirectionEnabled}"/>
+				<ComboBox x:Name="DirectionComboBox" Grid.Row="2" Grid.Column="1" ItemsSource="{Binding DirectionTypes}" SelectedItem="{Binding Direction}" Width="150" HorizontalAlignment="Left" IsEnabled="False"/>
 				<TextBox x:Name="SpeedRpmTextBox" Grid.Row="3" Grid.Column="1" Text="{Binding SpeedRpmString}" Width="150" HorizontalAlignment="Left" IsEnabled="{Binding IsSpeedRpmEnabled}"/>
 				<TextBox x:Name="TargetXDegTextBox" Grid.Row="4" Grid.Column="1" Text="{Binding TargetXDegString}" Width="150" HorizontalAlignment="Left" IsEnabled="{Binding IsTargetXDegEnabled}"/>
 				<TextBox x:Name="RepeatsTextBox" Grid.Row="5" Grid.Column="1" Text="{Binding RepeatsString}" Width="150" HorizontalAlignment="Left" IsEnabled="{Binding IsRepeatsEnabled}"/>

@@ -39,7 +39,14 @@ namespace LM01_UI.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("SystemKey")
+                        .HasColumnType("INTEGER");
+
+
                     b.HasKey("Id");
+
+                    b.HasIndex("SystemKey")
+                        .IsUnique();
 
                     b.ToTable("Recipes");
                 });
