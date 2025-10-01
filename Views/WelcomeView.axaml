@@ -2,18 +2,101 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" 
-			 d:DesignWidth="800" 
-			 d:DesignHeight="600"
-             x:Class="LM01_UI.Views.WelcomeView" 
-			 x:DataType="vm:WelcomeViewModel"      
-			 Background="White"
-			 BorderBrush="DarkGreen"
-			 BorderThickness="2"
-			 CornerRadius="25,25,25,25"
-			 Margin="0,20,0,0"
-			 xmlns:vm="clr-namespace:LM01_UI.ViewModels"     
-			 xmlns:converters="clr-namespace:LM01_UI">
+             xmlns:vm="clr-namespace:LM01_UI.ViewModels"
+             xmlns:converters="clr-namespace:LM01_UI"
+             xmlns:media="clr-namespace:Avalonia.Media;assembly=Avalonia.Visuals"
+             x:Class="LM01_UI.Views.WelcomeView"
+             x:DataType="vm:WelcomeViewModel"
+             mc:Ignorable="d"
+             d:DesignWidth="1024"
+             d:DesignHeight="768"
+             Background="#F5F8F6"
+             BorderBrush="#0A6E3D"
+             BorderThickness="2"
+             CornerRadius="25"
+             Margin="0,20,0,0">
+    <Border Margin="30"
+            Padding="32"
+            Background="White"
+            CornerRadius="20"
+            BorderBrush="#0A6E3D"
+            BorderThickness="1.5">
+        <Border.Effect>
+            <media:DropShadowEffect Color="#330A6E3D" BlurRadius="20" ShadowDepth="0"/>
+        </Border.Effect>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Spacing="24">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Dobrodošli v sistemu marmoriranja sladoleda" FontSize="32" FontWeight="Bold" Foreground="#0A6E3D" TextWrapping="Wrap"/>
+                    <TextBlock Text="Naša aplikacija LM01 vam pomaga ustvarjati edinstvene vzorce marmoriranja (marmoriranje) v proizvodnem procesu sladoleda. Uporabite spodnja navodila za hitro orientacijo po funkcijah." FontSize="18" TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <Border Background="#F0F7F3" CornerRadius="16" Padding="24" BorderBrush="#C2E2D2" BorderThickness="1">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Programi" FontSize="26" FontWeight="SemiBold" Foreground="#0A6E3D"/>
+                        <TextBlock Text="Stran \"Programi\" je srce našega sistema. Tukaj izberete recept, naložite parametre in zaženete marmoriranje." TextWrapping="Wrap" FontSize="16"/>
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="• Izberite željeni recept iz seznama in preverite opis vzorca." FontSize="16" TextWrapping="Wrap"/>
+                            <TextBlock Text="• Pritisnite gumb \"Naloži\" za prenos nastavitev v stroj." FontSize="16" TextWrapping="Wrap"/>
+                            <TextBlock Text="• Ko so nastavitve pripravljene, zaženite postopek s tipko \"Start\" in opazujte nastajanje izbranega vzorca marmoriranja." FontSize="16" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="#F6F3FA" CornerRadius="16" Padding="24" BorderBrush="#D7CAE8" BorderThickness="1">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Urejanje receptov" FontSize="26" FontWeight="SemiBold" Foreground="#5236A0"/>
+                        <TextBlock Text="Za prilagajanje receptov uporabite strani \"RecipeEditor\" in \"StepEditor\"." TextWrapping="Wrap" FontSize="16"/>
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="• V \"RecipeEditor\" ustvarite ali uredite celoten recept ter določite osnovne informacije (ime, opis, parametre serije)." FontSize="16" TextWrapping="Wrap"/>
+                            <TextBlock Text="• V \"StepEditor\" natančno nastavite posamezne korake marmoriranja: hitrosti, količine in trajanja, da dosežete željen vizualni učinek." FontSize="16" TextWrapping="Wrap"/>
+                            <TextBlock Text="• Shranjene spremembe so takoj na voljo v razdelku \"Programi\" za uporabo v proizvodnji." FontSize="16" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="#F3F9FF" CornerRadius="16" Padding="24" BorderBrush="#C8DDF4" BorderThickness="1">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Ročni način" FontSize="26" FontWeight="SemiBold" Foreground="#145A9E"/>
+                        <TextBlock Text="Na strani \"Ročni način\" (ManualMode) imate popoln nadzor nad strojem za marmoriranje." TextWrapping="Wrap" FontSize="16"/>
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="• Idealno za testiranje ali hitre popravke – parametre lahko prilagodite v realnem času." FontSize="16" TextWrapping="Wrap"/>
+                            <TextBlock Text="• Ročno zaženite posamezne komponente, preverite pretoke in zagotovite, da stroj deluje brezhibno." FontSize="16" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="#FFF7F3" CornerRadius="16" Padding="24" BorderBrush="#F4D2C1" BorderThickness="1">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Pranje sistema" FontSize="26" FontWeight="SemiBold" Foreground="#A64521"/>
+                        <TextBlock Text="Razdelek \"Pranje\" je specializiran recept za temeljito izpiranje in čiščenje sistema." TextWrapping="Wrap" FontSize="16"/>
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="• Uporabite ga po vsaki proizvodni seriji ali ob menjavi okusov, da preprečite navzkrižno kontaminacijo." FontSize="16" TextWrapping="Wrap"/>
+                            <TextBlock Text="• Postopek pranja sledi enakim korakom kot standardni recept, zato je uporaba znana in enostavna." FontSize="16" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="#EEF5F8" CornerRadius="16" Padding="24" BorderBrush="#BFD5DD" BorderThickness="1">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Nasveti za popolno marmoriranje" FontSize="26" FontWeight="SemiBold" Foreground="#0A6E3D"/>
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="• Pred vsakim zagonom preverite, da so recepti posodobljeni in pravilno shranjeni." FontSize="16" TextWrapping="Wrap"/>
+                            <TextBlock Text="• Vzdržujte dosledno temperaturo in kakovost surovin za najboljši vizualni učinek vzorca." FontSize="16" TextWrapping="Wrap"/>
+                            <TextBlock Text="• Uporabite razdelek \"Ročni način\" za hitro optimizacijo korakov, preden recept objavite za proizvodnjo." FontSize="16" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="#F5F0F7" CornerRadius="16" Padding="24" BorderBrush="#D9CCE8" BorderThickness="1">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Ste pripravljeni?" FontSize="26" FontWeight="SemiBold" Foreground="#5236A0"/>
+                        <TextBlock Text="Izberite razdelek, ki ga potrebujete, in začnite ustvarjati osupljive vzorce marmoriranja za vaše sladolede. Ekipa LM01 vam želi uspešno in kreativno delo!" FontSize="18" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
 
 
 </UserControl>
