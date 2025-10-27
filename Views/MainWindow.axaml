@@ -119,7 +119,7 @@
 						</TextBlock>
 
 						<TextBlock Grid.Row="2"
-								Text="V1.1044 Sep 2025"
+								Text="V1.2 Okt 2025"
 								FontSize="16"
 								Foreground="Black"
 								HorizontalAlignment="Center"
