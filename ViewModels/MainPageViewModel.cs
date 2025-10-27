@@ -16,6 +16,7 @@ namespace LM01_UI.ViewModels
 {
     public partial class MainPageViewModel : ViewModelBase
     {
+        private const int MaxVisibleRecipeId = 900;
         private readonly ApplicationDbContext _dbContext;
         private readonly PlcTcpClient _tcpClient;
         private readonly PlcService _plcService;
@@ -157,6 +158,7 @@ namespace LM01_UI.ViewModels
             try
             {
                 var recipes = await _dbContext.Recipes
+                    .Where(r => r.Id <= MaxVisibleRecipeId)
                     .OrderBy(r => r.Id)
                     .ToListAsync();
                 Recipes = new ObservableCollection<Recipe>(recipes);
@@ -346,10 +348,14 @@ namespace LM01_UI.ViewModels
                         if (status.State is "1" or "2" or "3")
                         {
                             var existing = Recipes.FirstOrDefault(r => r.Id == status.LoadedRecipeId);
-                            if (existing is null && recipe is not null)
+                            if (existing is null && recipe is not null && recipe.Id <= MaxVisibleRecipeId)
                             {
                                 Recipes.Add(recipe);
                                 existing = recipe;
+                            }
+                            else if (existing is null && recipe is not null && recipe.Id > MaxVisibleRecipeId)
+                            {
+                                existing = null;
                             }
                             SelectedRecipe = existing;
                         }

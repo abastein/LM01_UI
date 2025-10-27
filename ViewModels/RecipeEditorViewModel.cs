@@ -10,9 +10,11 @@ using LM01_UI.Views;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace LM01_UI.ViewModels
 {
@@ -21,6 +23,9 @@ namespace LM01_UI.ViewModels
         private readonly ApplicationDbContext _dbContext;
         private readonly Logger _logger;
         private readonly Action _closeAction;
+        private readonly int _originalId;
+        private readonly string _originalName;
+        private readonly string? _originalDescription;
 
         [ObservableProperty]
         private Recipe _currentRecipe;
@@ -42,6 +47,9 @@ namespace LM01_UI.ViewModels
             _logger = logger;
             _closeAction = closeAction;
             _currentRecipe = recipe;
+            _originalId = recipe.Id;
+            _originalName = recipe.Name;
+            _originalDescription = recipe.Description;
 
             Steps = new ObservableCollection<RecipeStep>(_currentRecipe.Steps.OrderBy(s => s.StepNumber));
 
@@ -57,6 +65,13 @@ namespace LM01_UI.ViewModels
         public IAsyncRelayCommand AddStepCommand { get; }
         public IAsyncRelayCommand EditStepCommand { get; }
         public IAsyncRelayCommand DeleteStepCommand { get; }
+        public bool CanEditMetadata => !CurrentRecipe.IsSystem;
+
+        partial void OnCurrentRecipeChanged(Recipe value)
+        {
+            OnPropertyChanged(nameof(CanEditMetadata));
+        }
+
 
         private async Task SaveRecipeAsync()
         {
@@ -65,12 +80,49 @@ namespace LM01_UI.ViewModels
                 await MessageBoxManager.GetMessageBoxStandard("Napaka", "Ime recepture ne sme biti prazno.").ShowAsync();
                 return;
             }
+            bool isNewRecipe = CurrentRecipe.Id == 0;
+
+            if (!CanEditMetadata)
+            {
+                CurrentRecipe.Id = _originalId;
+                CurrentRecipe.Name = _originalName;
+                CurrentRecipe.Description = _originalDescription;
+            }
+            else
+            {
+                if (CurrentRecipe.Id > 900)
+                {
+                    await MessageBoxManager.GetMessageBoxStandard("Napaka", "ID recepture ne sme biti večji od 900.").ShowAsync();
+                    return;
+                }
+            }
+
+            if (isNewRecipe)
+            {
+                var existingIds = await _dbContext.Recipes
+                    .Where(r => r.Id <= 900)
+                    .Select(r => r.Id)
+                    .ToListAsync();
+
+                var usedIds = new HashSet<int>(existingIds);
+                var availableId = Enumerable.Range(1, 900).FirstOrDefault(id => !usedIds.Contains(id));
+                if (availableId == 0)
+                {
+                    await MessageBoxManager.GetMessageBoxStandard("Napaka", "Ni več prostih ID-jev pod 900.").ShowAsync();
+                    return;
+                }
+
+                CurrentRecipe.Id = availableId;
+            }
             try
             {
                 RenumberSteps();
                 CurrentRecipe.Steps = new ObservableCollection<RecipeStep>(Steps);
 
-                if (CurrentRecipe.Id == 0) { _dbContext.Recipes.Add(CurrentRecipe); }
+                if (isNewRecipe)
+                {
+                    _dbContext.Recipes.Add(CurrentRecipe);
+                }
 
                 await _dbContext.SaveChangesAsync();
                 _logger.Inform(1, $"Receptura '{CurrentRecipe.Name}' uspešno shranjena.");

@@ -13,12 +13,25 @@
 
 			<StackPanel Grid.Row="1" Grid.Column="0" Spacing="10" Margin="0,0,40,0">
 				<TextBlock Text="Ime recepture:" Foreground="White"/>
-				<TextBox x:Name="NameTextBox" Text="{Binding CurrentRecipe.Name, Mode=TwoWay}" MinWidth="350"/>
+				                                <TextBox x:Name="NameTextBox"
+                                         Text="{Binding CurrentRecipe.Name, Mode=TwoWay}"
+                                         MinWidth="350"
+                                         IsEnabled="{Binding CanEditMetadata}"/>
 				<TextBlock Text="Opis:" Foreground="White" Margin="0,10,0,0"/>
-				<TextBox x:Name="DescriptionTextBox" Text="{Binding CurrentRecipe.Description, Mode=TwoWay}" MinWidth="350" Height="150" TextWrapping="Wrap" AcceptsReturn="True"/>
+				                                <TextBox x:Name="DescriptionTextBox"
+                                         Text="{Binding CurrentRecipe.Description, Mode=TwoWay}"
+                                         MinWidth="350"
+                                         Height="150"
+                                         TextWrapping="Wrap"
+                                         AcceptsReturn="True"
+                                         IsEnabled="{Binding CanEditMetadata}"/>
 			</StackPanel>
 
-			<views:QwertyKeypad x:Name="Keypad" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top"/>
+			                        <views:QwertyKeypad x:Name="Keypad"
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            VerticalAlignment="Top"
+                                            IsEnabled="{Binding CanEditMetadata}"/>
 
 			<StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="10" Margin="0,20,0,10">
 				<TextBlock Text="Koraki Recepture:" FontSize="24" FontWeight="Bold" Foreground="WhiteSmoke" VerticalAlignment="Center"/>
