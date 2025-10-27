@@ -8,7 +8,9 @@ namespace LM01_UI // POPRAVEK: Pravilen imenski prostor
 {
     public class Logger : IDisposable
     {
+        private const int MaxLogLines = 1000;
         private readonly StreamWriter? _logWriter;
+        private readonly string? _logFilePath;
 
         public ObservableCollection<string> Messages { get; } = new();
 
@@ -27,13 +29,17 @@ namespace LM01_UI // POPRAVEK: Pravilen imenski prostor
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     "LM01_UI");
                 Directory.CreateDirectory(logDirectory);
-                string logFilePath = Path.Combine(logDirectory, "communication_log.txt");
-                _logWriter = new StreamWriter(logFilePath, append: true) { AutoFlush = true };
+                _logFilePath = Path.Combine(logDirectory, "communication_log.txt");
+                var logStream = new FileStream(_logFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+                logStream.Seek(0, SeekOrigin.End);
+                _logWriter = new StreamWriter(logStream) { AutoFlush = true };
                 _logWriter.WriteLine($"--- Session started: {DateTime.Now} ---");
+                EnforceLogLineLimit();
             }
             catch (Exception)
             {
                 _logWriter = null;
+                _logFilePath = null;
             }
         }
 
@@ -43,6 +49,7 @@ namespace LM01_UI // POPRAVEK: Pravilen imenski prostor
             try
             {
                 _logWriter?.WriteLine(formattedMessage);
+                EnforceLogLineLimit();
             }
             catch (Exception)
             {
@@ -108,6 +115,39 @@ namespace LM01_UI // POPRAVEK: Pravilen imenski prostor
                 Messages.Clear();
                 _pending.Clear();
             });
+        }
+        private void EnforceLogLineLimit()
+        {
+            if (_logFilePath == null)
+                return;
+
+            try
+            {
+                _logWriter?.Flush();
+
+                Queue<string> buffer = new();
+                bool trimmed = false;
+
+                foreach (var line in File.ReadLines(_logFilePath))
+                {
+                    buffer.Enqueue(line);
+                    if (buffer.Count > MaxLogLines)
+                    {
+                        buffer.Dequeue();
+                        trimmed = true;
+                    }
+                }
+
+                if (trimmed)
+                {
+                    File.WriteAllLines(_logFilePath, buffer);
+                    _logWriter?.BaseStream.Seek(0, SeekOrigin.End);
+                }
+            }
+            catch (Exception)
+            {
+                // ignore logging failures
+            }
         }
     }
 }
