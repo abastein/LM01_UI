@@ -3,6 +3,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LM01_UI.Services;
+using System.IO;
 using System;
 using System.Threading.Tasks;
 
@@ -69,13 +70,41 @@ namespace LM01_UI.ViewModels
             {
                 if (!_plcClient.IsConnected)
                 {
-                    // You mentioned you changed this line, which is correct.
-                    await _plcClient.ConnectAsync("10.100.1.113", 2000);
+                    var ipAddress = GetPlcIpAddress();
+                    await _plcClient.ConnectAsync(ipAddress, 2000);
                 }
             }
             catch (Exception ex)
             {
                 _logger.Inform(2, $"Napaka pri povezovanju s PLC: {ex.Message}");
+            }
+        }
+
+        private string GetPlcIpAddress()
+        {
+            try
+            {
+                var executableDirectory = AppContext.BaseDirectory;
+                var configPath = Path.Combine(executableDirectory, "PLCIP.txt");
+
+                if (!File.Exists(configPath))
+                {
+                    throw new FileNotFoundException("Datoteka s PLC IP naslovom ni bila najdena.", configPath);
+                }
+
+                var ipAddress = File.ReadAllText(configPath).Trim();
+
+                if (string.IsNullOrWhiteSpace(ipAddress))
+                {
+                    throw new InvalidDataException("Datoteka s PLC IP naslovom je prazna.");
+                }
+
+                return ipAddress;
+            }
+            catch (Exception ex)
+            {
+                _logger.Inform(2, $"Napaka pri branju IP naslova PLC: {ex.Message}");
+                throw;
             }
         }
 
