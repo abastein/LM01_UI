@@ -103,18 +103,14 @@ namespace LM01_UI.ViewModels
             var deadline = DateTime.UtcNow + timeout;
             while (DateTime.UtcNow < deadline)
             {
-                try
+                var response = await _tcpClient.SendReceiveAsync(command, TimeSpan.FromSeconds(0.25));
+                if (response is not null)
                 {
-                    var response = await _tcpClient.SendReceiveAsync(command, TimeSpan.FromSeconds(0.25));
                     var digits = new string(response.Where(char.IsDigit).ToArray());
                     if (digits.Length > 0 && digits[0].ToString() == expectedState)
                     {
                         return true;
                     }
-                }
-                catch (TimeoutException)
-                {
-                    // retry until timeout
                 }
                 await Task.Delay(100);
             }

@@ -109,7 +109,8 @@ namespace LM01_UI
 
                 if (completedTask == timeoutTask)
                 {
-                    throw new TimeoutException("PLC response timed out.");
+                    //throw new TimeoutException("PLC response timed out.");
+                    return null;
                 }
 
                 return await readTask.ConfigureAwait(false);

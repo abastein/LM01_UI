@@ -55,9 +55,16 @@ namespace LM01_UI.Services
                     try
                     {
                         var command = _plcService.GetStatusCommand();
-                        string response = await _tcpClient.SendReceiveAsync(
+                        var response = await _tcpClient.SendReceiveAsync(
                             command,
                             TimeSpan.FromSeconds(0.25));
+
+                        if (response is null)
+                        {
+                            _logger.Inform(0, "STATUS timeout");
+                            continue;
+                        }
+
                         _logger.Inform(0, $"STATUS → sent: {command}");
                         _logger.Inform(0, $"STATUS ← response: {response}");
 
@@ -71,11 +78,11 @@ namespace LM01_UI.Services
                             });
                         }
                     }
-                    catch (TimeoutException)
-                    {
-                        _logger.Inform(0, "STATUS timeout");
-                        // ignore timeouts, they will be retried on next loop
-                    }
+                    //catch (TimeoutException)
+                    //{
+                    //    _logger.Inform(0, "STATUS timeout");
+                    //    // ignore timeouts, they will be retried on next loop
+                    //}
                     catch (Exception ex)
                     {
                         _logger.Inform(0, $"STATUS exception: {ex.Message}");
