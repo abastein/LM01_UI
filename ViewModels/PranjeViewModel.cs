@@ -235,6 +235,11 @@ namespace LM01_UI.ViewModels
             }
         }
 
+        public void ResetToStartupState()
+        {
+            ResetUiState();
+        }
+
         private async Task<int?> GetRecipeIdAsync(RecipeSystemKey recipeKey)
         {
             await _systemRecipeLookupLock.WaitAsync();

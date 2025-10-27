@@ -138,5 +138,16 @@ namespace LM01_UI.ViewModels
         {
             OnPropertyChanged(nameof(ControlsEnabled));
         }
+
+        public void ResetToStartupState()
+        {
+            Rpm = 0;
+            JogDistance = 360;
+            Direction = DirectionType.CW;
+            IsLoaded = false;
+            IsRunning = false;
+            StartStopText = "Start";
+            StartStopBrush = Brushes.MediumSeaGreen;
+        }
     }
 }

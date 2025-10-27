@@ -402,6 +402,42 @@ namespace LM01_UI.ViewModels
             }
 
         }
+        public async Task ResetToStartupStateAsync()
+        {
+            _statusService.Stop();
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                _acceptPlcUpdates = false;
+                _initialStatusProcessed = false;
+                LastStatusResponse = string.Empty;
+                SelectedRecipe = null;
+                SelectedRecipeSteps.Clear();
+                foreach (var recipe in Recipes)
+                {
+                    recipe.IsActive = false;
+                }
+
+                LoadedRecipeId = null;
+                IsRecipeLoaded = false;
+                IsRunning = false;
+                StartStopButtonText = "Start";
+                StartStopButtonBrush = Brushes.MediumSeaGreen;
+                CurrentStepNumber = 0;
+                PlcErrorCode = 0;
+                PlcStatusText = "Povezava ni vzpostavljena";
+                IsPlcConnected = _tcpClient.IsConnected;
+                UpdateUiState();
+            });
+
+            await ReloadRecipesAsync();
+
+            if (_tcpClient.IsConnected)
+            {
+                _statusService.Start();
+            }
+        }
 
     }
+
 }

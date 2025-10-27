@@ -79,6 +79,26 @@ namespace LM01_UI.ViewModels
             }
         }
 
+        public void ResetToStartupState()
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (_plcClient.IsConnected)
+                {
+                    IsPlcConnected = true;
+                    PlcStatusText = "PLC Povezan";
+                    PlcStatusBrush = Brushes.MediumSeaGreen;
+                }
+                else
+                {
+                    IsPlcConnected = false;
+                    PlcStatusText = "PLC ni povezan";
+                    PlcStatusBrush = Brushes.IndianRed;
+                }
+            });
+        }
+
+
         public void Dispose()
         {
             _plcClient.ConnectionStatusChanged -= OnPlcConnectionStatusChanged;

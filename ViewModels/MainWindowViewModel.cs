@@ -43,6 +43,7 @@ namespace LM01_UI.ViewModels
         public object? CurrentPageViewModel { get => _currentPageViewModel; set => SetProperty(ref _currentPageViewModel, value); }
 
         public IRelayCommand ExitApplicationCommand { get; }
+        public IAsyncRelayCommand NavigateHomeCommand { get; }
         public IRelayCommand NavigateProgramiCommand { get; }
         public IRelayCommand NavigateAdminCommand { get; }
         public IRelayCommand NavigateManualCommand { get; }
@@ -75,6 +76,7 @@ namespace LM01_UI.ViewModels
             CurrentPageViewModel = _welcomeViewModel;
 
             ExitApplicationCommand = new RelayCommand(ExitApplication);
+            NavigateHomeCommand = new AsyncRelayCommand(ResetAndNavigateHomeAsync);
             NavigateProgramiCommand = new RelayCommand(() => Navigate("Run"));
             NavigateAdminCommand = new RelayCommand(() => Navigate("Admin"));
             NavigateManualCommand = new RelayCommand(() => Navigate("Manual"));
@@ -125,6 +127,60 @@ namespace LM01_UI.ViewModels
                     break;
             }
         }
+
+        private async Task ResetAndNavigateHomeAsync()
+        {
+            _logger.Inform(1, "Ponastavitev aplikacije in prehod na začetni zaslon.");
+
+            _plcStatusService.Stop();
+
+            if (_plcClient.IsConnected)
+            {
+                try
+                {
+                    await _plcClient.SendAsync(_plcService.GetStopCommand());
+                }
+                catch (Exception ex)
+                {
+                    _logger.Inform(2, $"Napaka pri pošiljanju STOP ukaza: {ex.Message}");
+                }
+
+                try
+                {
+                    await _plcClient.SendAsync(_plcService.GetUnloadCommand());
+                }
+                catch (Exception ex)
+                {
+                    _logger.Inform(2, $"Napaka pri pošiljanju UNLOAD ukaza: {ex.Message}");
+                }
+            }
+
+            await _mainPageViewModel.ResetToStartupStateAsync();
+            _manualModeViewModel.ResetToStartupState();
+            _pranjeViewModel.ResetToStartupState();
+            _welcomeViewModel.ResetToStartupState();
+
+            _startupStatusHandled = false;
+
+            Navigate("Welcome");
+
+            if (_plcClient.IsConnected)
+            {
+                _plcStatusService.Start();
+            }
+            else
+            {
+                try
+                {
+                    await _welcomeViewModel.ConnectToPlcCommand.ExecuteAsync(null);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Inform(2, $"Napaka pri ponovnem povezovanju s PLC: {ex.Message}");
+                }
+            }
+        }
+
 
         private void OnPlcConnectionStatusChanged(bool isConnected)
         {

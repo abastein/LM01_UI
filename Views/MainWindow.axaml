@@ -224,20 +224,32 @@
 
 				</StackPanel>
 
-				<Button Content="Izhod"
-								Command="{Binding ExitApplicationCommand}"
-								Width="255"
-								Height="100"
-								FontSize="25"
-								FontWeight="Bold"
-								Background="Salmon"
-								Foreground="Black"
-								BorderBrush="DarkGray"
-								BorderThickness="3"
-								CornerRadius="10,50,10,10"
-								Margin="20,10,10,30"
-								Grid.Row="1"
-								VerticalAlignment="Bottom"/>
+                                <Button Command="{Binding NavigateHomeCommand}"
+                                        Width="255"
+                                        Height="100"
+                                        FontSize="25"
+                                        FontWeight="Bold"
+                                        Background="Orange"
+                                        Foreground="White"
+                                        BorderBrush="DarkGray"
+                                        BorderThickness="3"
+                                        CornerRadius="10,50,10,10"
+                                        Margin="20,10,10,30"
+                                        Grid.Row="1"
+                                        VerticalAlignment="Bottom"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        Padding="10">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+                                        <Path Width="32"
+                                              Height="32"
+                                              Stretch="Uniform"
+                                              Fill="White"
+                                              Data="M 16 6 L 4 18 L 8 18 L 8 30 L 14 30 L 14 22 L 18 22 L 18 30 L 24 30 L 24 18 L 28 18 Z"/>
+                                        <TextBlock Text="Home"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
 
 			</Grid>				
 		</Grid>
