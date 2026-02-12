@@ -147,16 +147,16 @@ namespace LM01_UI.ViewModels
         }
 
         //// Varnost: če teče, ne dovoli spremembe smeri (tudi če kdo poskuša programatsko)
-        //partial void OnDirectionChanging(DirectionType value)
-        //{
-        //    if (IsRunning)
-        //    {
-        //        // Prekini spremembo: vrni staro vrednost.
-        //        // CommunityToolkit ne omogoča "cancel" direktno, zato preprosto nastavimo nazaj.
-        //        // (To sproži še en PropertyChanged, kar je OK.)
-        //        Direction = _direction;
-        //    }
-        //}
+        partial void OnDirectionChanging(DirectionType value)
+        {
+            if (IsRunning)
+            {
+                // Prekini spremembo: vrni staro vrednost.
+                // CommunityToolkit ne omogoča "cancel" direktno, zato preprosto nastavimo nazaj.
+                // (To sproži še en PropertyChanged, kar je OK.)
+                Direction = _direction;
+            }
+        }
 
         public void ResetToStartupState()
         {
