@@ -33,8 +33,7 @@
             <StackPanel Orientation="Horizontal"
                         Grid.Row="0"
                         Spacing="20"
-                        HorizontalAlignment="Center"
-                        IsEnabled="{Binding ControlsEnabled}">
+                        HorizontalAlignment="Center">
                 <TextBlock
                     Text="Smer vrtenja"
                     FontSize="24"

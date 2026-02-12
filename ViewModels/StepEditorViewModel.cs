@@ -125,7 +125,8 @@ namespace LM01_UI.ViewModels
 
 
         public bool IsSpeedRpmEnabled => SelectedFunction?.Function == FunctionType.Rotate;
-        public bool IsDirectionEnabled => SelectedFunction?.Function == FunctionType.Rotate;
+        //public bool IsDirectionEnabled => SelectedFunction?.Function == FunctionType.Rotate;
+        public bool IsDirectionEnabled => true;
         public bool IsTargetXDegEnabled => SelectedFunction?.Function == FunctionType.Rotate;
         public bool IsRepeatsEnabled => SelectedFunction?.Function == FunctionType.Repeat;
         public bool IsPauseMsEnabled => SelectedFunction?.Function == FunctionType.Wait;
