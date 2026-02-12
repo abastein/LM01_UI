@@ -6,6 +6,10 @@ using LM01_UI.Services;
 using System.IO;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
 
 namespace LM01_UI.ViewModels
 {
@@ -80,26 +84,43 @@ namespace LM01_UI.ViewModels
             }
         }
 
+
+
         private string GetPlcIpAddress()
         {
             try
             {
-                var executableDirectory = AppContext.BaseDirectory;
-                var configPath = Path.Combine(executableDirectory, "PLCIP.txt");
+                var searchedLocations = new List<string>();
+                var candidateDirectories = GetCandidateConfigDirectories();
 
-                if (!File.Exists(configPath))
+                foreach (var directory in candidateDirectories)
                 {
-                    throw new FileNotFoundException("Datoteka s PLC IP naslovom ni bila najdena.", configPath);
+                    var configPath = Path.Combine(directory, "PLCIP.txt");
+                    searchedLocations.Add(configPath);
+
+                    if (!File.Exists(configPath))
+                    {
+                        continue;
+                    }
+
+                    var ipAddress = File.ReadAllText(configPath).Trim();
+
+                    if (string.IsNullOrWhiteSpace(ipAddress))
+                    {
+                        throw new InvalidDataException("Datoteka s PLC IP naslovom je prazna.");
+                    }
+
+                    if (!IPAddress.TryParse(ipAddress, out _))
+                    {
+                        throw new InvalidDataException("Vrednost IP naslova PLC ni veljavna IPv4 ali IPv6 vrednost.");
+                    }
+
+                    _logger.Inform(1, $"Prebran PLC IP naslov iz: {configPath}");
+                    return ipAddress;
                 }
 
-                var ipAddress = File.ReadAllText(configPath).Trim();
-
-                if (string.IsNullOrWhiteSpace(ipAddress))
-                {
-                    throw new InvalidDataException("Datoteka s PLC IP naslovom je prazna.");
-                }
-
-                return ipAddress;
+                var errorMessage = "Datoteka s PLC IP naslovom ni bila najdena v naslednjih lokacijah:" + Environment.NewLine + string.Join(Environment.NewLine, searchedLocations);
+                throw new FileNotFoundException(errorMessage);
             }
             catch (Exception ex)
             {
@@ -107,6 +128,47 @@ namespace LM01_UI.ViewModels
                 throw;
             }
         }
+
+        private static IEnumerable<string> GetCandidateConfigDirectories()
+        {
+            static IEnumerable<string> EnumerateSelfAndParents(string? path)
+            {
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    yield break;
+                }
+
+                var current = Path.GetFullPath(path);
+
+                while (!string.IsNullOrWhiteSpace(current))
+                {
+                    yield return current;
+
+                    var parent = Path.GetDirectoryName(current);
+
+                    if (string.IsNullOrWhiteSpace(parent) || parent == current)
+                    {
+                        break;
+                    }
+
+                    current = parent;
+                }
+            }
+
+            var candidateRoots = new[]
+            {
+                AppContext.BaseDirectory,
+                AppDomain.CurrentDomain.BaseDirectory,
+                Directory.GetCurrentDirectory(),
+                Path.GetDirectoryName(Environment.ProcessPath ?? string.Empty)
+            };
+
+            return candidateRoots
+                .Where(directory => !string.IsNullOrWhiteSpace(directory))
+                .SelectMany(EnumerateSelfAndParents)
+                .Distinct(StringComparer.OrdinalIgnoreCase);
+        }
+
 
         public void ResetToStartupState()
         {

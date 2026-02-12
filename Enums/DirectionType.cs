@@ -9,7 +9,7 @@ namespace LM01_UI.Enums
     public enum DirectionType
     {
         // Numerične kode, ki jih pričakuje PLC
-        CW = 0,  // Clockwise
-        CCW = 1  // Counter-Clockwise
+        CW = 1,  // Clockwise
+        CCW = 0  // Counter-Clockwise
     }
 }

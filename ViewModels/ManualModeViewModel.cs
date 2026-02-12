@@ -1,7 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿// ManualModeViewModel.cs
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LM01_UI.Enums;
-//using LM01_UI.Models;
 using LM01_UI.Services;
 using System;
 using System.Linq;
@@ -36,6 +36,8 @@ namespace LM01_UI.ViewModels
 
         [ObservableProperty]
         private IBrush _startStopBrush = Brushes.MediumSeaGreen;
+
+        // Kontrole (RPM + smer) so enabled samo ko ne teče
         public bool ControlsEnabled => !IsRunning;
 
         public IRelayCommand IncreaseRpmCommand { get; }
@@ -64,13 +66,15 @@ namespace LM01_UI.ViewModels
             {
                 if (!IsLoaded || !IsRunning)
                 {
-                    await _tcpClient.SendAsync(_plcService.GetManualLoadCommand(Rpm, Direction, JogDistance)); 
+                    await _tcpClient.SendAsync(_plcService.GetManualLoadCommand(Rpm, Direction, JogDistance));
                     var loaded = await WaitForStateAsync("1", TimeSpan.FromSeconds(5));
                     if (!loaded)
                     {
                         _logger.Inform(2, "PLC did not confirm load state in time");
                     }
+
                     await _tcpClient.SendAsync(_plcService.GetStartCommand());
+
                     IsLoaded = true;
                     IsRunning = true;
                     StartStopText = "Stop";
@@ -84,23 +88,26 @@ namespace LM01_UI.ViewModels
                     {
                         _logger.Inform(2, "PLC did not confirm stop state in time");
                     }
+
                     await _tcpClient.SendAsync(_plcService.GetUnloadCommand());
+
                     IsLoaded = false;
                     IsRunning = false;
                     StartStopText = "Start";
                     StartStopBrush = Brushes.MediumSeaGreen;
                 }
-
             }
             catch (Exception ex)
             {
                 _logger.Inform(2, $"Error toggling run: {ex.Message}");
             }
         }
+
         private async Task<bool> WaitForStateAsync(string expectedState, TimeSpan timeout)
         {
             var command = _plcService.GetStatusCommand();
             var deadline = DateTime.UtcNow + timeout;
+
             while (DateTime.UtcNow < deadline)
             {
                 var response = await _tcpClient.SendReceiveAsync(command, TimeSpan.FromSeconds(0.25));
@@ -114,8 +121,11 @@ namespace LM01_UI.ViewModels
                 }
                 await Task.Delay(100);
             }
+
             return false;
         }
+
+        // Clamp RPM v [0..400]
         partial void OnRpmChanged(int value)
         {
             if (value > 400)
@@ -130,9 +140,22 @@ namespace LM01_UI.ViewModels
             }
         }
 
+        // Ko se začne vrteti ali ustavi, osveži ControlsEnabled
         partial void OnIsRunningChanged(bool value)
         {
             OnPropertyChanged(nameof(ControlsEnabled));
+        }
+
+        // Varnost: če teče, ne dovoli spremembe smeri (tudi če kdo poskuša programatsko)
+        partial void OnDirectionChanging(DirectionType value)
+        {
+            if (IsRunning)
+            {
+                // Prekini spremembo: vrni staro vrednost.
+                // CommunityToolkit ne omogoča "cancel" direktno, zato preprosto nastavimo nazaj.
+                // (To sproži še en PropertyChanged, kar je OK.)
+                Direction = _direction;
+            }
         }
 
         public void ResetToStartupState()
