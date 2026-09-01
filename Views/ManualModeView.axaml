@@ -44,6 +44,7 @@
                     OnContent="CW"
                     OffContent="CCW"
                     IsChecked="{Binding Direction, Converter={StaticResource DirectionToBoolConverter}}"
+                    IsEnabled="{Binding ControlsEnabled}"
                     FontSize="36"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"/>
